@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#00A36C">
+<title>Ce conține? — scanner de aditivi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{
+  --paper:#F3FAF6; --surface:#FFFFFF; --ink:#0F241A; --muted:#4D6257; --line:#D3E5DA;
+  --brand:#00A36C; --on-brand:#FFFFFF;
+  --violet:#6A3DF0; --violet-bg:#EEE8FF;
+  --c0:#E0234E; --c1:#FF6B00; --c2:#FFC400; --c3:#12B76A;
+  --hi-bg:#FFE3E8; --mid-bg:#FFF0D2; --lo-bg:#DBF6E8;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#0B1611; --surface:#132119; --ink:#EAF3EE; --muted:#9BB0A4; --line:#25392E;
+    --brand:#14C47F; --on-brand:#04130C;
+    --violet:#9B7BFF; --violet-bg:#231B42;
+    --hi-bg:#41162A; --mid-bg:#3D2A0A; --lo-bg:#0E3424;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.appbar{background:var(--brand);color:var(--on-brand);padding:calc(env(safe-area-inset-top,0px) + 16px) 18px 22px}
+.appbar-in{max-width:560px;margin:0 auto}
+.brand{font-family:var(--display);font-weight:800;font-size:31px;letter-spacing:-.02em;margin:0;line-height:1.1}
+.brand small{display:block;font-family:var(--body);font-weight:400;font-size:15px;opacity:.92;margin-top:4px;letter-spacing:0}
+.wrap{max-width:560px;margin:0 auto;padding:18px 18px 120px}
+h2{font-family:var(--display);font-weight:600;font-size:22px;margin:26px 0 10px;letter-spacing:-.01em}
+.muted{color:var(--muted)}
+.view{display:none}.view.on{display:block}
+
+.pill{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:999px;padding:8px 15px;background:var(--violet-bg);color:var(--violet);font-weight:700;font-size:15px;cursor:pointer;margin-bottom:14px;max-width:100%;text-align:left}
+.pill::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--violet);flex:none}
+.pill.off{background:var(--surface);color:var(--muted);border:2px dashed var(--line)}
+.pill.off::before{background:var(--line)}
+
+.scanbox{position:relative;background:#0A1A12;border-radius:24px;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;border:3px solid var(--brand)}
+#reader{width:100%;height:100%}
+#reader video{object-fit:cover}
+.scan-idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#D9F7E8;text-align:center;padding:20px}
+.barcode-art{display:flex;gap:3px;height:56px;align-items:stretch}
+.barcode-art i{display:block;background:#5CF0A8;border-radius:1px}
+.btn{appearance:none;border:0;border-radius:14px;padding:13px 20px;font-weight:700;cursor:pointer;background:var(--brand);color:var(--on-brand);min-height:48px}
+.btn.violet{background:var(--violet);color:#fff}
+.btn.ghost{background:transparent;color:var(--brand);border:2px solid var(--brand)}
+.btn.small{padding:8px 14px;min-height:40px;font-size:15px}
+.row{display:flex;gap:10px;margin-top:12px}
+.row input{flex:1;min-width:0;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px}
+textarea{width:100%;min-height:120px;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;resize:vertical}
+.linkish{background:none;border:0;padding:6px 0;color:var(--brand);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.notice{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:14px}
+
+.product{display:flex;gap:14px;align-items:center;margin-top:22px}
+.product img{width:76px;height:76px;object-fit:contain;background:#fff;border-radius:14px;border:1px solid var(--line);flex:none}
+.product h3{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.2;margin:0}
+.product p{margin:2px 0 0;color:var(--muted);font-size:15px}
+
+.score{margin-top:18px;padding:22px 20px 20px;border-radius:24px;background:var(--vc);color:var(--vt)}
+.score-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.score-num{font-family:var(--display);font-weight:800;font-size:84px;line-height:.85;letter-spacing:-.04em}
+.score-num span{font-size:22px;letter-spacing:0;opacity:.75;font-weight:600}
+.verdict{font-family:var(--display);font-weight:800;font-size:23px;text-align:right;line-height:1.15}
+.sub{font-size:15px;opacity:.92;margin:10px 0 0}
+.meter{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:18px 0 6px;height:12px}
+.meter b{border-radius:6px;background:var(--seg)}
+.meter b.on{background:var(--segon)}
+.pin{position:absolute;top:-6px;width:5px;height:24px;background:var(--vt);border-radius:3px;transform:translateX(-50%);box-shadow:0 0 0 2px var(--vc)}
+.meter-labels{display:grid;grid-template-columns:repeat(4,1fr);font-size:13px;opacity:.85}
+.meter-labels span:last-child{text-align:right}
+.parts{margin-top:16px;display:grid;gap:10px}
+.part{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:15px}
+.part .bar{grid-column:1/-1;height:6px;background:var(--seg);border-radius:3px;overflow:hidden}
+.part .bar i{display:block;height:100%;background:var(--vt)}
+.partial{font-size:14px;opacity:.85;margin:12px 0 0}
+
+.alerts{margin-top:16px;display:grid;gap:8px}
+.alerts h2{margin:6px 0 2px;color:var(--violet)}
+.alert{border-radius:16px;padding:12px 14px 12px 46px;position:relative;font-size:16px}
+.alert::before{position:absolute;left:13px;top:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;font-family:var(--display)}
+.alert.crit{background:var(--c0);color:#fff;font-weight:700}
+.alert.crit::before{content:"!";background:#fff;color:var(--c0)}
+.alert.warn{background:var(--mid-bg)}
+.alert.warn::before{content:"!";background:var(--c1);color:#fff}
+.alert.info{background:var(--violet-bg)}
+.alert.info::before{content:"i";background:var(--violet);color:#fff}
+.alert.ok{background:var(--lo-bg)}
+.alert.ok::before{content:"✓";background:var(--c3);color:#fff}
+
+.lights{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.light{border-radius:16px;padding:10px 12px;font-size:15px;border-left:6px solid transparent}
+.light strong{display:block;font-size:20px}
+.light.hi{background:var(--hi-bg);border-color:var(--c0)}.light.mid{background:var(--mid-bg);border-color:var(--c1)}.light.lo{background:var(--lo-bg);border-color:var(--c3)}
+
+.add{border-left:6px solid var(--line);background:var(--surface);border-radius:4px 16px 16px 4px;padding:12px 14px;margin-top:8px}
+.add.hi{border-color:var(--c0)}.add.mid{border-color:var(--c1)}.add.lo{border-color:var(--c3)}
+.add summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.add summary::-webkit-details-marker{display:none}
+.add .code{font-weight:700}
+.add .lvl{font-size:13px;white-space:nowrap;color:var(--muted)}
+.add p{margin:8px 0 0;font-size:15px}
+.ban,.me{display:inline-block;color:#fff;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:700;margin-left:6px;vertical-align:2px}
+.ban{background:var(--c0)}.me{background:var(--violet)}
+.empty-ok{background:var(--lo-bg);border-radius:16px;padding:14px 16px;margin-top:8px}
+
+details.ingr{margin-top:14px}
+details.ingr summary{cursor:pointer;font-weight:700;color:var(--brand)}
+details.ingr p{font-size:15px;color:var(--muted)}
+.foot{font-size:13px;color:var(--muted);margin-top:22px;line-height:1.45}
+.foot a{color:var(--brand)}
+
+.hist{display:grid;gap:8px}
+.hitem{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px;cursor:pointer;text-align:left;width:100%}
+.hitem img,.hitem .ph{width:44px;height:44px;border-radius:10px;object-fit:contain;flex:none;background:#fff}
+.hitem .t{flex:1;min-width:0}
+.hitem .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hitem .t span{font-size:14px;color:var(--muted)}
+.badge{font-family:var(--display);font-weight:800;font-size:18px;min-width:52px;text-align:center;border-radius:12px;padding:6px 8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.chip{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:15px}
+.chip[aria-pressed="true"]{border-color:var(--brand);background:var(--brand);color:var(--on-brand)}
+.chips.al .chip[aria-pressed="true"]{border-color:var(--violet);background:var(--violet);color:#fff}
+.search{width:100%;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px}
+.count{font-size:14px;color:var(--muted);margin:8px 0}
+
+.group{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px 16px;margin-top:10px}
+.tog{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.tog:last-child{border-bottom:0}
+.tog span{flex:1}
+.tog small{display:block;color:var(--muted);font-size:14px;line-height:1.35;margin-top:2px}
+.tog input{appearance:none;-webkit-appearance:none;margin:0;width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .15s}
+.tog input::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tog input:checked{background:var(--violet)}
+.tog input:checked::after{transform:translateX(20px)}
+.private{font-size:14px;color:var(--muted);margin-top:14px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+nav.tabs button{flex:1;max-width:140px;background:none;border:0;padding:10px 4px 12px;cursor:pointer;color:var(--muted);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:inset 0 3px 0 transparent}
+nav.tabs button[aria-current="page"]{color:var(--brand);font-weight:700;box-shadow:inset 0 3px 0 var(--brand)}
+nav.tabs button[data-v="v-prof"][aria-current="page"]{color:var(--violet);box-shadow:inset 0 3px 0 var(--violet)}
+nav.tabs svg{width:24px;height:24px}
+.spinner{width:30px;height:30px;border:4px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:30px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinner{animation-duration:3s}.tog input,.tog input::after{transition:none}}
+</style>
+</head>
+<body>
+<header class="appbar"><div class="appbar-in">
+  <h1 class="brand">Ce conține?<small>Scanează codul de bare. Vezi aditivii și scorul.</small></h1>
+</div></header>
+<div class="wrap">
+
+  <!-- SCAN -->
+  <section id="v-scan" class="view on" aria-label="Scanare">
+    <button class="pill off" id="profPill"></button>
+    <div class="scanbox">
+      <div id="reader"></div>
+      <div class="scan-idle" id="idle">
+        <div class="barcode-art" aria-hidden="true"></div>
+        <button class="btn" id="startBtn">Pornește camera</button>
+      </div>
+    </div>
+    <div class="row" id="stopRow" hidden>
+      <button class="btn ghost small" id="stopBtn">Oprește camera</button>
+      <span class="muted" style="align-self:center;font-size:15px">Ține codul în cadrul de jos-mijloc.</span>
+    </div>
+    <form class="row" id="manualForm" autocomplete="off">
+      <input id="manualCode" inputmode="numeric" pattern="[0-9]*" placeholder="Sau scrie codul (ex. 5941234567890)" aria-label="Cod de bare">
+      <button class="btn" type="submit">Caută</button>
+    </form>
+    <button class="linkish" id="pasteToggle">Produsul nu are cod sau nu e găsit? Lipește ingredientele</button>
+    <div id="pasteBox" hidden>
+      <textarea id="pasteText" placeholder="Ex.: făină de grâu, zahăr, ulei de palmier, emulgator: lecitină de soia (E322), conservant: sorbat de potasiu, colorant E150d..."></textarea>
+      <div class="row"><button class="btn" id="pasteBtn">Analizează ingredientele</button></div>
+    </div>
+    <div id="result" aria-live="polite"></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="v-hist" class="view" aria-label="Istoric">
+    <h2>Produse scanate</h2>
+    <div id="histList" class="hist"></div>
+  </section>
+
+  <!-- ADDITIVES -->
+  <section id="v-add" class="view" aria-label="Lista de aditivi">
+    <h2>Lista de aditivi</h2>
+    <p class="muted" style="margin-top:0;font-size:15px">Clasificare orientativă bazată pe evaluări EFSA, IARC și studii publicate. Toți aditivii de mai jos (în afara celor marcați „interzis în UE”) sunt autorizați legal; nivelul indică gradul de îngrijorare științifică, nu ilegalitate.</p>
+    <input class="search" id="addSearch" placeholder="Caută: E250, aspartam, nitrit..." aria-label="Caută aditiv">
+    <div class="chips" role="group" aria-label="Filtru nivel">
+      <button class="chip" data-f="all" aria-pressed="true">Toți</button>
+      <button class="chip" data-f="3" aria-pressed="false">Risc ridicat</button>
+      <button class="chip" data-f="2" aria-pressed="false">Risc moderat</button>
+      <button class="chip" data-f="1" aria-pressed="false">Fără îngrijorare majoră</button>
+    </div>
+    <div class="count" id="addCount"></div>
+    <div id="addList"></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="v-prof" class="view" aria-label="Profilul meu">
+    <h2>Profilul meu</h2>
+    <p class="muted" style="margin-top:0;font-size:15px">Scorul și avertismentele se adaptează la ce bifezi aici.</p>
+    <div class="group" id="condList"></div>
+    <h2>Alergii și intoleranțe</h2>
+    <p class="muted" style="margin-top:0;font-size:15px">Cei 14 alergeni pe care UE obligă producătorii să-i declare.</p>
+    <div class="chips al" id="allergenList"></div>
+    <p class="private">Profilul rămâne doar pe acest dispozitiv. Nu se trimite nicăieri. La alergii severe, citește mereu și eticheta: datele din baza publică pot fi incomplete sau vechi.</p>
+    <div class="row"><button class="btn violet" id="profDone">Gata, scanează</button><button class="btn ghost small" id="profReset">Resetează</button></div>
+  </section>
+</div>
+
+<nav class="tabs" aria-label="Navigare">
+  <button data-v="v-scan" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8 8v8M11 8v8M14 8v8M17 8v8"/></svg>Scanează</button>
+  <button data-v="v-hist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Istoric</button>
+  <button data-v="v-prof"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Profil</button>
+  <button data-v="v-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Aditivi</button>
+</nav>
+
+<script>
+/* ============================================================
+   BAZA DE ADITIVI
+   l: 3 = risc ridicat, 2 = risc moderat, 1 = fără îngrijorare majoră
+   b: 1 = interzis în UE
+   k: cuvinte-cheie (fără diacritice, litere mici) pentru căutare în text
+   ============================================================ */
+const SOUTH = "Unul dintre cei 6 coloranți din studiul Southampton (2007): în UE, produsul trebuie să poarte avertismentul „poate avea efecte negative asupra activității și atenției copiilor”.";
+const SULF = "Sulfiți: pot declanșa crize la persoanele astmatice; alergen care trebuie declarat obligatoriu.";
+const PHOS = "Fosfați adăugați: aportul ridicat este asociat cu probleme renale și cardiovasculare; pot reduce absorbția calciului. EFSA (2019) a stabilit o doză zilnică admisibilă de grup.";
+const EMUL = "Emulgator: studii pe animale au arătat perturbarea microbiomului intestinal; studii observaționale NutriNet-Santé (2023–2024) asociază emulgatorii cu risc cardiovascular și oncologic crescut.";
+const ALU = "Conține aluminiu; expunerea cronică ridicată la aluminiu este asociată cu efecte neurotoxice. EFSA a constatat că o parte din populație poate depăși doza tolerabilă.";
+const NITRIT = "Nitriții pot forma nitrozamine, compuși cancerigeni. IARC clasifică carnea procesată în grupa 1 (cancerigen) și nitriții ingerați în condiții care duc la nitrozare în grupa 2A (probabil cancerigen). EFSA (2023) a confirmat îngrijorarea privind nitrozaminele.";
+const GLUT = "Potențiator de gust din grupa glutamaților. EFSA (2017) a stabilit o doză zilnică admisibilă de 30 mg/kg corp, care poate fi depășită de marii consumatori; simptome raportate la persoane sensibile.";
+const SWEET = "Îndulcitor artificial; studii observaționale (ex. NutriNet-Santé, 2022) asociază consumul ridicat de îndulcitori artificiali cu risc cardiovascular; efectele asupra microbiomului sunt în studiu.";
+const AMIDON = "Amidon modificat: fără îngrijorare toxicologică; indică un produs procesat.";
+
+const DB = [
+ // Coloranți
+ {c:"E100",n:"Curcumină",l:1,t:"Colorant",d:"Colorant natural din turmeric.",k:["curcumin"]},
+ {c:"E101",n:"Riboflavină",l:1,t:"Colorant",d:"Vitamina B2.",k:["riboflavin"]},
+ {c:"E102",n:"Tartrazină",l:3,t:"Colorant",d:SOUTH+" Poate declanșa reacții la persoanele sensibile la aspirină.",k:["tartrazin","tartrazine"]},
+ {c:"E104",n:"Galben de chinolină",l:3,t:"Colorant",d:SOUTH,k:["galben de chinolina","quinoline yellow"]},
+ {c:"E110",n:"Galben amurg FCF",l:3,t:"Colorant",d:SOUTH,k:["galben amurg","sunset yellow"]},
+ {c:"E120",n:"Carmin (coșenilă)",l:1,t:"Colorant",d:"Obținut din insecte; reacții alergice rare. Nu este vegan.",k:["carmin","cosenila","cochineal"]},
+ {c:"E122",n:"Azorubină / carmoizină",l:3,t:"Colorant",d:SOUTH,k:["azorubin","carmoizin"]},
+ {c:"E123",n:"Amarant",l:3,t:"Colorant",d:"Colorant azoic interzis în SUA; în UE permis doar în câteva produse (vinuri aperitiv, icre).",k:["amarant"]},
+ {c:"E124",n:"Ponceau 4R",l:3,t:"Colorant",d:SOUTH,k:["ponceau"]},
+ {c:"E127",n:"Eritrozină",l:3,t:"Colorant",d:"Conține iod; efecte asupra tiroidei la doze mari în studii pe animale. FDA a retras autorizarea în alimente în 2025. În UE permisă doar în cireșe cocktail și confiate.",k:["eritrozin","erythrosine"]},
+ {c:"E128",n:"Roșu 2G",l:3,b:1,t:"Colorant",d:"Interzis în UE din 2007 din cauza riscului cancerigen.",k:["rosu 2g"]},
+ {c:"E129",n:"Roșu Allura AC",l:3,t:"Colorant",d:SOUTH,k:["rosu allura","allura red"]},
+ {c:"E131",n:"Albastru patent V",l:2,t:"Colorant",d:"Colorant sintetic; reacții alergice raportate.",k:["albastru patent"]},
+ {c:"E132",n:"Indigotină",l:2,t:"Colorant",d:"Colorant sintetic; reacții de sensibilitate ocazionale.",k:["indigotin"]},
+ {c:"E133",n:"Albastru briliant FCF",l:2,t:"Colorant",d:"Colorant sintetic; reacții de sensibilitate rare.",k:["albastru briliant","brilliant blue"]},
+ {c:"E140",n:"Clorofile",l:1,t:"Colorant",d:"Pigment natural verde.",k:["clorofil"]},
+ {c:"E141",n:"Complecși cuprici ai clorofilelor",l:1,t:"Colorant",d:"Derivat al clorofilei.",k:[]},
+ {c:"E142",n:"Verde S",l:2,t:"Colorant",d:"Colorant sintetic; interzis în SUA și Canada.",k:["verde s"]},
+ {c:"E150A",n:"Caramel simplu",l:1,t:"Colorant",d:"Zahăr caramelizat.",k:["caramel simplu"]},
+ {c:"E150B",n:"Caramel sulfitic caustic",l:2,t:"Colorant",d:"Produs cu compuși sulfitici.",k:["caramel sulfitic caustic"]},
+ {c:"E150C",n:"Caramel amoniacal",l:2,t:"Colorant",d:"La fabricare se poate forma 4-MEI, clasificat posibil cancerigen (IARC 2B).",k:["caramel amoniacal"]},
+ {c:"E150D",n:"Caramel sulfitic amoniacal",l:2,t:"Colorant",d:"La fabricare se poate forma 4-MEI, clasificat posibil cancerigen (IARC 2B). Frecvent în băuturi tip cola.",k:["caramel sulfitic amoniacal","caramel amoniacal sulfitic"]},
+ {c:"E151",n:"Negru briliant BN",l:2,t:"Colorant",d:"Colorant azoic; interzis în SUA.",k:["negru briliant"]},
+ {c:"E153",n:"Cărbune vegetal",l:1,t:"Colorant",d:"Colorant negru de origine vegetală.",k:["carbune vegetal"]},
+ {c:"E155",n:"Brun HT",l:2,t:"Colorant",d:"Colorant azoic; poate afecta persoanele sensibile.",k:["brun ht"]},
+ {c:"E160A",n:"Caroteni",l:1,t:"Colorant",d:"Provitamina A, natural.",k:["caroten","beta-caroten"]},
+ {c:"E160B",n:"Annatto / bixină",l:2,t:"Colorant",d:"Reacții alergice raportate; EFSA a redus doza zilnică admisibilă.",k:["annatto","bixin"]},
+ {c:"E160C",n:"Extract de paprika",l:1,t:"Colorant",d:"Natural.",k:["extract de paprika"]},
+ {c:"E162",n:"Roșu de sfeclă",l:1,t:"Colorant",d:"Natural, din sfeclă roșie.",k:["rosu de sfecla","betanin"]},
+ {c:"E163",n:"Antociani",l:1,t:"Colorant",d:"Pigmenți naturali din fructe și legume.",k:["antocian"]},
+ {c:"E170",n:"Carbonat de calciu",l:1,t:"Colorant / corector",d:"Mineral, sursă de calciu.",k:["carbonat de calciu"]},
+ {c:"E171",n:"Dioxid de titan",l:3,b:1,t:"Colorant",d:"Interzis ca aditiv alimentar în UE din 2022: EFSA (2021) nu a mai putut exclude genotoxicitatea. Prezența lui indică un produs vechi sau din afara UE.",k:["dioxid de titan","titanium dioxide"]},
+ {c:"E172",n:"Oxizi de fier",l:1,t:"Colorant",d:"Pigmenți minerali.",k:["oxizi de fier","oxid de fier"]},
+ {c:"E173",n:"Aluminiu",l:3,t:"Colorant",d:ALU+" În UE permis doar pentru decorarea suprafeței dulciurilor.",k:[]},
+ {c:"E174",n:"Argint",l:2,t:"Colorant",d:"Folosit decorativ; EFSA a semnalat date insuficiente.",k:[]},
+ {c:"E175",n:"Aur",l:1,t:"Colorant",d:"Folosit decorativ.",k:[]},
+ {c:"E180",n:"Litolrubină BK",l:2,t:"Colorant",d:"Colorant azoic, folosit doar pe coaja brânzeturilor.",k:["litolrubin"]},
+
+ // Conservanți
+ {c:"E200",n:"Acid sorbic",l:1,t:"Conservant",d:"Unul dintre conservanții cei mai bine tolerați.",k:["acid sorbic"]},
+ {c:"E202",n:"Sorbat de potasiu",l:1,t:"Conservant",d:"Bine tolerat.",k:["sorbat de potasiu","potassium sorbate"]},
+ {c:"E203",n:"Sorbat de calciu",l:1,t:"Conservant",d:"Bine tolerat.",k:["sorbat de calciu"]},
+ {c:"E210",n:"Acid benzoic",l:2,t:"Conservant",d:"Poate forma benzen (cancerigen) în prezența vitaminei C (E300); reacții la persoanele sensibile.",k:["acid benzoic"]},
+ {c:"E211",n:"Benzoat de sodiu",l:2,t:"Conservant",d:"Inclus în studiul Southampton privind hiperactivitatea copiilor; poate forma benzen împreună cu vitamina C.",k:["benzoat de sodiu","sodium benzoate"]},
+ {c:"E212",n:"Benzoat de potasiu",l:2,t:"Conservant",d:"Ca benzoatul de sodiu: poate forma benzen cu vitamina C.",k:["benzoat de potasiu"]},
+ {c:"E213",n:"Benzoat de calciu",l:2,t:"Conservant",d:"Ca benzoatul de sodiu.",k:["benzoat de calciu"]},
+ {c:"E220",n:"Dioxid de sulf",l:2,t:"Conservant",d:SULF,k:["dioxid de sulf","anhidrida sulfuroasa"]},
+ {c:"E221",n:"Sulfit de sodiu",l:2,t:"Conservant",d:SULF,k:["sulfit de sodiu"]},
+ {c:"E222",n:"Bisulfit de sodiu",l:2,t:"Conservant",d:SULF,k:["bisulfit de sodiu"]},
+ {c:"E223",n:"Metabisulfit de sodiu",l:2,t:"Conservant",d:SULF,k:["metabisulfit de sodiu"]},
+ {c:"E224",n:"Metabisulfit de potasiu",l:2,t:"Conservant",d:SULF,k:["metabisulfit de potasiu"]},
+ {c:"E226",n:"Sulfit de calciu",l:2,t:"Conservant",d:SULF,k:["sulfit de calciu"]},
+ {c:"E227",n:"Bisulfit de calciu",l:2,t:"Conservant",d:SULF,k:["bisulfit de calciu"]},
+ {c:"E228",n:"Bisulfit de potasiu",l:2,t:"Conservant",d:SULF,k:["bisulfit de potasiu"]},
+ {c:"E234",n:"Nizină",l:1,t:"Conservant",d:"Peptidă antimicrobiană naturală.",k:["nizin"]},
+ {c:"E235",n:"Natamicină",l:1,t:"Conservant",d:"Antifungic folosit pe coaja brânzeturilor și a mezelurilor.",k:["natamicin"]},
+ {c:"E239",n:"Hexametilentetramină",l:2,t:"Conservant",d:"Eliberează formaldehidă; folosit doar în anumite brânzeturi.",k:["hexametilentetramin"]},
+ {c:"E242",n:"Dicarbonat de dimetil",l:1,t:"Conservant",d:"Se descompune rapid în băutură.",k:["dicarbonat de dimetil"]},
+ {c:"E249",n:"Nitrit de potasiu",l:3,t:"Conservant",d:NITRIT,k:["nitrit de potasiu","potassium nitrite"]},
+ {c:"E250",n:"Nitrit de sodiu",l:3,t:"Conservant",d:NITRIT+" Prezent frecvent în mezeluri, salamuri, șuncă.",k:["nitrit de sodiu","sodium nitrite","sare nitrita"]},
+ {c:"E251",n:"Nitrat de sodiu",l:2,t:"Conservant",d:"Se transformă parțial în nitriți în produs și în organism.",k:["nitrat de sodiu","sodium nitrate"]},
+ {c:"E252",n:"Nitrat de potasiu",l:2,t:"Conservant",d:"Se transformă parțial în nitriți în produs și în organism.",k:["nitrat de potasiu","salpetru"]},
+ {c:"E260",n:"Acid acetic",l:1,t:"Acidifiant",d:"Oțet.",k:["acid acetic"]},
+ {c:"E262",n:"Acetați de sodiu",l:1,t:"Conservant",d:"Fără îngrijorare.",k:["acetat de sodiu","diacetat de sodiu"]},
+ {c:"E270",n:"Acid lactic",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["acid lactic"]},
+ {c:"E280",n:"Acid propionic",l:1,t:"Conservant",d:"Fără îngrijorare majoră.",k:["acid propionic"]},
+ {c:"E281",n:"Propionat de sodiu",l:1,t:"Conservant",d:"Fără îngrijorare majoră.",k:["propionat de sodiu"]},
+ {c:"E282",n:"Propionat de calciu",l:2,t:"Conservant",d:"Un studiu din 2019 (Science Translational Medicine) a asociat consumul cu creșterea insulinei și a glucagonului; dovezi limitate. Frecvent în pâinea feliată.",k:["propionat de calciu"]},
+ {c:"E290",n:"Dioxid de carbon",l:1,t:"Gaz",d:"Fără îngrijorare.",k:["dioxid de carbon"]},
+ {c:"E296",n:"Acid malic",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["acid malic"]},
+
+ // Antioxidanți și acidifianți
+ {c:"E300",n:"Acid ascorbic (vitamina C)",l:1,t:"Antioxidant",d:"Vitamina C.",k:["acid ascorbic","acid l-ascorbic"]},
+ {c:"E301",n:"Ascorbat de sodiu",l:1,t:"Antioxidant",d:"Formă a vitaminei C. În mezeluri reduce formarea nitrozaminelor.",k:["ascorbat de sodiu"]},
+ {c:"E304",n:"Esteri ai acidului ascorbic",l:1,t:"Antioxidant",d:"Fără îngrijorare.",k:["palmitat de ascorbil"]},
+ {c:"E306",n:"Extract bogat în tocoferoli",l:1,t:"Antioxidant",d:"Vitamina E.",k:["tocoferol"]},
+ {c:"E307",n:"Alfa-tocoferol",l:1,t:"Antioxidant",d:"Vitamina E.",k:["alfa-tocoferol"]},
+ {c:"E310",n:"Galat de propil",l:2,t:"Antioxidant",d:"Reacții alergice; suspect de perturbare endocrină.",k:["galat de propil"]},
+ {c:"E319",n:"TBHQ",l:2,t:"Antioxidant",d:"Efecte asupra sistemului imunitar în studii pe animale.",k:["tbhq","butilhidrochinona tertiara"]},
+ {c:"E320",n:"BHA (butilhidroxianisol)",l:3,t:"Antioxidant",d:"Clasificat posibil cancerigen (IARC 2B); suspect de perturbare endocrină.",k:["butilhidroxianisol","bha"]},
+ {c:"E321",n:"BHT (butilhidroxitoluen)",l:2,t:"Antioxidant",d:"Date contradictorii; reevaluat de EFSA cu doză zilnică admisibilă redusă.",k:["butilhidroxitoluen","bht"]},
+ {c:"E322",n:"Lecitine",l:1,t:"Emulgator",d:"Natural (soia, floarea-soarelui). Atenție la alergia la soia.",k:["lecitin","lecithin"]},
+ {c:"E325",n:"Lactat de sodiu",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["lactat de sodiu"]},
+ {c:"E327",n:"Lactat de calciu",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["lactat de calciu"]},
+ {c:"E330",n:"Acid citric",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["acid citric","citric acid"]},
+ {c:"E331",n:"Citrați de sodiu",l:1,t:"Corector de aciditate",d:"Fără îngrijorare.",k:["citrat de sodiu","citrati de sodiu","citrat trisodic"]},
+ {c:"E332",n:"Citrați de potasiu",l:1,t:"Corector de aciditate",d:"Fără îngrijorare.",k:["citrat de potasiu","citrati de potasiu"]},
+ {c:"E333",n:"Citrați de calciu",l:1,t:"Corector de aciditate",d:"Fără îngrijorare.",k:["citrat de calciu"]},
+ {c:"E334",n:"Acid tartric",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["acid tartric"]},
+ {c:"E338",n:"Acid fosforic",l:2,t:"Acidifiant",d:PHOS+" Frecvent în băuturi tip cola.",k:["acid fosforic","phosphoric acid"]},
+ {c:"E339",n:"Fosfați de sodiu",l:2,t:"Corector / stabilizator",d:PHOS,k:["fosfat de sodiu","fosfati de sodiu","fosfat disodic","fosfat trisodic"]},
+ {c:"E340",n:"Fosfați de potasiu",l:2,t:"Corector / stabilizator",d:PHOS,k:["fosfat de potasiu","fosfati de potasiu"]},
+ {c:"E341",n:"Fosfați de calciu",l:2,t:"Corector / antiaglomerant",d:PHOS,k:["fosfat de calciu","fosfati de calciu"]},
+ {c:"E385",n:"EDTA calciu disodic",l:2,t:"Sechestrant",d:"Chelatant; poate lega mineralele din dietă.",k:["edta"]},
+ {c:"E392",n:"Extract de rozmarin",l:1,t:"Antioxidant",d:"Natural.",k:["extract de rozmarin"]},
+
+ // Îngroșători, emulgatori, stabilizatori
+ {c:"E400",n:"Acid alginic",l:1,t:"Îngroșător",d:"Din alge.",k:["acid alginic"]},
+ {c:"E401",n:"Alginat de sodiu",l:1,t:"Îngroșător",d:"Din alge.",k:["alginat de sodiu"]},
+ {c:"E406",n:"Agar",l:1,t:"Gelifiant",d:"Din alge.",k:["agar"]},
+ {c:"E407",n:"Caragenan",l:2,t:"Îngroșător",d:"Studii pe animale și in vitro asociază caragenanul cu inflamație intestinală; EFSA (2018) a cerut date suplimentare.",k:["caragenan","carrageenan","carragenan"]},
+ {c:"E407A",n:"Alge Eucheuma prelucrate",l:2,t:"Îngroșător",d:"Formă de caragenan; aceeași îngrijorare.",k:["alge eucheuma"]},
+ {c:"E410",n:"Gumă de roșcove",l:1,t:"Îngroșător",d:"Natural.",k:["guma de roscove","faina din samburi de roscove"]},
+ {c:"E412",n:"Gumă guar",l:1,t:"Îngroșător",d:"Natural.",k:["guma guar","guar"]},
+ {c:"E414",n:"Gumă arabică",l:1,t:"Îngroșător",d:"Natural.",k:["guma arabica"]},
+ {c:"E415",n:"Gumă xantan",l:1,t:"Îngroșător",d:"Fără îngrijorare.",k:["xantan","xanthan"]},
+ {c:"E417",n:"Gumă tara",l:1,t:"Îngroșător",d:"Natural.",k:["guma tara"]},
+ {c:"E418",n:"Gumă gellan",l:1,t:"Gelifiant",d:"Fără îngrijorare.",k:["gellan"]},
+ {c:"E420",n:"Sorbitol",l:1,t:"Îndulcitor / umectant",d:"Efect laxativ în cantități mari.",k:["sorbitol"]},
+ {c:"E421",n:"Manitol",l:1,t:"Îndulcitor",d:"Efect laxativ în cantități mari.",k:["manitol"]},
+ {c:"E422",n:"Glicerol",l:1,t:"Umectant",d:"Fără îngrijorare.",k:["glicerol","glicerina"]},
+ {c:"E425",n:"Konjac",l:1,t:"Îngroșător",d:"Fibră naturală; risc de sufocare doar în jeleuri mini.",k:["konjac"]},
+ {c:"E432",n:"Polisorbat 20",l:2,t:"Emulgator",d:EMUL,k:["polisorbat 20"]},
+ {c:"E433",n:"Polisorbat 80",l:2,t:"Emulgator",d:EMUL,k:["polisorbat 80","polysorbate 80"]},
+ {c:"E435",n:"Polisorbat 60",l:2,t:"Emulgator",d:EMUL,k:["polisorbat 60"]},
+ {c:"E436",n:"Polisorbat 65",l:2,t:"Emulgator",d:EMUL,k:["polisorbat 65"]},
+ {c:"E440",n:"Pectine",l:1,t:"Gelifiant",d:"Fibră naturală din fructe.",k:["pectin"]},
+ {c:"E442",n:"Fosfatide de amoniu",l:1,t:"Emulgator",d:"Folosit în ciocolată.",k:["fosfatide de amoniu"]},
+ {c:"E450",n:"Difosfați",l:2,t:"Stabilizator / afânător",d:PHOS,k:["difosfat","pirofosfat"]},
+ {c:"E451",n:"Trifosfați",l:2,t:"Stabilizator",d:PHOS,k:["trifosfat"]},
+ {c:"E452",n:"Polifosfați",l:2,t:"Stabilizator",d:PHOS+" Frecvent în mezeluri, pentru reținerea apei.",k:["polifosfat"]},
+ {c:"E460",n:"Celuloză",l:1,t:"Îngroșător",d:"Fibră.",k:["celuloza microcristalina","celuloza pudra"]},
+ {c:"E461",n:"Metilceluloză",l:1,t:"Îngroșător",d:"Fără îngrijorare majoră.",k:["metilceluloza"]},
+ {c:"E464",n:"Hidroxipropilmetilceluloză",l:1,t:"Îngroșător",d:"Fără îngrijorare majoră.",k:["hidroxipropilmetilceluloza"]},
+ {c:"E466",n:"Carboximetilceluloză (CMC)",l:2,t:"Îngroșător / emulgator",d:"Un studiu clinic controlat (2022, Gastroenterology) a arătat modificări ale microbiomului; asociată cu inflamație intestinală în studii pe animale. "+EMUL,k:["carboximetilceluloza","carboximetil celuloza","celuloza gumata"]},
+ {c:"E471",n:"Mono- și digliceride ale acizilor grași",l:2,t:"Emulgator",d:"Cel mai folosit emulgator. În NutriNet-Santé a fost asociat cu risc crescut de cancer și boli cardiovasculare (studiu observațional, nu demonstrează cauzalitate).",k:["mono- si digliceride","mono si digliceride","monogliceride","mono-si digliceride"]},
+ {c:"E472B",n:"Esteri lactici ai mono- și digliceridelor",l:1,t:"Emulgator",d:"Fără îngrijorare majoră.",k:[]},
+ {c:"E472E",n:"Esteri DATEM",l:1,t:"Emulgator",d:"Fără îngrijorare majoră; frecvent în pâine.",k:["datem"]},
+ {c:"E475",n:"Esteri poliglicerolici",l:1,t:"Emulgator",d:"Fără îngrijorare majoră.",k:[]},
+ {c:"E476",n:"Poliricinoleat de poliglicerol (PGPR)",l:1,t:"Emulgator",d:"Folosit în ciocolata ieftină în locul untului de cacao.",k:["poliricinoleat","pgpr"]},
+ {c:"E481",n:"Stearoil-2-lactilat de sodiu",l:1,t:"Emulgator",d:"Fără îngrijorare majoră.",k:["stearoil-2-lactilat"]},
+ {c:"E491",n:"Monostearat de sorbitan",l:1,t:"Emulgator",d:"Fără îngrijorare majoră.",k:["monostearat de sorbitan"]},
+ {c:"E500",n:"Carbonați de sodiu",l:1,t:"Afânător",d:"Bicarbonat de sodiu.",k:["bicarbonat de sodiu","carbonat de sodiu"]},
+ {c:"E501",n:"Carbonați de potasiu",l:1,t:"Afânător",d:"Fără îngrijorare.",k:["carbonat de potasiu"]},
+ {c:"E503",n:"Carbonați de amoniu",l:1,t:"Afânător",d:"Se volatilizează la coacere.",k:["carbonat de amoniu","bicarbonat de amoniu"]},
+ {c:"E508",n:"Clorură de potasiu",l:1,t:"Sare",d:"Înlocuitor de sare.",k:["clorura de potasiu"]},
+ {c:"E509",n:"Clorură de calciu",l:1,t:"Întăritor",d:"Fără îngrijorare.",k:["clorura de calciu"]},
+ {c:"E516",n:"Sulfat de calciu",l:1,t:"Întăritor",d:"Fără îngrijorare.",k:["sulfat de calciu"]},
+ {c:"E521",n:"Sulfat de aluminiu și sodiu",l:2,t:"Întăritor",d:ALU,k:["sulfat de aluminiu"]},
+ {c:"E523",n:"Sulfat de aluminiu și amoniu",l:2,t:"Întăritor",d:ALU,k:[]},
+ {c:"E524",n:"Hidroxid de sodiu",l:1,t:"Corector de aciditate",d:"Folosit în cantități mici (ex. covrigi).",k:["hidroxid de sodiu"]},
+ {c:"E541",n:"Fosfat acid de sodiu și aluminiu",l:2,t:"Afânător",d:ALU,k:["fosfat de sodiu si aluminiu"]},
+ {c:"E551",n:"Dioxid de siliciu",l:1,t:"Antiaglomerant",d:"EFSA a cerut date suplimentare despre fracția de nanoparticule; fără îngrijorare dovedită.",k:["dioxid de siliciu","silice"]},
+ {c:"E553B",n:"Talc",l:1,t:"Antiaglomerant",d:"Fără îngrijorare majoră în alimente.",k:["talc"]},
+ {c:"E554",n:"Silicat de sodiu și aluminiu",l:2,t:"Antiaglomerant",d:ALU,k:["silicat de sodiu si aluminiu"]},
+ {c:"E555",n:"Silicat de potasiu și aluminiu",l:2,t:"Antiaglomerant",d:ALU,k:["silicat de potasiu si aluminiu"]},
+ {c:"E556",n:"Silicat de calciu și aluminiu",l:2,t:"Antiaglomerant",d:ALU,k:["silicat de calciu si aluminiu"]},
+ {c:"E559",n:"Silicat de aluminiu (caolin)",l:2,t:"Antiaglomerant",d:ALU,k:["caolin"]},
+ {c:"E570",n:"Acizi grași",l:1,t:"Antiaglomerant",d:"Fără îngrijorare.",k:[]},
+ {c:"E575",n:"Glucono-delta-lactonă",l:1,t:"Acidifiant",d:"Fără îngrijorare.",k:["glucono-delta-lactona"]},
+
+ // Potențiatori de gust
+ {c:"E620",n:"Acid glutamic",l:2,t:"Potențiator de gust",d:GLUT,k:["acid glutamic"]},
+ {c:"E621",n:"Glutamat monosodic",l:2,t:"Potențiator de gust",d:GLUT+" Prezența lui indică de regulă un produs ultraprocesat.",k:["glutamat monosodic","glutamat de sodiu","monosodium glutamate","msg"]},
+ {c:"E622",n:"Glutamat monopotasic",l:2,t:"Potențiator de gust",d:GLUT,k:["glutamat monopotasic"]},
+ {c:"E623",n:"Diglutamat de calciu",l:2,t:"Potențiator de gust",d:GLUT,k:[]},
+ {c:"E624",n:"Glutamat monoamonic",l:2,t:"Potențiator de gust",d:GLUT,k:[]},
+ {c:"E625",n:"Diglutamat de magneziu",l:2,t:"Potențiator de gust",d:GLUT,k:[]},
+ {c:"E627",n:"Guanilat disodic",l:1,t:"Potențiator de gust",d:"Folosit împreună cu glutamatul. De evitat de persoanele cu gută (purine).",k:["guanilat"]},
+ {c:"E631",n:"Inozinat disodic",l:1,t:"Potențiator de gust",d:"De evitat de persoanele cu gută (purine).",k:["inozinat"]},
+ {c:"E635",n:"Ribonucleotide disodice",l:1,t:"Potențiator de gust",d:"Raportate rar reacții cutanate; de evitat de persoanele cu gută.",k:["ribonucleotid"]},
+ {c:"E640",n:"Glicină",l:1,t:"Potențiator de gust",d:"Aminoacid.",k:["glicina"]},
+
+ // Agenți de glazurare, diverși
+ {c:"E900",n:"Dimetilpolisiloxan",l:1,t:"Antispumant",d:"Fără îngrijorare majoră.",k:["dimetilpolisiloxan"]},
+ {c:"E901",n:"Ceară de albine",l:1,t:"Agent de glazurare",d:"Natural.",k:["ceara de albine"]},
+ {c:"E903",n:"Ceară carnauba",l:1,t:"Agent de glazurare",d:"Natural.",k:["ceara carnauba","carnauba"]},
+ {c:"E904",n:"Shellac",l:1,t:"Agent de glazurare",d:"Din insecte; nu este vegan.",k:["shellac","selac"]},
+ {c:"E905",n:"Ceară microcristalină",l:1,t:"Agent de glazurare",d:"Derivat petrolier, cantități mici.",k:["ceara microcristalina"]},
+ {c:"E920",n:"L-cisteină",l:1,t:"Agent de tratare a făinii",d:"Aminoacid.",k:["cistein"]},
+ {c:"E924",n:"Bromat de potasiu",l:3,b:1,t:"Agent de tratare a făinii",d:"Interzis în UE; clasificat posibil cancerigen (IARC 2B).",k:["bromat de potasiu"]},
+ {c:"E941",n:"Azot",l:1,t:"Gaz de ambalare",d:"Fără îngrijorare.",k:[]},
+ {c:"E948",n:"Oxigen",l:1,t:"Gaz de ambalare",d:"Fără îngrijorare.",k:[]},
+
+ // Îndulcitori
+ {c:"E950",n:"Acesulfam K",l:2,t:"Îndulcitor",d:SWEET,k:["acesulfam","acesulfame"]},
+ {c:"E951",n:"Aspartam",l:2,t:"Îndulcitor",d:"Clasificat posibil cancerigen (IARC 2B, 2023); JECFA și EFSA au menținut doza zilnică admisibilă de 40 mg/kg corp. Interzis persoanelor cu fenilcetonurie. "+SWEET,k:["aspartam","aspartame"]},
+ {c:"E952",n:"Ciclamat",l:2,t:"Îndulcitor",d:"Interzis în SUA din 1969. "+SWEET,k:["ciclamat","cyclamate"]},
+ {c:"E954",n:"Zaharină",l:2,t:"Îndulcitor",d:SWEET,k:["zaharina","saccharin"]},
+ {c:"E955",n:"Sucraloză",l:2,t:"Îndulcitor",d:"Un studiu din 2023 a arătat că sucraloza-6-acetat, compus asociat, este genotoxic in vitro; încălzirea poate forma compuși clorurați. "+SWEET,k:["sucraloza","sucralose"]},
+ {c:"E957",n:"Taumatină",l:1,t:"Îndulcitor",d:"Proteină naturală.",k:["taumatin"]},
+ {c:"E959",n:"Neohesperidină DC",l:1,t:"Îndulcitor",d:"Derivat din citrice.",k:["neohesperidin"]},
+ {c:"E960",n:"Glicozide de steviol",l:1,t:"Îndulcitor",d:"Din stevia; fără îngrijorare majoră la dozele uzuale.",k:["stevia","steviol"]},
+ {c:"E961",n:"Neotam",l:2,t:"Îndulcitor",d:SWEET,k:["neotam"]},
+ {c:"E962",n:"Sare de aspartam-acesulfam",l:2,t:"Îndulcitor",d:"Combină aspartamul și acesulfamul. "+SWEET,k:["sare de aspartam"]},
+ {c:"E965",n:"Maltitol",l:1,t:"Îndulcitor",d:"Efect laxativ în cantități mari.",k:["maltitol"]},
+ {c:"E966",n:"Lactitol",l:1,t:"Îndulcitor",d:"Efect laxativ în cantități mari.",k:["lactitol"]},
+ {c:"E967",n:"Xilitol",l:2,t:"Îndulcitor",d:"Un studiu din 2024 (European Heart Journal) a asociat nivelurile sanguine ridicate cu evenimente cardiovasculare. Toxic pentru câini.",k:["xilitol","xylitol"]},
+ {c:"E968",n:"Eritritol",l:2,t:"Îndulcitor",d:"Un studiu din 2023 (Nature Medicine) a asociat nivelurile sanguine ridicate cu risc de tromboză și evenimente cardiovasculare.",k:["eritritol","erythritol"]},
+ {c:"E969",n:"Advantam",l:2,t:"Îndulcitor",d:SWEET,k:["advantam"]},
+
+ // Alții
+ {c:"E1105",n:"Lizozim",l:1,t:"Conservant",d:"Din ou: alergen pentru persoanele alergice la ou.",k:["lizozim"]},
+ {c:"E1200",n:"Polidextroză",l:1,t:"Agent de încărcare",d:"Fibră; efect laxativ în cantități mari.",k:["polidextroza"]},
+ {c:"E1404",n:"Amidon oxidat",l:1,t:"Îngroșător",d:AMIDON,k:[]},
+ {c:"E1412",n:"Fosfat de diamidon",l:1,t:"Îngroșător",d:AMIDON,k:[]},
+ {c:"E1414",n:"Fosfat de diamidon acetilat",l:1,t:"Îngroșător",d:AMIDON,k:[]},
+ {c:"E1420",n:"Amidon acetilat",l:1,t:"Îngroșător",d:AMIDON,k:[]},
+ {c:"E1422",n:"Adipat de diamidon acetilat",l:1,t:"Îngroșător",d:AMIDON,k:[]},
+ {c:"E1442",n:"Fosfat de diamidon hidroxipropilat",l:1,t:"Îngroșător",d:AMIDON,k:[]},
+ {c:"E1450",n:"Octenil succinat de amidon și sodiu",l:1,t:"Emulgator",d:AMIDON,k:[]},
+ {c:"E1505",n:"Citrat de trietil",l:1,t:"Solvent",d:"Fără îngrijorare.",k:[]},
+ {c:"E1520",n:"Propilenglicol",l:1,t:"Solvent",d:"Solvent pentru arome; fără îngrijorare la dozele din alimente.",k:["propilenglicol"]}
+];
+
+const LEVEL = {
+  3:{name:"Risc ridicat",cls:"hi",pen:25},
+  2:{name:"Risc moderat",cls:"mid",pen:10},
+  1:{name:"Fără îngrijorare majoră",cls:"lo",pen:0},
+  0:{name:"Necatalogat",cls:"",pen:0}
+};
+const MAP = {}; DB.forEach(a => MAP[a.c] = a);
+
+/* ============================================================
+   PROFIL PERSONAL (stocat doar pe telefon, în localStorage)
+   ============================================================ */
+const PK = "ceContine.profile";
+const ALLERGENS = [
+  ["gluten","Gluten",/\b(grau|orz|secara|ovaz|spelt|gluten|extract de malt|malt de orz|cuscus|gris)/],
+  ["milk","Lapte",/\b(lapte|lactoz|smantan|unt\b|branz|zer\b|cazein|iaurt|frisca|lactoser)/],
+  ["eggs","Ouă",/\b(oua?\b|albus|galbenus|praf de ou|lizozim)/],
+  ["soybeans","Soia",/\bsoia/],
+  ["peanuts","Arahide",/\barahid/],
+  ["nuts","Fructe cu coajă lemnoasă",/\b(alun|migdal|nuc[ai]\b|caju|fistic|pecan|macadamia)/],
+  ["fish","Pește",/\b(peste|ton\b|somon|hamsi|cod\b|sardin)/],
+  ["crustaceans","Crustacee",/\b(crevet|crab|homar|raci?\b)/],
+  ["sesame-seeds","Susan",/\bsusan/],
+  ["mustard","Muștar",/\bmustar/],
+  ["celery","Țelină",/\btelin/],
+  ["lupin","Lupin",/\blupin/],
+  ["molluscs","Moluște",/\b(scoic|midi[ie]|calamar|caracatit)/],
+  ["sulphur-dioxide-and-sulphites","Sulfiți",/(sulfit|dioxid de sulf)/]
+];
+const CONDS = [
+  ["kids","Cumpăr pentru copii","Coloranții Southampton, benzoații, îndulcitorii și cofeina cântăresc mai mult."],
+  ["preg","Sarcină sau alăptare","Semnalez nitriții, cofeina, chinina și alcoolul."],
+  ["pku","Fenilcetonurie","Aspartamul devine contraindicat."],
+  ["gout","Gută","Semnalez ribonucleotidele (purine) și fructoza adăugată."],
+  ["bp","Hipertensiune","Prag mai strict pentru sare."],
+  ["diab","Diabet sau evit zahărul","Prag mai strict pentru zahăr."],
+  ["vegan","Vegan","Semnalez ingredientele și aditivii de origine animală."]
+];
+const CAF = /\b(cafein|cafea\b|guarana|extract de ceai|ceai negru|ceai verde)/;
+const ALC = /\b(alcool|etanol|vin\b|bere\b|lichior|coniac|vodca|whisky|rom\b)/;
+const VEG = /\b(lapte|lactoz|smantan|unt\b|branz|zer\b|cazein|iaurt|oua?\b|miere|gelatin|carne|porc|vita\b|pui\b|peste|colagen|untura|slanina|sunca)/;
+const SULF_CODES = ["E220","E221","E222","E223","E224","E226","E227","E228"];
+
+function getProfile(){ try{ return JSON.parse(localStorage.getItem(PK)) || {allergens:[]}; }catch(e){ return {allergens:[]}; } }
+function setProfile(p){ try{ localStorage.setItem(PK, JSON.stringify(p)); }catch(e){} }
+function profileLabels(P){
+  return [...CONDS.filter(c => P[c[0]]).map(c => c[1].replace("Cumpăr pentru copii","Copii").replace(" sau alăptare","").replace(" sau evit zahărul","")),
+          ...(P.allergens||[]).map(id => (ALLERGENS.find(a => a[0]===id)||[,""])[1])];
+}
+function splitTraces(t){ const i = t.search(/(poate contine|urme de|may contain)/); return i < 0 ? [t,""] : [t.slice(0,i), t.slice(i)]; }
+const num = (n,k) => n && n[k] !== undefined && n[k] !== "" ? +n[k] : null;
+const fmt = v => v.toLocaleString("ro-RO",{maximumFractionDigits:1});
+
+function personalize(ctx){
+  const P = getProfile();
+  const out = {alerts:[], pen:0, crit:false, mine:new Set(), active:profileLabels(P).length > 0};
+  if(!out.active) return out;
+  const adds = ctx.adds || [];
+  const has = c => adds.some(a => a.c === c);
+  const [main, traces] = splitTraces(ctx.text || "");
+  const add = (lvl, t, pen=0, codes=[]) => { out.alerts.push({lvl,t}); out.pen += pen; if(lvl==="crit") out.crit = true; codes.forEach(c => out.mine.add(c)); };
+
+  (P.allergens||[]).forEach(id => {
+    const A = ALLERGENS.find(x => x[0] === id); if(!A) return;
+    const sc = id.startsWith("sulphur") ? SULF_CODES.filter(has) : [];
+    const inside = (ctx.allergens||[]).includes("en:"+id) || A[2].test(main) || sc.length > 0;
+    const trace = (ctx.traces||[]).includes("en:"+id) || A[2].test(traces);
+    if(inside) add("crit", `Conține ${A[1].toLowerCase()}, la care ai declarat alergie.`, 0, sc);
+    else if(trace) add("warn", `Poate conține urme de ${A[1].toLowerCase()}.`, 20);
+  });
+
+  if(P.pku){
+    const A = ["E951","E962"].filter(has);
+    if(A.length || /fenilalanin/.test(main)) add("crit","Conține aspartam (sursă de fenilalanină): contraindicat în fenilcetonurie.",0,A);
+  }
+  if(P.kids){
+    const S = ["E102","E104","E110","E122","E124","E129"].filter(has);
+    if(S.length) add("warn",`Pentru copii: ${S.join(", ")} sunt coloranți asociați cu hiperactivitatea în studiul Southampton.`,15*S.length,S);
+    const B = ["E210","E211","E212","E213"].filter(has);
+    if(B.length) add("warn",`Pentru copii: ${B.join(", ")} (benzoați) au fost incluși în același studiu.`,10,B);
+    const SW = adds.filter(a => a.t === "Îndulcitor" && a.l >= 2).map(a => a.c);
+    if(SW.length) add("warn",`Îndulcitorii artificiali (${SW.join(", ")}) nu sunt recomandați copiilor mici.`,10,SW);
+    if(CAF.test(main)) add("warn","Conține cofeină: nerecomandată copiilor.",20);
+  }
+  if(P.preg){
+    const N = ["E249","E250","E251","E252"].filter(has);
+    if(N.length) add("warn",`Sarcină: conține nitriți sau nitrați (${N.join(", ")}).`,15,N);
+    if(CAF.test(main)) add("warn","Conține cofeină: EFSA recomandă sub 200 mg pe zi în sarcină, din toate sursele.",10);
+    if(/\bchinin/.test(main)) add("warn","Conține chinină (ex. apă tonică): nerecomandată în sarcină.",15);
+    if(ALC.test(main)) add("warn","Ingredientele menționează alcool sau o băutură alcoolică: verifică eticheta.",20);
+  }
+  if(P.gout){
+    const R = ["E627","E631","E635"].filter(has);
+    if(R.length) add("warn",`Gută: ${R.join(", ")} sunt ribonucleotide (purine).`,15,R);
+    if(/(fructoz|sirop de porumb)/.test(main)) add("warn","Gută: conține fructoză adăugată, asociată cu creșterea acidului uric.",15);
+  }
+  if(P.bp){
+    const s = num(ctx.nutr,"salt_100g");
+    if(s !== null){
+      if(s > 1.5) add("warn",`Hipertensiune: ${fmt(s)} g sare la 100 g, nivel ridicat.`,25);
+      else if(s > 0.6) add("warn",`Hipertensiune: ${fmt(s)} g sare la 100 g, nivel mediu.`,10);
+    }
+    const G = adds.filter(a => /^E62[0-5]$/.test(a.c)).map(a => a.c);
+    if(G.length) add("info",`Glutamații (${G.join(", ")}) adaugă sodiu.`,5,G);
+  }
+  if(P.diab){
+    const s = num(ctx.nutr,"sugars_100g");
+    if(s !== null){
+      if(s > 22.5) add("warn",`Zahăr: ${fmt(s)} g la 100 g, nivel ridicat.`,25);
+      else if(s > 5) add("warn",`Zahăr: ${fmt(s)} g la 100 g, nivel mediu.`,10);
+    } else if(/(zahar|sirop de glucoz|dextroz|sirop de fructoz)/.test(main)) add("info","Conține zahăr adăugat, dar lipsesc valorile nutriționale.",5);
+  }
+  if(P.vegan){
+    const AN = ["E120","E901","E904","E966","E1105"].filter(has);
+    const tags = ctx.analysis || [];
+    if(tags.includes("en:non-vegan") || VEG.test(main) || AN.length) add("info",`Nu pare vegan${AN.length ? ` (${AN.join(", ")} sunt de origine animală)` : ""}.`,0,AN);
+    else if(tags.includes("en:vegan")) add("ok","Pare vegan conform analizei ingredientelor.");
+  }
+  return out;
+}
+
+function alertsBlock(me){
+  if(!me.active) return "";
+  const order = {crit:0,warn:1,info:2,ok:3};
+  const list = [...me.alerts].sort((a,b) => order[a.lvl]-order[b.lvl]);
+  return `<div class="alerts"><h2>Pentru profilul tău</h2>${
+    list.length ? list.map(a => `<div class="alert ${a.lvl}">${esc(a.t)}</div>`).join("")
+                : `<div class="alert ok">Nimic de semnalat pentru profilul tău.</div>`}</div>`;
+}
+
+function renderProfilePill(){
+  const L = profileLabels(getProfile()), p = $("#profPill");
+  p.classList.toggle("off", !L.length);
+  p.textContent = L.length ? "Profil: " + L.join(", ") : "Setează-ți profilul: alergii, copii, sarcină…";
+}
+
+function renderProfile(){
+  const P = getProfile();
+  $("#condList").innerHTML = CONDS.map(([id,l,d]) =>
+    `<label class="tog"><span>${l}<small>${d}</small></span><input type="checkbox" data-c="${id}" ${P[id]?"checked":""}></label>`).join("");
+  $("#allergenList").innerHTML = ALLERGENS.map(([id,l]) =>
+    `<button class="chip" data-a="${id}" aria-pressed="${(P.allergens||[]).includes(id)}">${l}</button>`).join("");
+}
+
+/* ---------- utilitare ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+function lookup(raw){
+  let c = String(raw).toUpperCase().replace(/[\s\-.]/g,"");
+  if(!c.startsWith("E")) c = "E"+c;
+  if(MAP[c]) return MAP[c];
+  const r = c.replace(/(IV|III|II|I)$/,"");          // E322I -> E322
+  if(r !== c && MAP[r]) return MAP[r];
+  const d = (c.match(/^E\d+/)||[])[0];               // E150D2 -> E150
+  if(d && MAP[d]) return MAP[d];
+  return {c:d||c, n:"Aditiv necatalogat în listă", l:0, t:"", d:"Nu avem o evaluare pentru acest cod."};
+}
+
+function extractFromText(text){
+  const found = new Map();
+  const re = /\bE[\s-]?(\d{3,4})([a-d])?(?![0-9])/gi;
+  let m;
+  while((m = re.exec(text))){
+    const a = lookup("E"+m[1]+(m[2]||""));
+    found.set(a.c, a);
+  }
+  const t = " "+norm(text)+" ";
+  DB.forEach(a => (a.k||[]).forEach(k => {
+    let i = t.indexOf(k);
+    while(i > -1){
+      if(!/[a-z0-9]/.test(t[i-1])){ found.set(a.c, a); break; }
+      i = t.indexOf(k, i+1);
+    }
+  }));
+  return [...found.values()];
+}
+
+function fromTags(tags){
+  const found = new Map();
+  (tags||[]).forEach(t => { const a = lookup(t.replace(/^[a-z]{2}:/,"")); found.set(a.c, a); });
+  return [...found.values()];
+}
+
+/* ---------- scor ---------- */
+const NS = {a:100,b:78,c:55,d:30,e:10};
+const NV = {1:100,2:85,3:55,4:20};
+function computeScore(p, adds){
+  const parts = [];
+  const ns = (p.nutriscore_grade||"").toLowerCase();
+  if(NS[ns] !== undefined) parts.push({label:"Profil nutrițional · Nutri-Score "+ns.toUpperCase(), val:NS[ns], w:.5});
+  if(adds){
+    let pen = adds.reduce((s,a) => s + LEVEL[a.l].pen, 0);
+    if(adds.some(a => a.b)) pen += 25;
+    const nr = adds.filter(a => a.l >= 2).length;
+    parts.push({label:"Aditivi · "+(nr ? nr+" cu risc" : "fără aditivi cu risc"), val:Math.max(0,100-pen), w:.3});
+  }
+  const nv = +p.nova_group;
+  if(NV[nv]) parts.push({label:"Procesare · NOVA "+nv+" din 4", val:NV[nv], w:.2});
+  if(!parts.length) return null;
+  const W = parts.reduce((s,x) => s+x.w, 0);
+  return {score:Math.round(parts.reduce((s,x) => s + x.val*x.w, 0)/W), parts, partial:parts.length < 3};
+}
+function verdict(s){
+  if(s >= 75) return {t:"Alegere bună", i:3};
+  if(s >= 50) return {t:"Acceptabil", i:2};
+  if(s >= 25) return {t:"Slab", i:1};
+  return {t:"De evitat", i:0};
+}
+const VCOL = ["var(--plum)","var(--tomato)","var(--mustard)","var(--leaf)"];
+
+/* ---------- randare ---------- */
+const VSTYLE = [
+  "--vc:var(--c0);--vt:#fff;--seg:rgba(255,255,255,.35);--segon:#fff",
+  "--vc:var(--c1);--vt:#fff;--seg:rgba(255,255,255,.35);--segon:#fff",
+  "--vc:var(--c2);--vt:#3A2A00;--seg:rgba(0,0,0,.14);--segon:rgba(0,0,0,.65)",
+  "--vc:var(--c3);--vt:#fff;--seg:rgba(255,255,255,.35);--segon:#fff"
+];
+function scoreBlock(sc, me){
+  me = me || {active:false, pen:0, crit:false};
+  if(!sc && !me.crit) return `<div class="notice">Nu există suficiente date pentru un scor. Verifică lista de ingrediente de pe ambalaj și folosește „Lipește ingredientele”.</div>`;
+  const base = sc ? sc.score : 0;
+  let shown = me.active ? Math.max(0, base - me.pen) : base;
+  if(me.crit) shown = Math.min(shown, 5);
+  const v = verdict(shown);
+  const vt = me.crit ? "Nepotrivit pentru tine" : v.t;
+  const segs = [0,1,2,3].map(i => `<b class="${i===v.i?'on':''}"></b>`).join("");
+  const parts = sc ? sc.parts.map(x => `<div class="part"><span>${esc(x.label)}</span><strong>${x.val}</strong><div class="bar"><i style="width:${x.val}%"></i></div></div>`).join("") : "";
+  const sub = me.active ? `<p class="sub">Ajustat pentru profilul tău${sc ? ` · scor general ${base}` : ""}</p>` : "";
+  return `<div class="score" style="${VSTYLE[v.i]}">
+    <div class="score-head">
+      <div class="score-num">${shown}<span>/100</span></div>
+      <div class="verdict">${vt}</div>
+    </div>
+    ${sub}
+    <div class="meter">${segs}<i class="pin" style="left:${Math.min(99,Math.max(1,shown))}%"></i></div>
+    <div class="meter-labels"><span>De evitat</span><span>Slab</span><span>Acceptabil</span><span>Bun</span></div>
+    ${parts ? `<div class="parts">${parts}</div>` : ""}
+    ${sc && sc.partial ? `<p class="partial">Scor parțial: lipsesc unele date, așa că s-a calculat doar din componentele disponibile.</p>` : ""}
+  </div>`;
+}
+
+function lightsBlock(n){
+  if(!n) return "";
+  const TL = [["sugars_100g","Zaharuri",5,22.5],["fat_100g","Grăsimi",3,17.5],["saturated-fat_100g","Grăsimi saturate",1.5,5],["salt_100g","Sare",.3,1.5]];
+  const items = TL.filter(([k]) => n[k] !== undefined && n[k] !== "").map(([k,l,lo,hi]) => {
+    const v = +n[k]; const cls = v > hi ? "hi" : v > lo ? "mid" : "lo";
+    const word = cls==="hi" ? "mult" : cls==="mid" ? "mediu" : "puțin";
+    return `<div class="light ${cls}"><strong>${v.toLocaleString("ro-RO",{maximumFractionDigits:1})} g</strong>${l} · ${word}</div>`;
+  }).join("");
+  return items ? `<h2>La 100 g</h2><div class="lights">${items}</div>` : "";
+}
+
+function addItem(a, mine){
+  const L = LEVEL[a.l];
+  return `<details class="add ${L.cls}">
+    <summary><span><span class="code">${esc(a.c)}</span> ${esc(a.n)}${a.b?'<span class="ban">interzis în UE</span>':''}${mine && mine.has(a.c)?'<span class="me">contează pentru tine</span>':''}</span><span class="lvl">${L.name}</span></summary>
+    <p>${a.t ? `<em>${esc(a.t)}.</em> ` : ""}${esc(a.d)}</p>
+  </details>`;
+}
+
+function additivesBlock(adds, mine){
+  if(adds === null) return `<h2>Aditivi</h2><div class="notice">Lista de ingrediente lipsește din baza de date.</div>`;
+  if(!adds.length) return `<h2>Aditivi</h2><div class="empty-ok">Nu am găsit aditivi alimentari (coduri E) în ingrediente.</div>`;
+  const sorted = [...adds].sort((x,y) => (y.b||0)-(x.b||0) || y.l-x.l);
+  return `<h2>Aditivi (${adds.length})</h2>${sorted.map(a => addItem(a, mine)).join("")}`;
+}
+
+const FOOT = `<p class="foot">Scor orientativ, nu sfat medical. Clasificarea aditivilor reflectă dezbateri științifice publice (EFSA, IARC, studii publicate); toți aditivii fără mențiunea „interzis în UE” sunt autorizați legal. Datele despre produs provin din <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (licență ODbL) și pot fi incomplete.</p>`;
+
+let lastRender = null;
+function renderProduct(code, p, quiet){
+  lastRender = () => renderProduct(code, p, true);
+  const name = p.product_name_ro || p.product_name || "Produs fără nume";
+  const ingr = p.ingredients_text_ro || p.ingredients_text || "";
+  let adds = null;
+  if((p.additives_tags||[]).length) adds = fromTags(p.additives_tags);
+  if(ingr){ const ex = extractFromText(ingr); adds = adds ? mergeAdds(adds, ex) : ex; }
+  const sc = computeScore(p, adds);
+  const me = personalize({adds, text:norm(ingr), nutr:p.nutriments, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags});
+  $("#result").innerHTML = `
+    <div class="product">
+      ${p.image_front_small_url ? `<img src="${esc(p.image_front_small_url)}" alt="">` : ""}
+      <div><h3>${esc(name)}</h3><p>${esc([p.brands, p.quantity].filter(Boolean).join(", "))}</p><p>Cod ${esc(code)}</p></div>
+    </div>
+    ${scoreBlock(sc, me)}
+    ${alertsBlock(me)}
+    ${additivesBlock(adds, me.mine)}
+    ${lightsBlock(p.nutriments)}
+    ${ingr ? `<details class="ingr"><summary>Ingrediente</summary><p>${esc(ingr)}</p></details>` : ""}
+    <p class="foot"><a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">Vezi sau corectează produsul în Open Food Facts</a></p>
+    ${FOOT}`;
+  if(quiet) return;
+  saveHistory({code, name, brand:p.brands||"", img:p.image_front_small_url||"", score:sc?sc.score:null, t:Date.now()});
+  $("#result").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function mergeAdds(a, b){ const m = new Map(); [...a,...b].forEach(x => { if(!m.has(x.c)) m.set(x.c,x); }); return [...m.values()]; }
+
+function renderNotFound(code){
+  $("#result").innerHTML = `<div class="notice" style="margin-top:20px">
+    <strong>Codul ${esc(code)} nu există încă în baza de date.</strong>
+    <p style="margin:6px 0 10px">Lipește lista de ingrediente de pe ambalaj ca să vezi aditivii, sau adaugă produsul în Open Food Facts ca să fie găsit data viitoare.</p>
+    <button class="btn small" onclick="openPaste()">Lipește ingredientele</button>
+    <a class="linkish" style="margin-left:10px" href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">Adaugă produsul</a>
+  </div>`;
+}
+
+function renderPasted(text, quiet){
+  lastRender = () => renderPasted(text, true);
+  const adds = extractFromText(text);
+  const sc = computeScore({}, adds);
+  const me = personalize({adds, text:norm(text)});
+  $("#result").innerHTML = `
+    <div class="product"><div><h3>Analiză din ingrediente</h3><p>Fără date nutriționale: scorul ține cont doar de aditivi.</p></div></div>
+    ${scoreBlock(sc, me)}${alertsBlock(me)}${additivesBlock(adds, me.mine)}${FOOT}`;
+  if(!quiet) $("#result").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* ---------- căutare produs ---------- */
+const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,brands,quantity,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro";
+async function loadProduct(raw){
+  const code = String(raw).replace(/\D/g,"");
+  if(code.length < 8){ $("#result").innerHTML = `<div class="notice">Codul trebuie să aibă cel puțin 8 cifre.</div>`; return; }
+  $("#result").innerHTML = `<div class="spinner" role="status" aria-label="Se caută produsul"></div>`;
+  try{
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=${FIELDS}`);
+    if(r.status === 404){ renderNotFound(code); return; }
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j = await r.json();
+    if(j.status !== 1 || !j.product){ renderNotFound(code); return; }
+    renderProduct(code, j.product);
+  }catch(e){
+    $("#result").innerHTML = `<div class="notice">Nu pot accesa baza de date (${esc(e.message)}). Verifică conexiunea la internet și încearcă din nou.</div>`;
+  }
+}
+
+/* ---------- scanner ---------- */
+let qr = null, scanning = false;
+async function startScan(){
+  if(typeof Html5Qrcode === "undefined"){ $("#result").innerHTML = `<div class="notice">Modulul de scanare nu s-a încărcat. Verifică conexiunea sau scrie codul manual.</div>`; return; }
+  try{
+    if(!qr){
+      const F = Html5QrcodeSupportedFormats;
+      qr = new Html5Qrcode("reader", {formatsToSupport:[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E], verbose:false, experimentalFeatures:{useBarCodeDetectorIfSupported:true}});
+    }
+    $("#idle").hidden = true;
+    await qr.start({facingMode:"environment"},
+      {fps:12, qrbox:(w,h) => ({width:Math.floor(Math.min(w*.85,340)), height:Math.floor(Math.min(h*.4,150))})},
+      onCode, () => {});
+    scanning = true; $("#stopRow").hidden = false;
+  }catch(e){
+    $("#idle").hidden = false;
+    $("#result").innerHTML = `<div class="notice">Camera nu a pornit. Permite accesul la cameră din setările browserului; pagina trebuie deschisă prin HTTPS.</div>`;
+  }
+}
+async function stopScan(){
+  if(qr && scanning){ try{ await qr.stop(); }catch(e){} }
+  scanning = false; $("#stopRow").hidden = true; $("#idle").hidden = false;
+}
+async function onCode(text){
+  if(!scanning) return;
+  await stopScan();
+  if(navigator.vibrate) navigator.vibrate(60);
+  $("#manualCode").value = text;
+  loadProduct(text);
+}
+
+/* ---------- istoric ---------- */
+const HK = "ceContine.history";
+function getHistory(){ try{ return JSON.parse(localStorage.getItem(HK)) || []; }catch(e){ return []; } }
+function saveHistory(item){
+  try{
+    const h = getHistory().filter(x => x.code !== item.code);
+    h.unshift(item); localStorage.setItem(HK, JSON.stringify(h.slice(0,60)));
+  }catch(e){}
+}
+function renderHistory(){
+  const h = getHistory();
+  if(!h.length){ $("#histList").innerHTML = `<div class="notice">Produsele scanate apar aici. Scanează primul produs din tabul Scanează.</div>`; return; }
+  $("#histList").innerHTML = h.map(x => {
+    const v = x.score == null ? null : verdict(x.score);
+    return `<button class="hitem" data-code="${esc(x.code)}">
+      ${x.img ? `<img src="${esc(x.img)}" alt="">` : `<span class="ph"></span>`}
+      <span class="t"><b>${esc(x.name)}</b><span>${esc(x.brand || x.code)}</span></span>
+      <span class="badge" style="${v ? VSTYLE[v.i].replace(/--vc:([^;]+);--vt:([^;]+).*/,'background:$1;color:$2') : 'color:var(--muted)'}">${x.score ?? "–"}</span>
+    </button>`;
+  }).join("") + `<button class="linkish" id="clearHist">Șterge istoricul</button>`;
+}
+
+/* ---------- lista aditivi ---------- */
+let filt = "all";
+function renderAddList(){
+  const q = norm($("#addSearch").value.trim());
+  const list = DB.filter(a => (filt === "all" || String(a.l) === filt) &&
+    (!q || norm(a.c).includes(q) || norm(a.n).includes(q) || (a.k||[]).some(k => k.includes(q)) || norm(a.t).includes(q)));
+  $("#addCount").textContent = `${list.length} aditivi`;
+  $("#addList").innerHTML = list.map(a => addItem(a)).join("");
+}
+
+/* ---------- navigare și evenimente ---------- */
+function show(v){
+  document.querySelectorAll(".view").forEach(s => s.classList.toggle("on", s.id === v));
+  document.querySelectorAll("nav.tabs button").forEach(b => {
+    if(b.dataset.v === v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+  });
+  if(v !== "v-scan") stopScan();
+  if(v === "v-hist") renderHistory();
+  if(v === "v-add") renderAddList();
+  if(v === "v-prof") renderProfile();
+  if(v === "v-scan"){ renderProfilePill(); if(lastRender) lastRender(); }
+  window.scrollTo(0,0);
+}
+function openPaste(){ $("#pasteBox").hidden = false; $("#pasteText").focus(); }
+
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
+$("#startBtn").addEventListener("click", startScan);
+$("#stopBtn").addEventListener("click", stopScan);
+$("#manualForm").addEventListener("submit", e => { e.preventDefault(); stopScan(); loadProduct($("#manualCode").value); });
+$("#pasteToggle").addEventListener("click", () => { const b = $("#pasteBox"); b.hidden = !b.hidden; if(!b.hidden) $("#pasteText").focus(); });
+$("#pasteBtn").addEventListener("click", () => { const t = $("#pasteText").value.trim(); if(t) renderPasted(t); });
+$("#histList").addEventListener("click", e => {
+  if(e.target.id === "clearHist"){ try{ localStorage.removeItem(HK); }catch(_){} renderHistory(); return; }
+  const it = e.target.closest(".hitem"); if(it){ show("v-scan"); $("#manualCode").value = it.dataset.code; loadProduct(it.dataset.code); }
+});
+$("#addSearch").addEventListener("input", renderAddList);
+document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+  filt = c.dataset.f;
+  document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === c ? "true" : "false"));
+  renderAddList();
+}));
+
+$("#profPill").addEventListener("click", () => show("v-prof"));
+$("#condList").addEventListener("change", e => {
+  const id = e.target.dataset.c; if(!id) return;
+  const P = getProfile(); P[id] = e.target.checked; setProfile(P);
+});
+$("#allergenList").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if(!b) return;
+  const P = getProfile(); const set = new Set(P.allergens||[]);
+  set.has(b.dataset.a) ? set.delete(b.dataset.a) : set.add(b.dataset.a);
+  P.allergens = [...set]; setProfile(P);
+  b.setAttribute("aria-pressed", set.has(b.dataset.a));
+});
+$("#profDone").addEventListener("click", () => show("v-scan"));
+$("#profReset").addEventListener("click", () => { setProfile({allergens:[]}); renderProfile(); });
+renderProfilePill();
+
+// desen cod de bare decorativ
+$(".barcode-art").innerHTML = [3,1,2,1,4,1,1,3,2,1,1,2,3,1,2,4,1,2,1,3,1,1,2].map(w => `<i style="width:${w}px"></i>`).join("");
+// deschidere directă: index.html?cod=5941234567890
+const qp = new URLSearchParams(location.search).get("cod"); if(qp){ $("#manualCode").value = qp; loadProduct(qp); }
+</script>
+</body>
+</html>
