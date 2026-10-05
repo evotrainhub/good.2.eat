@@ -61,7 +61,7 @@ h2{font-family:var(--display);font-weight:600;font-size:22px;margin:26px 0 10px;
 .row{display:flex;gap:10px;margin-top:12px}
 .row input{flex:1;min-width:0;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px}
 textarea{width:100%;min-height:120px;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;resize:vertical}
-.linkish{background:none;border:0;padding:6px 0;color:var(--brand);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.linkish{white-space:nowrap;background:none;border:0;padding:6px 0;color:var(--brand);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .notice{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:14px}
 
 .product{display:flex;gap:14px;align-items:center;margin-top:22px}
@@ -155,6 +155,38 @@ nav.tabs svg{width:24px;height:24px}
 .spinner{width:30px;height:30px;border:4px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:30px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.spinner{animation-duration:3s}.tog input,.tog input::after{transition:none}}
+.alt{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.hint{font-size:14px;color:var(--muted);margin:6px 0 0;line-height:1.4}
+#ocrBox{margin-top:12px}
+.ocr-status{background:var(--violet-bg);color:var(--ink);border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:15px}
+.ocr-status .bar{height:6px;background:var(--surface);border-radius:3px;margin-top:8px;overflow:hidden}
+.ocr-status .bar i{display:block;height:100%;background:var(--violet);transition:width .2s}
+.ocr-status.err{background:var(--hi-bg)}
+h3.sub-h{font-family:var(--display);font-weight:600;font-size:18px;margin:22px 0 8px}
+.seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px}
+.seg button{flex:1 1 auto;border:0;background:none;border-radius:12px;padding:10px 10px;cursor:pointer;font-size:15px;min-width:72px}
+.seg button[aria-checked="true"]{background:var(--violet);color:#fff;font-weight:700}
+.method{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:4px 0 14px}
+.method summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.method p{font-size:15px;margin:10px 0 0}
+.method a{color:var(--brand)}
+.add .eu{font-size:13px;color:var(--muted);margin-top:6px}
+.trust{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;background:var(--lo-bg);border-radius:14px;padding:10px 14px;margin-top:4px;font-size:14px}
+.trust .linkish{padding:0;font-size:14px}
+.portion{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-top:10px}
+.portion-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.portion-row input{width:92px;border:2px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--paper)}
+.qbtn{border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:14px}
+.qbtn[aria-pressed="true"]{border-color:var(--brand);background:var(--brand);color:var(--on-brand)}
+table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
+.nt td{padding:7px 0;border-bottom:1px solid var(--line)}
+.nt td:nth-child(2){text-align:right;font-weight:700}
+.nt td:nth-child(3){text-align:right;color:var(--muted);width:64px}
+.nt tr.subrow td:first-child{padding-left:14px;color:var(--muted)}
+.nt tr:last-child td{border-bottom:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.internal{border-left:6px solid var(--violet)}
+#sportSeg{display:grid;grid-template-columns:1fr 1fr}
 </style>
 </head>
 <body>
@@ -175,16 +207,22 @@ nav.tabs svg{width:24px;height:24px}
     </div>
     <div class="row" id="stopRow" hidden>
       <button class="btn ghost small" id="stopBtn">Oprește camera</button>
-      <span class="muted" style="align-self:center;font-size:15px">Ține codul în cadrul de jos-mijloc.</span>
+      <span class="muted" style="align-self:center;font-size:15px">Ține codul în cadrul din mijloc.</span>
     </div>
     <form class="row" id="manualForm" autocomplete="off">
-      <input id="manualCode" inputmode="numeric" pattern="[0-9]*" placeholder="Sau scrie codul (ex. 5941234567890)" aria-label="Cod de bare">
+      <input id="manualCode" inputmode="numeric" pattern="[0-9]*" placeholder="Sau scrie codul de sub bare" aria-label="Cod de bare">
       <button class="btn" type="submit">Caută</button>
     </form>
-    <button class="linkish" id="pasteToggle">Produsul nu are cod sau nu e găsit? Lipește ingredientele</button>
-    <div id="pasteBox" hidden>
-      <textarea id="pasteText" placeholder="Ex.: făină de grâu, zahăr, ulei de palmier, emulgator: lecitină de soia (E322), conservant: sorbat de potasiu, colorant E150d..."></textarea>
-      <div class="row"><button class="btn" id="pasteBtn">Analizează ingredientele</button></div>
+    <div class="alt">
+      <button class="btn violet" id="ocrBtn">Fotografiază ingredientele</button>
+      <button class="linkish" id="typeToggle">sau scrie-le</button>
+    </div>
+    <input type="file" id="ocrFile" accept="image/*" capture="environment" hidden>
+    <div id="ocrBox" hidden>
+      <div id="ocrStatus" class="ocr-status" hidden></div>
+      <textarea id="pasteText" aria-label="Lista de ingrediente" placeholder="Ex.: făină de grâu, zahăr, emulgator: lecitină de soia (E322), conservant: sorbat de potasiu, colorant E150d..."></textarea>
+      <p class="hint">Încadrează doar lista de ingrediente, bine luminată, fără reflexii. Poți corecta textul citit înainte de analiză.</p>
+      <div class="row"><button class="btn" id="pasteBtn">Analizează ingredientele</button><button class="btn ghost small" id="ocrAgain">Altă fotografie</button></div>
     </div>
     <div id="result" aria-live="polite"></div>
   </section>
@@ -198,7 +236,14 @@ nav.tabs svg{width:24px;height:24px}
   <!-- ADDITIVES -->
   <section id="v-add" class="view" aria-label="Lista de aditivi">
     <h2>Lista de aditivi</h2>
-    <p class="muted" style="margin-top:0;font-size:15px">Clasificare orientativă bazată pe evaluări EFSA, IARC și studii publicate. Toți aditivii de mai jos (în afara celor marcați „interzis în UE”) sunt autorizați legal; nivelul indică gradul de îngrijorare științifică, nu ilegalitate.</p>
+    <details class="method" id="method">
+      <summary>Cum analizăm</summary>
+      <p>Lista conține aditivii autorizați în Uniunea Europeană prin Regulamentul (CE) nr. 1333/2008, așa cum apar în baza de date oficială a Comisiei Europene. Câțiva aditivi interziși sunt păstrați și marcați „interzis în UE”, ca să-i poți recunoaște pe produse vechi sau din import.</p>
+      <p>Toți aditivii autorizați sunt legali. Culoarea arată ce spun evaluările și cercetările recente: EFSA (Autoritatea Europeană pentru Siguranța Alimentară), IARC (agenția OMS pentru cercetarea cancerului) și studii publicate în reviste de specialitate.</p>
+      <p>Scorul de la 0 la 100 combină profilul nutrițional (Nutri-Score, 50%), aditivii (30%: minus 25 de puncte pentru risc ridicat, minus 10 pentru risc moderat) și gradul de procesare (NOVA, 20%). Profilul tău personal adaugă ajustări, explicate la fiecare produs.</p>
+      <p>Scorul e orientativ și nu înlocuiește sfatul medicului sau al nutriționistului.</p>
+      <p><a href="https://food.ec.europa.eu/food-safety/food-improvement-agents/additives/database_en" target="_blank" rel="noopener">Baza de date UE a aditivilor</a><br><a href="https://www.efsa.europa.eu/en/topics/topic/food-additives" target="_blank" rel="noopener">EFSA despre aditivii alimentari</a></p>
+    </details>
     <input class="search" id="addSearch" placeholder="Caută: E250, aspartam, nitrit..." aria-label="Caută aditiv">
     <div class="chips" role="group" aria-label="Filtru nivel">
       <button class="chip" data-f="all" aria-pressed="true">Toți</button>
@@ -213,10 +258,17 @@ nav.tabs svg{width:24px;height:24px}
   <!-- PROFILE -->
   <section id="v-prof" class="view" aria-label="Profilul meu">
     <h2>Profilul meu</h2>
-    <p class="muted" style="margin-top:0;font-size:15px">Scorul și avertismentele se adaptează la ce bifezi aici.</p>
+    <p class="muted" style="margin-top:0;font-size:15px">Scorul și avertismentele se adaptează la ce alegi aici.</p>
+    <h3 class="sub-h">Cumpăr pentru un copil</h3>
+    <div class="seg" id="kidSeg" role="radiogroup" aria-label="Vârsta copilului"></div>
+    <p class="hint">Praguri mai stricte pentru zahăr, sare, îndulcitori, cofeină și coloranți. Sub 1 an: alertă pentru miere.</p>
+    <h3 class="sub-h">Fac sport</h3>
+    <div class="seg" id="sportSeg" role="radiogroup" aria-label="Obiectiv sportiv"></div>
+    <p class="hint">Masă musculară: proteine raportat la calorii. Anduranță: carbohidrați pe porție. Slăbire: calorii și sațietate.</p>
+    <h3 class="sub-h">Sănătate și stil alimentar</h3>
     <div class="group" id="condList"></div>
-    <h2>Alergii și intoleranțe</h2>
-    <p class="muted" style="margin-top:0;font-size:15px">Cei 14 alergeni pe care UE obligă producătorii să-i declare.</p>
+    <h3 class="sub-h">Alergii și intoleranțe</h3>
+    <p class="hint" style="margin-top:0">Cei 14 alergeni pe care UE obligă producătorii să-i declare.</p>
     <div class="chips al" id="allergenList"></div>
     <p class="private">Profilul rămâne doar pe acest dispozitiv. Nu se trimite nicăieri. La alergii severe, citește mereu și eticheta: datele din baza publică pot fi incomplete sau vechi.</p>
     <div class="row"><button class="btn violet" id="profDone">Gata, scanează</button><button class="btn ghost small" id="profReset">Resetează</button></div>
@@ -462,165 +514,29 @@ const LEVEL = {
 };
 const MAP = {}; DB.forEach(a => MAP[a.c] = a);
 
-/* ============================================================
-   PROFIL PERSONAL (stocat doar pe telefon, în localStorage)
-   ============================================================ */
-const PK = "ceContine.profile";
-const ALLERGENS = [
-  ["gluten","Gluten",/\b(grau|orz|secara|ovaz|spelt|gluten|extract de malt|malt de orz|cuscus|gris)/],
-  ["milk","Lapte",/\b(lapte|lactoz|smantan|unt\b|branz|zer\b|cazein|iaurt|frisca|lactoser)/],
-  ["eggs","Ouă",/\b(oua?\b|albus|galbenus|praf de ou|lizozim)/],
-  ["soybeans","Soia",/\bsoia/],
-  ["peanuts","Arahide",/\barahid/],
-  ["nuts","Fructe cu coajă lemnoasă",/\b(alun|migdal|nuc[ai]\b|caju|fistic|pecan|macadamia)/],
-  ["fish","Pește",/\b(peste|ton\b|somon|hamsi|cod\b|sardin)/],
-  ["crustaceans","Crustacee",/\b(crevet|crab|homar|raci?\b)/],
-  ["sesame-seeds","Susan",/\bsusan/],
-  ["mustard","Muștar",/\bmustar/],
-  ["celery","Țelină",/\btelin/],
-  ["lupin","Lupin",/\blupin/],
-  ["molluscs","Moluște",/\b(scoic|midi[ie]|calamar|caracatit)/],
-  ["sulphur-dioxide-and-sulphites","Sulfiți",/(sulfit|dioxid de sulf)/]
-];
-const CONDS = [
-  ["kids","Cumpăr pentru copii","Coloranții Southampton, benzoații, îndulcitorii și cofeina cântăresc mai mult."],
-  ["preg","Sarcină sau alăptare","Semnalez nitriții, cofeina, chinina și alcoolul."],
-  ["pku","Fenilcetonurie","Aspartamul devine contraindicat."],
-  ["gout","Gută","Semnalez ribonucleotidele (purine) și fructoza adăugată."],
-  ["bp","Hipertensiune","Prag mai strict pentru sare."],
-  ["diab","Diabet sau evit zahărul","Prag mai strict pentru zahăr."],
-  ["vegan","Vegan","Semnalez ingredientele și aditivii de origine animală."]
-];
-const CAF = /\b(cafein|cafea\b|guarana|extract de ceai|ceai negru|ceai verde)/;
-const ALC = /\b(alcool|etanol|vin\b|bere\b|lichior|coniac|vodca|whisky|rom\b)/;
-const VEG = /\b(lapte|lactoz|smantan|unt\b|branz|zer\b|cazein|iaurt|oua?\b|miere|gelatin|carne|porc|vita\b|pui\b|peste|colagen|untura|slanina|sunca)/;
-const SULF_CODES = ["E220","E221","E222","E223","E224","E226","E227","E228"];
-
-function getProfile(){ try{ return JSON.parse(localStorage.getItem(PK)) || {allergens:[]}; }catch(e){ return {allergens:[]}; } }
-function setProfile(p){ try{ localStorage.setItem(PK, JSON.stringify(p)); }catch(e){} }
-function profileLabels(P){
-  return [...CONDS.filter(c => P[c[0]]).map(c => c[1].replace("Cumpăr pentru copii","Copii").replace(" sau alăptare","").replace(" sau evit zahărul","")),
-          ...(P.allergens||[]).map(id => (ALLERGENS.find(a => a[0]===id)||[,""])[1])];
-}
-function splitTraces(t){ const i = t.search(/(poate contine|urme de|may contain)/); return i < 0 ? [t,""] : [t.slice(0,i), t.slice(i)]; }
-const num = (n,k) => n && n[k] !== undefined && n[k] !== "" ? +n[k] : null;
-const fmt = v => v.toLocaleString("ro-RO",{maximumFractionDigits:1});
-
-function personalize(ctx){
-  const P = getProfile();
-  const out = {alerts:[], pen:0, crit:false, mine:new Set(), active:profileLabels(P).length > 0};
-  if(!out.active) return out;
-  const adds = ctx.adds || [];
-  const has = c => adds.some(a => a.c === c);
-  const [main, traces] = splitTraces(ctx.text || "");
-  const add = (lvl, t, pen=0, codes=[]) => { out.alerts.push({lvl,t}); out.pen += pen; if(lvl==="crit") out.crit = true; codes.forEach(c => out.mine.add(c)); };
-
-  (P.allergens||[]).forEach(id => {
-    const A = ALLERGENS.find(x => x[0] === id); if(!A) return;
-    const sc = id.startsWith("sulphur") ? SULF_CODES.filter(has) : [];
-    const inside = (ctx.allergens||[]).includes("en:"+id) || A[2].test(main) || sc.length > 0;
-    const trace = (ctx.traces||[]).includes("en:"+id) || A[2].test(traces);
-    if(inside) add("crit", `Conține ${A[1].toLowerCase()}, la care ai declarat alergie.`, 0, sc);
-    else if(trace) add("warn", `Poate conține urme de ${A[1].toLowerCase()}.`, 20);
-  });
-
-  if(P.pku){
-    const A = ["E951","E962"].filter(has);
-    if(A.length || /fenilalanin/.test(main)) add("crit","Conține aspartam (sursă de fenilalanină): contraindicat în fenilcetonurie.",0,A);
-  }
-  if(P.kids){
-    const S = ["E102","E104","E110","E122","E124","E129"].filter(has);
-    if(S.length) add("warn",`Pentru copii: ${S.join(", ")} sunt coloranți asociați cu hiperactivitatea în studiul Southampton.`,15*S.length,S);
-    const B = ["E210","E211","E212","E213"].filter(has);
-    if(B.length) add("warn",`Pentru copii: ${B.join(", ")} (benzoați) au fost incluși în același studiu.`,10,B);
-    const SW = adds.filter(a => a.t === "Îndulcitor" && a.l >= 2).map(a => a.c);
-    if(SW.length) add("warn",`Îndulcitorii artificiali (${SW.join(", ")}) nu sunt recomandați copiilor mici.`,10,SW);
-    if(CAF.test(main)) add("warn","Conține cofeină: nerecomandată copiilor.",20);
-  }
-  if(P.preg){
-    const N = ["E249","E250","E251","E252"].filter(has);
-    if(N.length) add("warn",`Sarcină: conține nitriți sau nitrați (${N.join(", ")}).`,15,N);
-    if(CAF.test(main)) add("warn","Conține cofeină: EFSA recomandă sub 200 mg pe zi în sarcină, din toate sursele.",10);
-    if(/\bchinin/.test(main)) add("warn","Conține chinină (ex. apă tonică): nerecomandată în sarcină.",15);
-    if(ALC.test(main)) add("warn","Ingredientele menționează alcool sau o băutură alcoolică: verifică eticheta.",20);
-  }
-  if(P.gout){
-    const R = ["E627","E631","E635"].filter(has);
-    if(R.length) add("warn",`Gută: ${R.join(", ")} sunt ribonucleotide (purine).`,15,R);
-    if(/(fructoz|sirop de porumb)/.test(main)) add("warn","Gută: conține fructoză adăugată, asociată cu creșterea acidului uric.",15);
-  }
-  if(P.bp){
-    const s = num(ctx.nutr,"salt_100g");
-    if(s !== null){
-      if(s > 1.5) add("warn",`Hipertensiune: ${fmt(s)} g sare la 100 g, nivel ridicat.`,25);
-      else if(s > 0.6) add("warn",`Hipertensiune: ${fmt(s)} g sare la 100 g, nivel mediu.`,10);
-    }
-    const G = adds.filter(a => /^E62[0-5]$/.test(a.c)).map(a => a.c);
-    if(G.length) add("info",`Glutamații (${G.join(", ")}) adaugă sodiu.`,5,G);
-  }
-  if(P.diab){
-    const s = num(ctx.nutr,"sugars_100g");
-    if(s !== null){
-      if(s > 22.5) add("warn",`Zahăr: ${fmt(s)} g la 100 g, nivel ridicat.`,25);
-      else if(s > 5) add("warn",`Zahăr: ${fmt(s)} g la 100 g, nivel mediu.`,10);
-    } else if(/(zahar|sirop de glucoz|dextroz|sirop de fructoz)/.test(main)) add("info","Conține zahăr adăugat, dar lipsesc valorile nutriționale.",5);
-  }
-  if(P.vegan){
-    const AN = ["E120","E901","E904","E966","E1105"].filter(has);
-    const tags = ctx.analysis || [];
-    if(tags.includes("en:non-vegan") || VEG.test(main) || AN.length) add("info",`Nu pare vegan${AN.length ? ` (${AN.join(", ")} sunt de origine animală)` : ""}.`,0,AN);
-    else if(tags.includes("en:vegan")) add("ok","Pare vegan conform analizei ingredientelor.");
-  }
-  return out;
-}
-
-function alertsBlock(me){
-  if(!me.active) return "";
-  const order = {crit:0,warn:1,info:2,ok:3};
-  const list = [...me.alerts].sort((a,b) => order[a.lvl]-order[b.lvl]);
-  return `<div class="alerts"><h2>Pentru profilul tău</h2>${
-    list.length ? list.map(a => `<div class="alert ${a.lvl}">${esc(a.t)}</div>`).join("")
-                : `<div class="alert ok">Nimic de semnalat pentru profilul tău.</div>`}</div>`;
-}
-
-function renderProfilePill(){
-  const L = profileLabels(getProfile()), p = $("#profPill");
-  p.classList.toggle("off", !L.length);
-  p.textContent = L.length ? "Profil: " + L.join(", ") : "Setează-ți profilul: alergii, copii, sarcină…";
-}
-
-function renderProfile(){
-  const P = getProfile();
-  $("#condList").innerHTML = CONDS.map(([id,l,d]) =>
-    `<label class="tog"><span>${l}<small>${d}</small></span><input type="checkbox" data-c="${id}" ${P[id]?"checked":""}></label>`).join("");
-  $("#allergenList").innerHTML = ALLERGENS.map(([id,l]) =>
-    `<button class="chip" data-a="${id}" aria-pressed="${(P.allergens||[]).includes(id)}">${l}</button>`).join("");
-}
-
 /* ---------- utilitare ---------- */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const num = (n,k) => n && n[k] !== undefined && n[k] !== "" && n[k] !== null && !isNaN(+n[k]) ? +n[k] : null;
+const fmt = v => (+v).toLocaleString("ro-RO",{maximumFractionDigits:1});
 
 function lookup(raw){
   let c = String(raw).toUpperCase().replace(/[\s\-.]/g,"");
   if(!c.startsWith("E")) c = "E"+c;
   if(MAP[c]) return MAP[c];
-  const r = c.replace(/(IV|III|II|I)$/,"");          // E322I -> E322
+  const r = c.replace(/(IV|III|II|I)$/,"");
   if(r !== c && MAP[r]) return MAP[r];
-  const d = (c.match(/^E\d+/)||[])[0];               // E150D2 -> E150
+  const d = (c.match(/^E\d+/)||[])[0];
   if(d && MAP[d]) return MAP[d];
-  return {c:d||c, n:"Aditiv necatalogat în listă", l:0, t:"", d:"Nu avem o evaluare pentru acest cod."};
+  return {c:d||c, n:"Aditiv necatalogat în listă", l:0, t:"", d:"Nu avem o evaluare pentru acest cod.", u:1};
 }
 
 function extractFromText(text){
   const found = new Map();
   const re = /\bE[\s-]?(\d{3,4})([a-d])?(?![0-9])/gi;
   let m;
-  while((m = re.exec(text))){
-    const a = lookup("E"+m[1]+(m[2]||""));
-    found.set(a.c, a);
-  }
+  while((m = re.exec(text))){ const a = lookup("E"+m[1]+(m[2]||"")); found.set(a.c, a); }
   const t = " "+norm(text)+" ";
   DB.forEach(a => (a.k||[]).forEach(k => {
     let i = t.indexOf(k);
@@ -631,11 +547,20 @@ function extractFromText(text){
   }));
   return [...found.values()];
 }
-
 function fromTags(tags){
   const found = new Map();
   (tags||[]).forEach(t => { const a = lookup(t.replace(/^[a-z]{2}:/,"")); found.set(a.c, a); });
   return [...found.values()];
+}
+function mergeAdds(a, b){ const m = new Map(); [...a,...b].forEach(x => { if(!m.has(x.c)) m.set(x.c,x); }); return [...m.values()]; }
+
+/* corectează greșelile tipice ale citirii optice în codurile E */
+function fixOcr(t){
+  return t.replace(/-\s*\n\s*/g,"")
+    .replace(/\s*\n\s*/g," ")
+    .replace(/\b([Ee])[\s-]?([0-9OoIlS]{3,4})(?=[a-dA-D]?(?![0-9A-Za-z]))/g, (m,e,d) =>
+      d.replace(/\D/g,"").length >= 2 ? "E"+d.replace(/[Oo]/g,"0").replace(/[Il]/g,"1").replace(/S/g,"5") : m)
+    .replace(/\s{2,}/g," ").trim();
 }
 
 /* ---------- scor ---------- */
@@ -663,32 +588,203 @@ function verdict(s){
   if(s >= 25) return {t:"Slab", i:1};
   return {t:"De evitat", i:0};
 }
-const VCOL = ["var(--plum)","var(--tomato)","var(--mustard)","var(--leaf)"];
-
-/* ---------- randare ---------- */
 const VSTYLE = [
   "--vc:var(--c0);--vt:#fff;--seg:rgba(255,255,255,.35);--segon:#fff",
   "--vc:var(--c1);--vt:#fff;--seg:rgba(255,255,255,.35);--segon:#fff",
   "--vc:var(--c2);--vt:#3A2A00;--seg:rgba(0,0,0,.14);--segon:rgba(0,0,0,.65)",
   "--vc:var(--c3);--vt:#fff;--seg:rgba(255,255,255,.35);--segon:#fff"
 ];
+
+/* ============================================================
+   PROFIL PERSONAL (stocat doar pe dispozitiv)
+   ============================================================ */
+const PK = "ceContine.profile";
+const ALLERGENS = [
+  ["gluten","Gluten",/\b(grau|orz|secara|ovaz|spelt|gluten|extract de malt|malt de orz|cuscus|gris)/],
+  ["milk","Lapte",/\b(lapte|lactoz|smantan|unt\b|branz|zer\b|cazein|iaurt|frisca|lactoser)/],
+  ["eggs","Ouă",/\b(oua?\b|albus|galbenus|praf de ou|lizozim)/],
+  ["soybeans","Soia",/\bsoia/],
+  ["peanuts","Arahide",/\barahid/],
+  ["nuts","Fructe cu coajă lemnoasă",/\b(alun|migdal|nuc[ai]\b|caju|fistic|pecan|macadamia)/],
+  ["fish","Pește",/\b(peste|ton\b|somon|hamsi|cod\b|sardin)/],
+  ["crustaceans","Crustacee",/\b(crevet|crab|homar|raci?\b)/],
+  ["sesame-seeds","Susan",/\bsusan/],
+  ["mustard","Muștar",/\bmustar/],
+  ["celery","Țelină",/\btelin/],
+  ["lupin","Lupin",/\blupin/],
+  ["molluscs","Moluște",/\b(scoic|midi[ie]|calamar|caracatit)/],
+  ["sulphur-dioxide-and-sulphites","Sulfiți",/(sulfit|dioxid de sulf)/]
+];
+const CONDS = [
+  ["preg","Sarcină sau alăptare","Semnalez nitriții, cofeina, chinina și alcoolul.","Sarcină"],
+  ["pku","Fenilcetonurie","Aspartamul devine contraindicat.","Fenilcetonurie"],
+  ["gout","Gută","Semnalez ribonucleotidele (purine) și fructoza adăugată.","Gută"],
+  ["bp","Hipertensiune","Prag mai strict pentru sare.","Hipertensiune"],
+  ["diab","Diabet sau evit zahărul","Prag mai strict pentru zahăr.","Zahăr redus"],
+  ["vegan","Vegan","Semnalez ingredientele și aditivii de origine animală.","Vegan"]
+];
+const KID_OPTS = [["","Nu"],["0","Sub 1 an"],["1","1–3 ani"],["3","3–12 ani"]];
+const SPORT_OPTS = [["","Nu"],["muscle","Masă musculară"],["endurance","Anduranță"],["weight","Slăbire"]];
+const CAF = /\b(cafein|cafea\b|guarana|extract de ceai|ceai negru|ceai verde)/;
+const ALC = /\b(alcool|etanol|vin\b|bere\b|lichior|coniac|vodca|whisky|rom\b)/;
+const VEG = /\b(lapte|lactoz|smantan|unt\b|branz|zer\b|cazein|iaurt|oua?\b|miere|gelatin|carne|porc|vita\b|pui\b|peste|colagen|untura|slanina|sunca)/;
+const SUGAR_TXT = /\b(zahar|sirop de|dextroz|glucoz|fructoz|miere|zaharoz)/;
+const SULF_CODES = ["E220","E221","E222","E223","E224","E226","E227","E228"];
+const POLYOLS = ["E420","E421","E953","E965","E966","E967","E968"];
+
+function getProfile(){
+  let P; try{ P = JSON.parse(localStorage.getItem(PK)) || {}; }catch(e){ P = {}; }
+  if(P.kids && P.kidAge === undefined) P.kidAge = "3";
+  delete P.kids;
+  P.allergens = P.allergens || []; P.kidAge = P.kidAge || ""; P.sport = P.sport || "";
+  return P;
+}
+function setProfile(p){ try{ localStorage.setItem(PK, JSON.stringify(p)); }catch(e){} }
+function profileLabels(P){
+  const L = [];
+  if(P.kidAge) L.push("Copil "+KID_OPTS.find(o => o[0]===P.kidAge)[1].toLowerCase());
+  if(P.sport) L.push(SPORT_OPTS.find(o => o[0]===P.sport)[1]);
+  CONDS.forEach(c => { if(P[c[0]]) L.push(c[3]); });
+  P.allergens.forEach(id => { const a = ALLERGENS.find(x => x[0]===id); if(a) L.push(a[1]); });
+  return L;
+}
+function splitTraces(t){ const i = t.search(/(poate contine|urme de|may contain)/); return i < 0 ? [t,""] : [t.slice(0,i), t.slice(i)]; }
+
+function personalize(ctx, grams){
+  const P = getProfile();
+  const g = grams || 100;
+  const out = {alerts:[], pen:0, crit:false, mine:new Set(), active:profileLabels(P).length > 0};
+  if(!out.active) return out;
+  const adds = ctx.adds || [];
+  const has = c => adds.some(a => a.c === c);
+  const n = ctx.nutr;
+  const v100 = k => num(n,k);
+  const per = k => { const v = num(n,k); return v === null ? null : v*g/100; };
+  const [main, traces] = splitTraces(ctx.text || "");
+  const add = (lvl, t, pen=0, codes=[]) => { out.alerts.push({lvl,t}); out.pen += pen; if(lvl==="crit") out.crit = true; codes.forEach(c => out.mine.add(c)); };
+
+  P.allergens.forEach(id => {
+    const A = ALLERGENS.find(x => x[0] === id); if(!A) return;
+    const sc = id.startsWith("sulphur") ? SULF_CODES.filter(has) : [];
+    const inside = (ctx.allergens||[]).includes("en:"+id) || A[2].test(main) || sc.length > 0;
+    const trace = (ctx.traces||[]).includes("en:"+id) || A[2].test(traces);
+    if(inside) add("crit", `Conține ${A[1].toLowerCase()}, la care ai declarat alergie.`, 0, sc);
+    else if(trace) add("warn", `Poate conține urme de ${A[1].toLowerCase()}.`, 20);
+  });
+
+  if(P.pku){
+    const A = ["E951","E962"].filter(has);
+    if(A.length || /fenilalanin/.test(main)) add("crit","Conține aspartam (sursă de fenilalanină): contraindicat în fenilcetonurie.",0,A);
+  }
+
+  /* copii, pe vârste */
+  if(P.kidAge){
+    const young = P.kidAge === "0" || P.kidAge === "1";
+    if(P.kidAge === "0" && /\bmiere/.test(main)) add("crit","Conține miere: nu se dă copiilor sub 1 an (risc de botulism infantil).");
+    const S = ["E102","E104","E110","E122","E124","E129"].filter(has);
+    if(S.length) add("warn",`${S.join(", ")}: coloranți asociați cu hiperactivitatea copiilor (studiul Southampton).`,15*S.length,S);
+    const B = ["E210","E211","E212","E213"].filter(has);
+    if(B.length) add("warn",`${B.join(", ")} (benzoați) au fost incluși în același studiu despre hiperactivitate.`,10,B);
+    const SW = adds.filter(a => a.t === "Îndulcitor" && a.l >= 2).map(a => a.c);
+    if(SW.length) young
+      ? add("warn",`Îndulcitori artificiali (${SW.join(", ")}): nu sunt permiși în alimentele destinate sugarilor și copiilor mici.`,25,SW)
+      : add("warn",`Îndulcitori artificiali (${SW.join(", ")}): nerecomandați copiilor.`,10,SW);
+    if(CAF.test(main)) add("warn","Conține cofeină: nerecomandată copiilor.", young ? 30 : 20);
+    const s100 = v100("sugars_100g");
+    if(young){
+      if(SUGAR_TXT.test(main) || (s100 !== null && s100 > 5)) add("warn","OMS recomandă fără zahăr adăugat până la 2 ani.",20);
+      const salt = v100("salt_100g");
+      if(salt !== null && salt > 0.3) add("warn",`Prea sărat pentru un copil mic: ${fmt(salt)} g sare la 100 g.`,15);
+    } else if(s100 !== null && s100 > 12.5) add("warn",`Mult zahăr pentru un copil: ${fmt(s100)} g la 100 g.`,10);
+    const sp = per("sugars_100g");
+    if(sp !== null && sp >= 1) add("info",`${fmt(sp/4)} lingurițe de zahăr în ${fmt(g)} g de produs (1 linguriță = 4 g).`);
+  }
+
+  /* sport */
+  if(P.sport){
+    const kcal = v100("energy-kcal_100g"), prot = v100("proteins_100g"), fib = v100("fiber_100g");
+    const POL = POLYOLS.filter(has);
+    if(POL.length) add("warn",`Polioli (${POL.join(", ")}): pot da disconfort digestiv, mai ales înainte de efort.`,5,POL);
+    if(P.sport === "muscle" && prot !== null){
+      const pp = `${fmt(per("proteins_100g"))} g proteine în ${fmt(g)} g.`;
+      if(kcal){
+        const d = prot/kcal*100;
+        if(d >= 10) add("ok",`Densitate proteică bună: ${fmt(d)} g proteine la 100 kcal. ${pp}`,-10);
+        else if(d >= 5) add("info",`Densitate proteică medie: ${fmt(d)} g proteine la 100 kcal. ${pp}`);
+        else add("warn",`Puține proteine raportat la calorii: ${fmt(d)} g la 100 kcal. ${pp}`,5);
+      } else add("info", pp);
+    }
+    if(P.sport === "endurance"){
+      const c = per("carbohydrates_100g"), su = per("sugars_100g");
+      if(c !== null) add("info",`${fmt(c)} g carbohidrați în ${fmt(g)} g${su !== null ? `, din care ${fmt(su)} g zaharuri` : ""}.`);
+      if(fib !== null && fib > 6) add("info","Multe fibre: mai potrivit după efort decât chiar înainte.");
+      const fat = v100("fat_100g");
+      if(fat !== null && fat > 17.5) add("info","Multe grăsimi: digestie lentă dacă îl mănânci înainte de efort.");
+    }
+    if(P.sport === "weight"){
+      if(kcal !== null){
+        add("info",`${Math.round(kcal*g/100)} kcal în ${fmt(g)} g.`);
+        if(kcal > 400) add("warn",`Densitate calorică ridicată: ${Math.round(kcal)} kcal la 100 g.`,10);
+      }
+      if(fib !== null && fib >= 6) add("ok","Bogat în fibre (peste 6 g la 100 g): ajută la senzația de sațietate.",-5);
+      if(prot !== null && kcal && prot*4/kcal >= 0.12) add("ok","Sursă de proteine: ajută la senzația de sațietate.",-5);
+      const s = v100("sugars_100g");
+      if(s !== null && s > 22.5) add("warn",`Mult zahăr: ${fmt(s)} g la 100 g.`,10);
+    }
+  }
+
+  if(P.preg){
+    const N = ["E249","E250","E251","E252"].filter(has);
+    if(N.length) add("warn",`Sarcină: conține nitriți sau nitrați (${N.join(", ")}).`,15,N);
+    if(CAF.test(main)) add("warn","Conține cofeină: EFSA recomandă sub 200 mg pe zi în sarcină, din toate sursele.",10);
+    if(/\bchinin/.test(main)) add("warn","Conține chinină (ex. apă tonică): nerecomandată în sarcină.",15);
+    if(ALC.test(main)) add("warn","Ingredientele menționează alcool sau o băutură alcoolică: verifică eticheta.",20);
+  }
+  if(P.gout){
+    const R = ["E627","E631","E635"].filter(has);
+    if(R.length) add("warn",`Gută: ${R.join(", ")} sunt ribonucleotide (purine).`,15,R);
+    if(/(fructoz|sirop de porumb)/.test(main)) add("warn","Gută: conține fructoză adăugată, asociată cu creșterea acidului uric.",15);
+  }
+  if(P.bp){
+    const s = v100("salt_100g");
+    if(s !== null){
+      if(s > 1.5) add("warn",`Hipertensiune: ${fmt(s)} g sare la 100 g, nivel ridicat.`,25);
+      else if(s > 0.6) add("warn",`Hipertensiune: ${fmt(s)} g sare la 100 g, nivel mediu.`,10);
+    }
+    const G = adds.filter(a => /^E62[0-5]$/.test(a.c)).map(a => a.c);
+    if(G.length) add("info",`Glutamații (${G.join(", ")}) adaugă sodiu.`,5,G);
+  }
+  if(P.diab){
+    const s = v100("sugars_100g");
+    if(s !== null){
+      if(s > 22.5) add("warn",`Zahăr: ${fmt(s)} g la 100 g, nivel ridicat.`,25);
+      else if(s > 5) add("warn",`Zahăr: ${fmt(s)} g la 100 g, nivel mediu.`,10);
+    } else if(SUGAR_TXT.test(main)) add("info","Conține zahăr adăugat, dar lipsesc valorile nutriționale.",5);
+  }
+  if(P.vegan){
+    const AN = ["E120","E901","E904","E966","E1105"].filter(has);
+    const tags = ctx.analysis || [];
+    if(tags.includes("en:non-vegan") || VEG.test(main) || AN.length) add("info",`Nu pare vegan${AN.length ? ` (${AN.join(", ")} sunt de origine animală)` : ""}.`,0,AN);
+    else if(tags.includes("en:vegan")) add("ok","Pare vegan conform analizei ingredientelor.");
+  }
+  return out;
+}
+
+/* ---------- blocuri de rezultat ---------- */
 function scoreBlock(sc, me){
-  me = me || {active:false, pen:0, crit:false};
-  if(!sc && !me.crit) return `<div class="notice">Nu există suficiente date pentru un scor. Verifică lista de ingrediente de pe ambalaj și folosește „Lipește ingredientele”.</div>`;
+  if(!sc && !me.crit) return `<div class="notice">Nu există suficiente date pentru un scor. Fotografiază lista de ingrediente de pe ambalaj.</div>`;
   const base = sc ? sc.score : 0;
-  let shown = me.active ? Math.max(0, base - me.pen) : base;
+  let shown = me.active ? Math.min(100, Math.max(0, base - me.pen)) : base;
   if(me.crit) shown = Math.min(shown, 5);
   const v = verdict(shown);
-  const vt = me.crit ? "Nepotrivit pentru tine" : v.t;
   const segs = [0,1,2,3].map(i => `<b class="${i===v.i?'on':''}"></b>`).join("");
   const parts = sc ? sc.parts.map(x => `<div class="part"><span>${esc(x.label)}</span><strong>${x.val}</strong><div class="bar"><i style="width:${x.val}%"></i></div></div>`).join("") : "";
-  const sub = me.active ? `<p class="sub">Ajustat pentru profilul tău${sc ? ` · scor general ${base}` : ""}</p>` : "";
   return `<div class="score" style="${VSTYLE[v.i]}">
     <div class="score-head">
       <div class="score-num">${shown}<span>/100</span></div>
-      <div class="verdict">${vt}</div>
+      <div class="verdict">${me.crit ? "Nepotrivit pentru tine" : v.t}</div>
     </div>
-    ${sub}
+    ${me.active ? `<p class="sub">Ajustat pentru profilul tău${sc ? ` · scor general ${base}` : ""}</p>` : ""}
     <div class="meter">${segs}<i class="pin" style="left:${Math.min(99,Math.max(1,shown))}%"></i></div>
     <div class="meter-labels"><span>De evitat</span><span>Slab</span><span>Acceptabil</span><span>Bun</span></div>
     ${parts ? `<div class="parts">${parts}</div>` : ""}
@@ -696,33 +792,85 @@ function scoreBlock(sc, me){
   </div>`;
 }
 
-function lightsBlock(n){
-  if(!n) return "";
-  const TL = [["sugars_100g","Zaharuri",5,22.5],["fat_100g","Grăsimi",3,17.5],["saturated-fat_100g","Grăsimi saturate",1.5,5],["salt_100g","Sare",.3,1.5]];
-  const items = TL.filter(([k]) => n[k] !== undefined && n[k] !== "").map(([k,l,lo,hi]) => {
-    const v = +n[k]; const cls = v > hi ? "hi" : v > lo ? "mid" : "lo";
-    const word = cls==="hi" ? "mult" : cls==="mid" ? "mediu" : "puțin";
-    return `<div class="light ${cls}"><strong>${v.toLocaleString("ro-RO",{maximumFractionDigits:1})} g</strong>${l} · ${word}</div>`;
-  }).join("");
-  return items ? `<h2>La 100 g</h2><div class="lights">${items}</div>` : "";
+function alertsBlock(me){
+  if(!me.active) return `<div id="alertsBox"></div>`;
+  const order = {crit:0,warn:1,info:2,ok:3};
+  const list = [...me.alerts].sort((a,b) => order[a.lvl]-order[b.lvl]);
+  return `<div class="alerts" id="alertsBox"><h2>Pentru profilul tău</h2>${
+    list.length ? list.map(a => `<div class="alert ${a.lvl}">${esc(a.t)}</div>`).join("")
+                : `<div class="alert ok">Nimic de semnalat pentru profilul tău.</div>`}</div>`;
 }
 
 function addItem(a, mine){
   const L = LEVEL[a.l];
+  const eu = a.u ? "Cod necunoscut listei noastre" : a.b ? "Interzis în UE" : "Autorizat în UE · Regulamentul (CE) nr. 1333/2008";
   return `<details class="add ${L.cls}">
     <summary><span><span class="code">${esc(a.c)}</span> ${esc(a.n)}${a.b?'<span class="ban">interzis în UE</span>':''}${mine && mine.has(a.c)?'<span class="me">contează pentru tine</span>':''}</span><span class="lvl">${L.name}</span></summary>
     <p>${a.t ? `<em>${esc(a.t)}.</em> ` : ""}${esc(a.d)}</p>
+    <p class="eu">${eu}</p>
   </details>`;
 }
 
+const TRUST = `<div class="trust">Aditivii sunt verificați după lista oficială UE (Regulamentul CE nr. 1333/2008). <button class="linkish" data-method="1">Cum analizăm</button></div>`;
 function additivesBlock(adds, mine){
-  if(adds === null) return `<h2>Aditivi</h2><div class="notice">Lista de ingrediente lipsește din baza de date.</div>`;
-  if(!adds.length) return `<h2>Aditivi</h2><div class="empty-ok">Nu am găsit aditivi alimentari (coduri E) în ingrediente.</div>`;
+  if(adds === null) return `<h2>Aditivi</h2><div class="notice">Lista de ingrediente lipsește din baza de date. Fotografiază-o de pe ambalaj.</div>`;
+  if(!adds.length) return `<h2>Aditivi</h2>${TRUST}<div class="empty-ok">Nu am găsit aditivi alimentari (coduri E) în ingrediente.</div>`;
   const sorted = [...adds].sort((x,y) => (y.b||0)-(x.b||0) || y.l-x.l);
-  return `<h2>Aditivi (${adds.length})</h2>${sorted.map(a => addItem(a, mine)).join("")}`;
+  return `<h2>Aditivi (${adds.length})</h2>${TRUST}${sorted.map(a => addItem(a, mine)).join("")}`;
 }
 
-const FOOT = `<p class="foot">Scor orientativ, nu sfat medical. Clasificarea aditivilor reflectă dezbateri științifice publice (EFSA, IARC, studii publicate); toți aditivii fără mențiunea „interzis în UE” sunt autorizați legal. Datele despre produs provin din <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> (licență ODbL) și pot fi incomplete.</p>`;
+function lightsBlock(n){
+  if(!n) return "";
+  const TL = [["sugars_100g","Zaharuri",5,22.5],["fat_100g","Grăsimi",3,17.5],["saturated-fat_100g","Grăsimi saturate",1.5,5],["salt_100g","Sare",.3,1.5]];
+  const items = TL.filter(([k]) => num(n,k) !== null).map(([k,l,lo,hi]) => {
+    const v = num(n,k); const cls = v > hi ? "hi" : v > lo ? "mid" : "lo";
+    const word = cls==="hi" ? "mult" : cls==="mid" ? "mediu" : "puțin";
+    return `<div class="light ${cls}"><strong>${fmt(v)} g</strong>${l} · ${word}</div>`;
+  }).join("");
+  return items ? `<h2>Semafor la 100 g</h2><div class="lights">${items}</div>` : "";
+}
+
+/* calcul pe cantitate */
+const NT = [["energy-kcal_100g","Energie","kcal",2000],["fat_100g","Grăsimi","g",70],["saturated-fat_100g","din care saturate","g",20,1],
+  ["carbohydrates_100g","Carbohidrați","g",260],["sugars_100g","din care zaharuri","g",90,1],["fiber_100g","Fibre","g",0],
+  ["proteins_100g","Proteine","g",50],["salt_100g","Sare","g",6]];
+function ntTable(n, g){
+  const rows = NT.filter(([k]) => num(n,k) !== null).map(([k,l,u,ri,sub]) => {
+    const v = num(n,k)*g/100;
+    const shown = u === "kcal" ? Math.round(v)+" kcal" : fmt(v)+" g";
+    return `<tr class="${sub?'subrow':''}"><td>${l}</td><td>${shown}</td><td>${ri ? Math.round(v/ri*100)+"% RI" : ""}</td></tr>`;
+  }).join("");
+  return `<table class="nt">${rows}</table>`;
+}
+function portionBlock(p, g){
+  const n = p.nutriments;
+  if(!n || !NT.some(([k]) => num(n,k) !== null)) return "";
+  const opts = [["100 g",100]];
+  if(+p.serving_quantity > 0) opts.push([`O porție (${fmt(+p.serving_quantity)} g)`, +p.serving_quantity]);
+  if(+p.product_quantity > 0 && +p.product_quantity !== +p.serving_quantity) opts.push([`Tot pachetul (${fmt(+p.product_quantity)} g)`, +p.product_quantity]);
+  return `<h2>Calculează pentru cantitatea ta</h2>
+  <div class="portion">
+    <div class="portion-row">
+      <label class="sr" for="grams">Cantitate în grame</label>
+      <input id="grams" type="number" inputmode="decimal" min="1" step="any" value="${g}"><span>g</span>
+      ${opts.map(([l,v]) => `<button class="qbtn" data-g="${v}" aria-pressed="${v===g}">${l}</button>`).join("")}
+    </div>
+    <div id="ntBox">${ntTable(n, g)}</div>
+    <p class="hint">RI = procent din aportul zilnic de referință pentru un adult (2000 kcal), conform Regulamentului UE nr. 1169/2011. La băuturi, valorile sunt la ml.</p>
+  </div>`;
+}
+
+let cur = {ctx:null, g:100};
+function updatePortion(g, fromInput){
+  if(!(g > 0) || !cur.ctx) return;
+  cur.g = g;
+  if($("#ntBox")) $("#ntBox").innerHTML = ntTable(cur.ctx.nutr, g);
+  const box = $("#alertsBox"); if(box) box.outerHTML = alertsBlock(personalize(cur.ctx, g));
+  document.querySelectorAll(".qbtn").forEach(b => b.setAttribute("aria-pressed", +b.dataset.g === g));
+  if(!fromInput && $("#grams")) $("#grams").value = g;
+}
+
+const FOOT = `<p class="foot">Scor orientativ, nu sfat medical. Datele despre produs provin din baza publică <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> și pot fi incomplete.</p>`;
 
 let lastRender = null;
 function renderProduct(code, p, quiet){
@@ -733,7 +881,9 @@ function renderProduct(code, p, quiet){
   if((p.additives_tags||[]).length) adds = fromTags(p.additives_tags);
   if(ingr){ const ex = extractFromText(ingr); adds = adds ? mergeAdds(adds, ex) : ex; }
   const sc = computeScore(p, adds);
-  const me = personalize({adds, text:norm(ingr), nutr:p.nutriments, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags});
+  if(!quiet) cur.g = +p.serving_quantity > 0 ? +p.serving_quantity : 100;
+  cur.ctx = {adds, text:norm(ingr), nutr:p.nutriments, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags};
+  const me = personalize(cur.ctx, cur.g);
   $("#result").innerHTML = `
     <div class="product">
       ${p.image_front_small_url ? `<img src="${esc(p.image_front_small_url)}" alt="">` : ""}
@@ -742,56 +892,120 @@ function renderProduct(code, p, quiet){
     ${scoreBlock(sc, me)}
     ${alertsBlock(me)}
     ${additivesBlock(adds, me.mine)}
+    ${portionBlock(p, cur.g)}
     ${lightsBlock(p.nutriments)}
     ${ingr ? `<details class="ingr"><summary>Ingrediente</summary><p>${esc(ingr)}</p></details>` : ""}
-    <p class="foot"><a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">Vezi sau corectează produsul în Open Food Facts</a></p>
-    ${FOOT}`;
+    ${FOOT}
+    <p class="foot">Ai găsit o greșeală la acest produs? <a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">Raporteaz-o aici</a>.</p>`;
   if(quiet) return;
   saveHistory({code, name, brand:p.brands||"", img:p.image_front_small_url||"", score:sc?sc.score:null, t:Date.now()});
   $("#result").scrollIntoView({behavior:"smooth", block:"start"});
-}
-
-function mergeAdds(a, b){ const m = new Map(); [...a,...b].forEach(x => { if(!m.has(x.c)) m.set(x.c,x); }); return [...m.values()]; }
-
-function renderNotFound(code){
-  $("#result").innerHTML = `<div class="notice" style="margin-top:20px">
-    <strong>Codul ${esc(code)} nu există încă în baza de date.</strong>
-    <p style="margin:6px 0 10px">Lipește lista de ingrediente de pe ambalaj ca să vezi aditivii, sau adaugă produsul în Open Food Facts ca să fie găsit data viitoare.</p>
-    <button class="btn small" onclick="openPaste()">Lipește ingredientele</button>
-    <a class="linkish" style="margin-left:10px" href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">Adaugă produsul</a>
-  </div>`;
 }
 
 function renderPasted(text, quiet){
   lastRender = () => renderPasted(text, true);
   const adds = extractFromText(text);
   const sc = computeScore({}, adds);
-  const me = personalize({adds, text:norm(text)});
+  cur.ctx = {adds, text:norm(text)};
+  const me = personalize(cur.ctx, 100);
   $("#result").innerHTML = `
-    <div class="product"><div><h3>Analiză din ingrediente</h3><p>Fără date nutriționale: scorul ține cont doar de aditivi.</p></div></div>
+    <div class="product"><div><h3>Analiză din ingrediente</h3><p>Fără valori nutriționale: scorul ține cont doar de aditivi și de profilul tău.</p></div></div>
     ${scoreBlock(sc, me)}${alertsBlock(me)}${additivesBlock(adds, me.mine)}${FOOT}`;
   if(!quiet) $("#result").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
+const OCR_CTA = `<div class="row"><button class="btn violet small" data-ocr="1">Fotografiază ingredientele</button><button class="linkish" data-type="1">sau scrie-le</button></div>`;
+function isInternal(code){ return /^2/.test(code) || (code.length === 13 && /^02/.test(code)); }
+function renderInternal(code){
+  lastRender = null;
+  $("#result").innerHTML = `<div class="notice internal" style="margin-top:20px">
+    <strong>Cod intern de magazin (${esc(code)})</strong>
+    <p style="margin:6px 0 4px">Codurile care încep cu 2 sunt create de magazin pentru produsele cântărite sau ambalate la raion: mezeluri, brânzeturi, carne, produse de patiserie. Conțin de obicei articolul și greutatea sau prețul, nu sunt înregistrate în nicio bază de date publică și nicio aplicație nu le poate identifica.</p>
+    <p style="margin:0 0 4px">Fotografiază eticheta cu ingredientele și o analizez de acolo.</p>
+    ${OCR_CTA}
+  </div>`;
+}
+function renderNotFound(code){
+  lastRender = null;
+  $("#result").innerHTML = `<div class="notice" style="margin-top:20px">
+    <strong>Produsul ${esc(code)} nu e încă în baza de date publică.</strong>
+    <p style="margin:6px 0 4px">Fotografiază lista de ingrediente de pe ambalaj și o analizez direct.</p>
+    ${OCR_CTA}
+    <p class="hint">Poți ajuta și pe alții adăugând produsul în <a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener" style="color:var(--brand)">Open Food Facts</a>.</p>
+  </div>`;
+}
+
 /* ---------- căutare produs ---------- */
-const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,brands,quantity,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro";
+const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,brands,quantity,product_quantity,serving_quantity,serving_size,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro";
 async function loadProduct(raw){
   const code = String(raw).replace(/\D/g,"");
   if(code.length < 8){ $("#result").innerHTML = `<div class="notice">Codul trebuie să aibă cel puțin 8 cifre.</div>`; return; }
   $("#result").innerHTML = `<div class="spinner" role="status" aria-label="Se caută produsul"></div>`;
+  const tries = [code];
+  if(code.length === 12) tries.push("0"+code);
+  if(code.length === 13 && code[0] === "0") tries.push(code.slice(1));
   try{
-    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=${FIELDS}`);
-    if(r.status === 404){ renderNotFound(code); return; }
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    const j = await r.json();
-    if(j.status !== 1 || !j.product){ renderNotFound(code); return; }
-    renderProduct(code, j.product);
+    for(const c of tries){
+      const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${c}.json?fields=${FIELDS}`);
+      if(r.status === 404) continue;
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j = await r.json();
+      if(j.status === 1 && j.product){ renderProduct(code, j.product); return; }
+    }
+    isInternal(code) ? renderInternal(code) : renderNotFound(code);
   }catch(e){
     $("#result").innerHTML = `<div class="notice">Nu pot accesa baza de date (${esc(e.message)}). Verifică conexiunea la internet și încearcă din nou.</div>`;
   }
 }
 
-/* ---------- scanner ---------- */
+/* ---------- citire etichetă cu camera (OCR, gratuit, în telefon) ---------- */
+let ocrWorker = null, ocrBusy = false;
+function loadScript(src){
+  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("modulul nu s-a descărcat")); document.head.appendChild(s); });
+}
+function ocrStatus(html, pct, err){
+  const s = $("#ocrStatus"); s.hidden = false; s.classList.toggle("err", !!err);
+  s.innerHTML = html + (pct != null ? `<div class="bar"><i style="width:${Math.round(pct*100)}%"></i></div>` : "");
+}
+function ocrLogger(m){
+  if(m.status === "recognizing text") ocrStatus("Citesc textul…", m.progress);
+  else if(/traineddata/.test(m.status)) ocrStatus("Descarc limba română (doar prima dată)…", m.progress);
+  else if(/initializ|loading/.test(m.status)) ocrStatus("Pregătesc cititorul…", m.progress);
+}
+async function prepImage(file){
+  const img = await createImageBitmap(file);
+  const sc = Math.min(1, 2000/Math.max(img.width, img.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
+  const x = c.getContext("2d");
+  x.filter = "grayscale(1) contrast(1.4)";
+  x.drawImage(img, 0, 0, c.width, c.height);
+  return c;
+}
+function startOcr(){ stopScan(); $("#ocrFile").value = ""; $("#ocrFile").click(); }
+function openTyping(){ $("#ocrBox").hidden = false; $("#ocrStatus").hidden = true; $("#pasteText").focus(); $("#ocrBox").scrollIntoView({behavior:"smooth", block:"center"}); }
+async function runOcr(file){
+  if(!file || ocrBusy) return;
+  ocrBusy = true;
+  $("#ocrBox").hidden = false; $("#pasteText").value = "";
+  $("#ocrBox").scrollIntoView({behavior:"smooth", block:"start"});
+  ocrStatus("Pregătesc imaginea…", 0);
+  try{
+    const canvas = await prepImage(file);
+    if(!window.Tesseract) await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js");
+    if(!ocrWorker) ocrWorker = await Tesseract.createWorker("ron", 1, {logger: ocrLogger});
+    const { data } = await ocrWorker.recognize(canvas);
+    const text = fixOcr(data.text || "");
+    if(text.length < 10){ ocrStatus("Nu am găsit text lizibil. Apropie telefonul de listă, evită reflexiile și încearcă din nou.", null, true); return; }
+    $("#pasteText").value = text;
+    ocrStatus("Gata. Verifică textul de mai jos și corectează-l dacă e nevoie, apoi apasă din nou Analizează.");
+    renderPasted(text, true);
+  }catch(e){
+    ocrStatus("Citirea nu a funcționat ("+esc(e.message)+"). Verifică conexiunea sau scrie ingredientele manual.", null, true);
+  }finally{ ocrBusy = false; }
+}
+
+/* ---------- scanner coduri de bare ---------- */
 let qr = null, scanning = false;
 async function startScan(){
   if(typeof Html5Qrcode === "undefined"){ $("#result").innerHTML = `<div class="notice">Modulul de scanare nu s-a încărcat. Verifică conexiunea sau scrie codul manual.</div>`; return; }
@@ -826,25 +1040,23 @@ async function onCode(text){
 const HK = "ceContine.history";
 function getHistory(){ try{ return JSON.parse(localStorage.getItem(HK)) || []; }catch(e){ return []; } }
 function saveHistory(item){
-  try{
-    const h = getHistory().filter(x => x.code !== item.code);
-    h.unshift(item); localStorage.setItem(HK, JSON.stringify(h.slice(0,60)));
-  }catch(e){}
+  try{ const h = getHistory().filter(x => x.code !== item.code); h.unshift(item); localStorage.setItem(HK, JSON.stringify(h.slice(0,60))); }catch(e){}
 }
 function renderHistory(){
   const h = getHistory();
-  if(!h.length){ $("#histList").innerHTML = `<div class="notice">Produsele scanate apar aici. Scanează primul produs din tabul Scanează.</div>`; return; }
+  if(!h.length){ $("#histList").innerHTML = `<div class="notice">Produsele scanate apar aici. Scanează primul produs din fila Scanează.</div>`; return; }
   $("#histList").innerHTML = h.map(x => {
     const v = x.score == null ? null : verdict(x.score);
+    const st = v ? VSTYLE[v.i].replace(/--vc:([^;]+);--vt:([^;]+).*/,"background:$1;color:$2") : "color:var(--muted)";
     return `<button class="hitem" data-code="${esc(x.code)}">
       ${x.img ? `<img src="${esc(x.img)}" alt="">` : `<span class="ph"></span>`}
       <span class="t"><b>${esc(x.name)}</b><span>${esc(x.brand || x.code)}</span></span>
-      <span class="badge" style="${v ? VSTYLE[v.i].replace(/--vc:([^;]+);--vt:([^;]+).*/,'background:$1;color:$2') : 'color:var(--muted)'}">${x.score ?? "–"}</span>
+      <span class="badge" style="${st}">${x.score ?? "–"}</span>
     </button>`;
   }).join("") + `<button class="linkish" id="clearHist">Șterge istoricul</button>`;
 }
 
-/* ---------- lista aditivi ---------- */
+/* ---------- lista de aditivi ---------- */
 let filt = "all";
 function renderAddList(){
   const q = norm($("#addSearch").value.trim());
@@ -852,6 +1064,25 @@ function renderAddList(){
     (!q || norm(a.c).includes(q) || norm(a.n).includes(q) || (a.k||[]).some(k => k.includes(q)) || norm(a.t).includes(q)));
   $("#addCount").textContent = `${list.length} aditivi`;
   $("#addList").innerHTML = list.map(a => addItem(a)).join("");
+}
+
+/* ---------- profil (interfață) ---------- */
+function renderProfilePill(){
+  const L = profileLabels(getProfile()), p = $("#profPill");
+  p.classList.toggle("off", !L.length);
+  p.textContent = L.length ? "Profil: " + L.join(", ") : "Setează-ți profilul: copii, sport, alergii…";
+}
+function segHtml(key, opts, val){
+  return opts.map(([v,l]) => `<button role="radio" aria-checked="${v===val}" data-key="${key}" data-val="${v}">${l}</button>`).join("");
+}
+function renderProfile(){
+  const P = getProfile();
+  $("#kidSeg").innerHTML = segHtml("kidAge", KID_OPTS, P.kidAge);
+  $("#sportSeg").innerHTML = segHtml("sport", SPORT_OPTS, P.sport);
+  $("#condList").innerHTML = CONDS.map(([id,l,d]) =>
+    `<label class="tog"><span>${l}<small>${d}</small></span><input type="checkbox" data-c="${id}" ${P[id]?"checked":""}></label>`).join("");
+  $("#allergenList").innerHTML = ALLERGENS.map(([id,l]) =>
+    `<button class="chip" data-a="${id}" aria-pressed="${P.allergens.includes(id)}">${l}</button>`).join("");
 }
 
 /* ---------- navigare și evenimente ---------- */
@@ -867,44 +1098,59 @@ function show(v){
   if(v === "v-scan"){ renderProfilePill(); if(lastRender) lastRender(); }
   window.scrollTo(0,0);
 }
-function openPaste(){ $("#pasteBox").hidden = false; $("#pasteText").focus(); }
 
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
 $("#startBtn").addEventListener("click", startScan);
 $("#stopBtn").addEventListener("click", stopScan);
 $("#manualForm").addEventListener("submit", e => { e.preventDefault(); stopScan(); loadProduct($("#manualCode").value); });
-$("#pasteToggle").addEventListener("click", () => { const b = $("#pasteBox"); b.hidden = !b.hidden; if(!b.hidden) $("#pasteText").focus(); });
+$("#ocrBtn").addEventListener("click", startOcr);
+$("#ocrAgain").addEventListener("click", startOcr);
+$("#ocrFile").addEventListener("change", e => runOcr(e.target.files[0]));
+$("#typeToggle").addEventListener("click", openTyping);
 $("#pasteBtn").addEventListener("click", () => { const t = $("#pasteText").value.trim(); if(t) renderPasted(t); });
+
+$("#result").addEventListener("click", e => {
+  if(e.target.closest("[data-ocr]")) return startOcr();
+  if(e.target.closest("[data-type]")) return openTyping();
+  if(e.target.closest("[data-method]")){ show("v-add"); $("#method").open = true; return; }
+  const q = e.target.closest(".qbtn"); if(q) updatePortion(+q.dataset.g);
+});
+$("#result").addEventListener("input", e => {
+  if(e.target.id === "grams") updatePortion(parseFloat(String(e.target.value).replace(",", ".")), true);
+});
+
 $("#histList").addEventListener("click", e => {
   if(e.target.id === "clearHist"){ try{ localStorage.removeItem(HK); }catch(_){} renderHistory(); return; }
   const it = e.target.closest(".hitem"); if(it){ show("v-scan"); $("#manualCode").value = it.dataset.code; loadProduct(it.dataset.code); }
 });
 $("#addSearch").addEventListener("input", renderAddList);
-document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+document.querySelectorAll(".chips:not(.al) .chip").forEach(c => c.addEventListener("click", () => {
   filt = c.dataset.f;
-  document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === c ? "true" : "false"));
+  document.querySelectorAll(".chips:not(.al) .chip").forEach(x => x.setAttribute("aria-pressed", x === c ? "true" : "false"));
   renderAddList();
 }));
 
 $("#profPill").addEventListener("click", () => show("v-prof"));
+["#kidSeg","#sportSeg"].forEach(id => $(id).addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  const P = getProfile(); P[b.dataset.key] = b.dataset.val; setProfile(P); renderProfile();
+}));
 $("#condList").addEventListener("change", e => {
   const id = e.target.dataset.c; if(!id) return;
   const P = getProfile(); P[id] = e.target.checked; setProfile(P);
 });
 $("#allergenList").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if(!b) return;
-  const P = getProfile(); const set = new Set(P.allergens||[]);
+  const P = getProfile(); const set = new Set(P.allergens);
   set.has(b.dataset.a) ? set.delete(b.dataset.a) : set.add(b.dataset.a);
   P.allergens = [...set]; setProfile(P);
   b.setAttribute("aria-pressed", set.has(b.dataset.a));
 });
 $("#profDone").addEventListener("click", () => show("v-scan"));
 $("#profReset").addEventListener("click", () => { setProfile({allergens:[]}); renderProfile(); });
-renderProfilePill();
 
-// desen cod de bare decorativ
+renderProfilePill();
 $(".barcode-art").innerHTML = [3,1,2,1,4,1,1,3,2,1,1,2,3,1,2,4,1,2,1,3,1,1,2].map(w => `<i style="width:${w}px"></i>`).join("");
-// deschidere directă: index.html?cod=5941234567890
 const qp = new URLSearchParams(location.search).get("cod"); if(qp){ $("#manualCode").value = qp; loadProduct(qp); }
 </script>
 </body>
