@@ -209,6 +209,23 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
 .nf{display:flex;align-items:center;gap:6px}
 .nf input{width:100%;min-width:0;border:2px solid var(--line);border-radius:10px;padding:7px 9px;background:var(--paper);color:var(--ink);font-size:16px}
 .nf em{font-style:normal;font-size:13px;color:var(--muted);min-width:28px}
+.comp{background:var(--surface);border:2px solid var(--violet);border-radius:20px;padding:2px 16px 14px;margin-top:14px}
+.comp h2{margin:14px 0 4px;font-size:20px;color:var(--violet)}
+.steps{list-style:none;margin:10px 0 0;padding:0}
+.steps li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.steps li:first-child{border-top:0}
+.ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;background:var(--line);color:var(--muted)}
+.steps .done .ic{background:var(--c3);color:#fff}
+.steps .todo .ic{background:var(--violet-bg);color:var(--violet)}
+.st small{display:block;color:var(--muted);font-size:14px}
+.acts{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:8px}
+.ed{margin-top:10px}
+.ed summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.ed textarea{margin-top:8px}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 82px);z-index:9;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:13px 22px;background:var(--brand);color:var(--on-brand);font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.28);white-space:nowrap}
+.fab svg{width:22px;height:22px}
+.fab[hidden]{display:none}
+.wrap{padding-bottom:160px}
 .brandlink{display:flex;align-items:center;gap:12px;min-width:0}
 .logo{width:52px;height:52px;flex:none;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
 .brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -314,6 +331,8 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
     <div class="row"><button class="btn violet" id="profDone" data-i18n="profDone"></button><button class="btn ghost small" id="profReset" data-i18n="profReset"></button></div>
   </section>
 </div>
+
+<button class="fab" id="newScan" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8 8v8M11 8v8M14 8v8M17 8v8"/></svg><span data-i18n="newScan"></span></button>
 
 <div id="cropper" class="cropper" hidden role="dialog" aria-modal="true" aria-labelledby="cropTitle">
   <p class="crop-title" id="cropTitle"></p>
@@ -779,6 +798,21 @@ const DB_EN = {
    ============================================================ */
 const STR = {
 ro:{
+ newScan:"Scanează alt produs",
+ compH:"Completează produsul",
+ compDone:"Produs completat de tine",
+ compSub:"Codul a identificat produsul, dar baza de date nu are toate datele. Două fotografii dau un scor complet.",
+ compSubNone:"Codul nu e încă în baza de date. Două fotografii dau un scor complet.",
+ compSubDone:"Ai adăugat datele lipsă. Le poți corecta oricând.",
+ rowName:"Nume și poză", rowIngr:"Ingrediente", rowNutr:"Valori nutriționale",
+ stFound:"găsite", stMissing:"lipsesc", stDb:"din baza de date", stMine:"adăugate de tine",
+ redo:"refă",
+ edIngr:"Scrie sau corectează ingredientele", edIngrApply:"Salvează și reanalizează",
+ edNut:"Scrie sau corectează valorile nutriționale",
+ saveNote:"Datele adăugate de tine rămân pe telefon și apar automat la următoarea scanare a acestui cod.",
+ resetSaved:"Șterge datele adăugate de mine",
+ unknownProduct:"Produs absent din baza de date",
+ ocrDoneCard:"Gata. Verifică ingredientele citite în cardul de mai jos și corectează-le dacă e nevoie.",
  fromPhoto:"din fotografie",
  a_noIngr:"Lista de ingrediente lipsește, deci nu pot verifica alergenii și restricțiile din profilul tău. Fotografiază ingredientele înainte să consumi produsul.",
  incompleteHintIngr:"Lipsește lista de ingrediente, deci scorul nu include aditivii și gradul de procesare. Fotografiază ingredientele mai jos pentru un scor complet.",
@@ -843,7 +877,7 @@ ro:{
  ml0:"De evitat", ml1:"Slab", ml2:"Acceptabil", ml3:"Bun",
  notForYou:"Nepotrivit pentru tine", adjusted:"Ajustat pentru profilul tău", generalScore:" · scor general {n}",
  partial:"Scor parțial: lipsesc unele date, așa că s-a calculat doar din componentele disponibile.",
- noScore:"Nu există suficiente date pentru un scor. Fotografiază lista de ingrediente de pe ambalaj.",
+ noScore:"Nu există suficiente date pentru un scor. Completează produsul cu două fotografii.",
  pNutri:"Profil nutrițional · Nutri-Score {g}", pAdd:"Aditivi · {n} cu risc", pAddNone:"Aditivi · fără aditivi cu risc", pNova:"Procesare · NOVA {n} din 4",
  forProfile:"Pentru profilul tău", nothing:"Nimic de semnalat pentru profilul tău.",
  additives:"Aditivi", additivesN:"Aditivi ({n})",
@@ -917,6 +951,21 @@ ro:{
  a_vegan:"Pare vegan conform analizei ingredientelor."
 },
 en:{
+ newScan:"Scan another product",
+ compH:"Complete the product",
+ compDone:"Product completed by you",
+ compSub:"The code identified the product, but the database lacks some data. Two photos give a complete score.",
+ compSubNone:"The code isn't in the database yet. Two photos give a complete score.",
+ compSubDone:"You added the missing data. You can correct it any time.",
+ rowName:"Name and photo", rowIngr:"Ingredients", rowNutr:"Nutrition values",
+ stFound:"found", stMissing:"missing", stDb:"from the database", stMine:"added by you",
+ redo:"redo",
+ edIngr:"Type or correct the ingredients", edIngrApply:"Save and re-analyse",
+ edNut:"Type or correct the nutrition values",
+ saveNote:"Data you add stays on your phone and shows up automatically the next time you scan this code.",
+ resetSaved:"Delete the data I added",
+ unknownProduct:"Product not in the database",
+ ocrDoneCard:"Done. Check the ingredients read in the card below and correct them if needed.",
  fromPhoto:"from photo",
  a_noIngr:"The ingredient list is missing, so I can't check the allergens and restrictions in your profile. Photograph the ingredients before you eat this product.",
  incompleteHintIngr:"The ingredient list is missing, so the score doesn't include additives and processing. Photograph the ingredients below for a complete score.",
@@ -981,7 +1030,7 @@ en:{
  ml0:"Avoid", ml1:"Poor", ml2:"Fair", ml3:"Good",
  notForYou:"Not suitable for you", adjusted:"Adjusted for your profile", generalScore:" · overall score {n}",
  partial:"Partial score: some data is missing, so only the available parts were used.",
- noScore:"Not enough data for a score. Photograph the ingredient list on the pack.",
+ noScore:"Not enough data for a score. Complete the product with two photos.",
  pNutri:"Nutrition · Nutri-Score {g}", pAdd:"Additives · {n} of concern", pAddNone:"Additives · none of concern", pNova:"Processing · NOVA {n} of 4",
  forProfile:"For your profile", nothing:"Nothing to flag for your profile.",
  additives:"Additives", additivesN:"Additives ({n})",
@@ -1058,7 +1107,7 @@ en:{
 /* ---------- limbă / language ---------- */
 const LK = "good2eat.lang";
 let LANG = (() => { try{ const s = localStorage.getItem(LK); if(s === "ro" || s === "en") return s; }catch(e){} return (navigator.language||"").toLowerCase().startsWith("ro") ? "ro" : "en"; })();
-const t = (k, v={}) => String(STR[LANG][k] ?? STR.ro[k] ?? k).replace(/\{(\w+)\}/g, (m,n) => v[n] ?? "");
+const t = (k, v={}) => String(STR[LANG][k] ?? STR.ro[k] ?? k).replace(/\{(\w+)\}/g, (m,n) => v[n] ?? m);   // placeholderele necunoscute rămân (ex. {link}) și se înlocuiesc ulterior
 const LOCALE = () => LANG === "ro" ? "ro-RO" : "en-GB";
 
 /* migrare din versiunea anterioară (numele vechi) */
@@ -1367,7 +1416,7 @@ function addItem(a, mine){
 }
 const TRUST = () => `<div class="trust">${esc(t("trust"))} <button class="linkish" data-method="1">${esc(t("method"))}</button></div>`;
 function additivesBlock(adds, mine){
-  if(adds === null) return `<h2>${esc(t("additives"))}</h2><div class="notice">${esc(t("noIngr"))}${OCR_CTA()}</div>`;
+  if(adds === null) return prodCtx ? "" : `<h2>${esc(t("additives"))}</h2><div class="notice">${esc(t("noIngr"))}${OCR_CTA()}</div>`;
   if(!adds.length) return `<h2>${esc(t("additives"))}</h2>${TRUST()}<div class="empty-ok">${esc(t("noAdds"))}</div>`;
   const sorted = [...adds].sort((x,y) => (y.b||0)-(x.b||0) || y.l-x.l);
   return `<h2>${esc(t("additivesN",{n:adds.length}))}</h2>${TRUST()}${sorted.map(a => addItem(a, mine)).join("")}`;
@@ -1423,28 +1472,118 @@ function updatePortion(g, fromInput){
 const OFF_LINK = `<a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>`;
 const FOOT = () => `<p class="foot">${esc(t("foot")).replace("{link}", OFF_LINK)}</p>`;
 
-let lastRender = null, prodCtx = null;
-function applyIngredients(text){
-  if(prodCtx){ prodCtx.p._ingr = text; renderProduct(prodCtx.code, prodCtx.p, true); const a = $("#alertsBox") || $("#result"); a.scrollIntoView({behavior:"smooth", block:"start"}); }
-  else renderPasted(text, true);
+let lastRender = null, prodCtx = null, openEditor = null;
+
+/* ---------- date adăugate de utilizator, păstrate pe telefon, legate de codul de bare ---------- */
+const SK = "good2eat.saved";
+function getSaved(code){ try{ const o = JSON.parse(localStorage.getItem(SK)) || {}; return o[code] || null; }catch(e){ return null; } }
+function saveSaved(code, patch){
+  try{
+    const o = JSON.parse(localStorage.getItem(SK)) || {};
+    o[code] = {...(o[code]||{}), ...patch, t:Date.now()};
+    const out = {}; Object.keys(o).sort((a,b) => o[b].t - o[a].t).slice(0,200).forEach(k => out[k] = o[k]);
+    localStorage.setItem(SK, JSON.stringify(out));
+  }catch(e){}
 }
+function clearSaved(code){ try{ const o = JSON.parse(localStorage.getItem(SK)) || {}; delete o[code]; localStorage.setItem(SK, JSON.stringify(o)); }catch(e){} }
+
+const NUTR_MIN = ["energy-kcal_100g","sugars_100g","saturated-fat_100g","salt_100g"];
+function nutrComplete(n){ return !!n && NUTR_MIN.every(k => num(n,k) !== null); }
+
+function afterMerge(){
+  if(cur.hist) saveHistory(cur.hist);
+  const sc = $("#result .score"); if(sc) sc.scrollIntoView({behavior:"smooth", block:"start"});
+}
+function applyIngredients(text, fromOcr){
+  if(prodCtx && prodCtx.needsIngr){
+    const {code, p} = prodCtx;
+    p._ingr = text; saveSaved(code, {ingr:text});
+    openEditor = fromOcr ? "ingr" : null;
+    renderProduct(code, p, true); afterMerge();
+  } else renderPasted(text, true);
+}
+function applyNutrition(nutr){
+  if(prodCtx && prodCtx.needsNutr){
+    const {code, p} = prodCtx;
+    p._nutr = {...(p._nutr||{}), ...nutr}; saveSaved(code, {nutr:p._nutr});
+    openEditor = "nut";
+    renderProduct(code, p, true); afterMerge();
+  } else {
+    pasted.nutr = {...(pasted.nutr||{}), ...nutr};
+    renderPasted(pasted.text, true);
+    const f = $("#nutForm"); if(f) f.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+function resetSaved(){
+  if(!prodCtx) return;
+  const {code, p} = prodCtx;
+  clearSaved(code); delete p._ingr; delete p._nutr;
+  renderProduct(code, p, true); afterMerge();
+}
+
+function nutGridHtml(nutr){
+  const v = k => nutr && nutr[k] != null ? String(nutr[k]).replace(".", LANG === "ro" ? "," : ".") : "";
+  return `<div class="nutgrid">${NF.map(([k,l,u]) => `<label><span>${esc(t(l))}</span><span class="nf"><input inputmode="decimal" data-nf="${k}" value="${esc(v(k))}"><em>${u}</em></span></label>`).join("")}</div>`;
+}
+
+/* cardul „Completează produsul”: ce a găsit codul și ce lipsește */
+function completeBlock(p, dbIngr, ingr, eff, needsNutr){
+  const hasName = !!(p.product_name || p.product_name_ro || p.product_name_en), hasImg = !!p.image_front_small_url;
+  const ingrOk = !!ingr, nutrOk = nutrComplete(eff);
+  const missing = [!ingrOk && "ingr", !nutrOk && "nut"].filter(Boolean);
+  const first = missing[0];
+  const mine = (ingr && !dbIngr) || (needsNutr && p._nutr);
+  const row = (cls, ic, label, status, acts) => `<li class="${cls}"><span class="ic" aria-hidden="true">${ic}</span><div class="st"><strong>${esc(label)}</strong><small>${esc(status)}</small>${acts ? `<div class="acts">${acts}</div>` : ""}</div></li>`;
+  const btn = (key, label, attr) => `<button class="btn ${first === key ? "violet" : "ghost"} small" ${attr}>${esc(label)}</button>`;
+
+  const nameRow = row((hasName||hasImg) ? "done" : "na", (hasName||hasImg) ? "✓" : "–", t("rowName"), t((hasName||hasImg) ? "stFound" : "stMissing"), "");
+  const ingrRow = row(ingrOk ? "done" : "todo", ingrOk ? "✓" : "○", t("rowIngr"), t(!ingrOk ? "stMissing" : dbIngr ? "stDb" : "stMine"),
+    dbIngr ? "" : ingrOk ? `<button class="linkish" data-ocr="1">${esc(t("redo"))}</button>`
+                         : btn("ingr", t("ocrBtn"), 'data-ocr="1"') + `<button class="linkish" data-comptype="1">${esc(t("typeIt"))}</button>`);
+  const nutrRow = row(nutrOk ? "done" : "todo", nutrOk ? "✓" : "○", t("rowNutr"), t(!nutrOk ? "stMissing" : (needsNutr && p._nutr) ? "stMine" : "stDb"),
+    !needsNutr ? "" : nutrOk ? `<button class="linkish" data-nutocr="1">${esc(t("redo"))}</button>`
+                            : btn("nut", t("nutPhoto"), 'data-nutocr="1"'));
+
+  const ingrEd = dbIngr ? "" : `<details class="ed" id="ingrEd" ${openEditor === "ingr" ? "open" : ""}><summary>${esc(t("edIngr"))}</summary>
+    <textarea id="ingrEdit" aria-label="${esc(t("pasteAria"))}" placeholder="${esc(t("pastePh"))}">${esc(p._ingr || "")}</textarea>
+    <div class="row"><button class="btn small" data-ingrapply="1">${esc(t("edIngrApply"))}</button></div></details>`;
+  const est = nutrOk && eff && !p.nutriscore_grade;
+  const nutEd = !needsNutr ? "" : `<details class="ed" id="nutEd" ${openEditor === "nut" ? "open" : ""}><summary>${esc(t("edNut"))}</summary>
+    ${nutGridHtml(eff)}<div class="row"><button class="btn small" data-nutapply="1">${esc(t("nutApply"))}</button></div>
+    ${eff && !nutrOk ? `<p class="hint">${esc(t("nutNeed"))}</p>` : ""}${est ? `<p class="hint">${esc(t("estNote"))}</p>` : ""}</details>`;
+
+  return `<div class="comp" id="compCard">
+    <h2>${esc(t(missing.length ? "compH" : "compDone"))}</h2>
+    <p class="hint" style="margin-top:0">${esc(t(missing.length ? (p._notInDb ? "compSubNone" : "compSub") : "compSubDone"))}</p>
+    <ul class="steps">${nameRow}${ingrRow}${nutrRow}</ul>
+    <div id="compStatus" class="ocr-status" hidden></div>
+    ${ingrEd}${nutEd}
+    <p class="hint">${esc(t("saveNote"))}</p>
+    ${mine ? `<button class="linkish" data-resetsaved="1">${esc(t("resetSaved"))}</button>` : ""}
+  </div>`;
+}
+
 function renderProduct(code, p, quiet){
+  const sv = getSaved(code);
+  if(sv){ if(sv.ingr && p._ingr === undefined) p._ingr = sv.ingr; if(sv.nutr && p._nutr === undefined) p._nutr = sv.nutr; }
   lastRender = () => renderProduct(code, p, true);
-  const name = (LANG === "en" ? p.product_name_en || p.product_name || p.product_name_ro : p.product_name_ro || p.product_name || p.product_name_en) || t("unnamed");
+  const name = (LANG === "en" ? p.product_name_en || p.product_name || p.product_name_ro : p.product_name_ro || p.product_name || p.product_name_en) || t(p._notInDb ? "unknownProduct" : "unnamed");
   const dbIngr = (LANG === "en" ? p.ingredients_text_en || p.ingredients_text || p.ingredients_text_ro : p.ingredients_text_ro || p.ingredients_text || p.ingredients_text_en) || "";
-  prodCtx = dbIngr ? null : {code, p};                       // produs fără ingrediente în baza de date: pozele se leagă de el
+  const dbN = p.nutriments || null;
+  const needsNutr = !nutrComplete(dbN);
+  prodCtx = (dbIngr && !needsNutr) ? null : {code, p, needsIngr:!dbIngr, needsNutr};   // pozele utilizatorului se leagă de acest produs
   const ingr = dbIngr || p._ingr || "";
+  const eff = (needsNutr && p._nutr) ? {...(dbN||{}), ...p._nutr} : dbN;
   let adds = null;
   if((p.additives_tags||[]).length) adds = fromTags(p.additives_tags);
   if(ingr){ const ex = extractFromText(ingr); adds = adds ? mergeAdds(adds, ex) : ex; }
-  const q = {...p};
+  const q = {...p, nutriments: eff || undefined};
   if(!q.nutriscore_grade && q.nutriments){ const e = estimateNutriScore(q.nutriments); if(e){ q.nutriscore_grade = e; q._estNS = 1; } }
   if(!+q.nova_group){ const nv = estimateNova(norm(ingr), adds); if(nv){ q.nova_group = nv; q._estNova = 1; } }
   const sc = computeScore(q, adds);
   if(!quiet) cur.g = +p.serving_quantity > 0 ? +p.serving_quantity : 100;
-  cur.ctx = {adds, text:norm(ingr), nutr:p.nutriments, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags};
+  cur.ctx = {adds, text:norm(ingr), nutr:eff, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags};
   const me = personalize(cur.ctx, cur.g);
-  const fromPhoto = !dbIngr && p._ingr;
   const report = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">${esc(t("reportLink"))}</a>`;
   $("#result").innerHTML = `
     <div class="product">
@@ -1452,17 +1591,21 @@ function renderProduct(code, p, quiet){
       <div><h3>${esc(name)}</h3><p>${esc([p.brands, p.quantity].filter(Boolean).join(", "))}</p><p>${esc(t("codeLbl",{c:code}))}</p></div>
     </div>
     ${scoreBlock(sc, me)}
+    ${prodCtx ? completeBlock(p, dbIngr, ingr, eff, needsNutr) : ""}
     ${alertsBlock(me)}
     ${additivesBlock(adds, me.mine)}
-    ${portionBlock(p, cur.g)}
-    ${lightsBlock(p.nutriments)}
-    ${ingr ? `<details class="ingr"><summary>${esc(t("ingredients"))}${fromPhoto ? " · " + esc(t("fromPhoto")) : ""}</summary><p>${esc(ingr)}</p></details>` : ""}
+    ${portionBlock(q, cur.g)}
+    ${lightsBlock(eff)}
+    ${dbIngr ? `<details class="ingr"><summary>${esc(t("ingredients"))}</summary><p>${esc(dbIngr)}</p></details>` : ""}
     ${FOOT()}
     <p class="foot">${esc(t("report")).replace("{link}", report)}</p>`;
+  openEditor = null;
+  cur.hist = {code, name, brand:p.brands||"", img:p.image_front_small_url||"", score:sc?sc.score:null, t:Date.now()};
   if(quiet) return;
-  saveHistory({code, name, brand:p.brands||"", img:p.image_front_small_url||"", score:sc?sc.score:null, t:Date.now()});
+  saveHistory(cur.hist);
   $("#result").scrollIntoView({behavior:"smooth", block:"start"});
 }
+
 /* analiză din ingrediente și (opțional) valori nutriționale introduse */
 let pasted = {text:"", nutr:null};
 const NOVA4_TYPES = new Set(["Colorant","Emulgator","Îndulcitor","Îndulcitor / umectant","Potențiator de gust","Îngroșător","Îngroșător / emulgator",
@@ -1490,12 +1633,11 @@ function estimateNutriScore(n){
 const NF = [["energy-kcal_100g","n_energy","kcal"],["fat_100g","n_fat","g"],["saturated-fat_100g","n_satSub","g"],["carbohydrates_100g","n_carbs","g"],
   ["sugars_100g","n_sugSub","g"],["fiber_100g","n_fibre","g"],["proteins_100g","n_protein","g"],["salt_100g","n_salt","g"]];
 function nutFormBlock(nutr, est){
-  const v = k => nutr && nutr[k] != null ? String(nutr[k]).replace(".", LANG === "ro" ? "," : ".") : "";
   return `<h2 id="nutForm">${esc(t("nutH"))}</h2>
   <div class="portion">
     <p class="hint" style="margin-top:0">${esc(t(nutr ? "nutHintHave" : "nutHint"))}</p>
     <div class="row" style="margin-top:8px"><button class="btn violet small" data-nutocr="1">${esc(t("nutPhoto"))}</button></div>
-    <div class="nutgrid">${NF.map(([k,l,u]) => `<label><span>${esc(t(l))}</span><span class="nf"><input inputmode="decimal" data-nf="${k}" value="${esc(v(k))}"><em>${u}</em></span></label>`).join("")}</div>
+    ${nutGridHtml(nutr)}
     <div class="row"><button class="btn small" data-nutapply="1">${esc(t("nutApply"))}</button></div>
     ${nutr && !est ? `<p class="hint">${esc(t("nutNeed"))}</p>` : ""}
     ${est ? `<p class="hint">${esc(t("estNote"))}</p>` : ""}
@@ -1507,6 +1649,13 @@ function applyNutForm(){
     const x = parseFloat(String(i.value).replace(",", ".").replace(/[^\d.]/g, ""));
     if(!isNaN(x)) n[i.dataset.nf] = x;
   });
+  if(prodCtx && prodCtx.needsNutr){
+    const {code, p} = prodCtx;
+    if(Object.keys(n).length){ p._nutr = n; saveSaved(code, {nutr:n}); } else { delete p._nutr; saveSaved(code, {nutr:null}); }
+    openEditor = "nut";
+    renderProduct(code, p, true); afterMerge();
+    return;
+  }
   pasted.nutr = Object.keys(n).length ? n : null;
   renderPasted(pasted.text, true);
   const f = $("#result"); if(f) f.scrollIntoView({behavior:"smooth", block:"start"});
@@ -1548,18 +1697,6 @@ function renderInternal(code){
     ${OCR_CTA()}
   </div>`;
 }
-function renderNotFound(code){
-  prodCtx = null;
-  lastRender = () => renderNotFound(code);
-  const link = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener" style="color:var(--brand)">Open Food Facts</a>`;
-  $("#result").innerHTML = `<div class="notice" style="margin-top:20px">
-    <strong>${esc(t("notFoundTitle",{c:code}))}</strong>
-    <p style="margin:6px 0 4px">${esc(t("notFoundP"))}</p>
-    ${OCR_CTA()}
-    <p class="hint">${esc(t("helpOthers")).replace("{link}", link)}</p>
-  </div>`;
-}
-
 /* ---------- căutare produs ---------- */
 const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,product_name_en,brands,quantity,product_quantity,serving_quantity,serving_size,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro,ingredients_text_en";
 async function loadProduct(raw){
@@ -1577,7 +1714,7 @@ async function loadProduct(raw){
       const j = await r.json();
       if(j.status === 1 && j.product){ renderProduct(code, j.product); return; }
     }
-    isInternal(code) ? renderInternal(code) : renderNotFound(code);
+    isInternal(code) ? renderInternal(code) : renderProduct(code, {_notInDb:true});
   }catch(e){
     lastRender = null;
     $("#result").innerHTML = `<div class="notice">${esc(t("netErr",{e:e.message}))}</div>`;
@@ -1589,8 +1726,10 @@ let ocrWorker = null, ocrLangLoaded = null, ocrBusy = false, ocrMode = "ingr";
 function loadScript(src){
   return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("script")); document.head.appendChild(s); });
 }
+function inCard(){ return !!(prodCtx && $("#compStatus") && ((ocrMode === "ingr" && prodCtx.needsIngr) || (ocrMode === "nut" && prodCtx.needsNutr))); }
+function ocrTarget(){ return inCard() ? $("#compStatus") : $("#ocrStatus"); }
 function ocrStatus(text, pct, err){
-  const s = $("#ocrStatus"); s.hidden = false; s.classList.toggle("err", !!err);
+  const s = ocrTarget(); s.hidden = false; s.classList.toggle("err", !!err);
   s.innerHTML = esc(text) + (pct != null ? `<div class="bar"><i style="width:${Math.round(pct*100)}%"></i></div>` : "");
 }
 function ocrLogger(m){
@@ -1743,10 +1882,13 @@ async function runOcr(file){
   const canvas = await cropImage(file);
   if(!canvas) return;
   ocrBusy = true;
-  $("#ocrBox").hidden = false;
-  if(ocrMode === "ingr"){ $("#pasteText").value = ""; if(!prodCtx) pasted.nutr = null; }
-  $("#ocrStatus").hidden = false;
-  $("#ocrStatus").scrollIntoView({behavior:"smooth", block:"center"});
+  const card = inCard();
+  if(!card){
+    $("#ocrBox").hidden = false;
+    if(ocrMode === "ingr"){ $("#pasteText").value = ""; pasted.nutr = null; }
+  }
+  ocrTarget().hidden = false;
+  ocrTarget().scrollIntoView({behavior:"smooth", block:"center"});
   ocrStatus(t("ocrPrep"), 0);
   try{
     if(!window.Tesseract) await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js");
@@ -1758,18 +1900,16 @@ async function runOcr(file){
     if(ocrMode === "nut"){
       const nutr = parseNutrition(fuzzyFix(data.text || ""));
       const n = Object.keys(nutr).length;
-      if(!n){ ocrStatus(t("nutNone"), null, true); renderPasted(pasted.text, true); return; }
-      pasted.nutr = {...(pasted.nutr||{}), ...nutr};
+      if(!n){ ocrStatus(t("nutNone"), null, true); if(!card) renderPasted(pasted.text, true); return; }
+      applyNutrition(nutr);
       ocrStatus(t("nutRead",{n}));
-      renderPasted(pasted.text, true);
-      const f = $("#nutForm"); if(f) f.scrollIntoView({behavior:"smooth", block:"start"});
       return;
     }
     const text = fuzzyFix(fixOcr(data.text || ""));
     if(text.length < 10){ ocrStatus(t("ocrNoText"), null, true); return; }
-    $("#pasteText").value = text;
-    ocrStatus(t("ocrDone"));
-    applyIngredients(text);
+    if(!card) $("#pasteText").value = text;
+    applyIngredients(text, true);
+    ocrStatus(t(card ? "ocrDoneCard" : "ocrDone"));
   }catch(e){
     ocrStatus(t("ocrErr",{e:e.message}), null, true);
   }finally{ ocrBusy = false; }
@@ -1804,7 +1944,7 @@ async function startScan(){
         fps:15, disableFlip:true,
         videoConstraints:{facingMode:"environment", width:{ideal:1920}, height:{ideal:1080}, advanced:[{focusMode:"continuous"}]}
       }, onCode, () => {});
-    scanning = true; $("#stopRow").hidden = false;
+    scanning = true; $("#stopRow").hidden = false; updateFab();
     $("#scanHint").textContent = t("scanHint");
     setupCamTools();
     clearTimeout(hintTimer);
@@ -1840,7 +1980,7 @@ async function toggleZoom(){
 async function stopScan(){
   clearTimeout(hintTimer);
   if(qr && scanning){ try{ await qr.stop(); }catch(e){} }
-  scanning = false; $("#stopRow").hidden = true; $("#idle").hidden = false;
+  scanning = false; $("#stopRow").hidden = true; $("#idle").hidden = false; updateFab();
 }
 async function onCode(text){
   if(!scanning) return;
@@ -1931,6 +2071,21 @@ function applyLang(){
 function setLang(l){ LANG = l; try{ localStorage.setItem(LK, l); }catch(e){} applyLang(); }
 
 /* ---------- navigare și evenimente ---------- */
+function updateFab(){
+  const f = $("#newScan"); if(!f) return;
+  const r = $("#result");
+  const hasResult = r.innerHTML.trim() !== "" && !r.querySelector(".spinner");
+  f.hidden = !($("#v-scan").classList.contains("on") && hasResult && !scanning);
+}
+async function newScan(){
+  lastRender = null; prodCtx = null; cur.ctx = null; pasted.text = ""; pasted.nutr = null;
+  $("#result").innerHTML = "";
+  $("#manualCode").value = "";
+  $("#pasteText").value = ""; $("#ocrBox").hidden = true; $("#ocrStatus").hidden = true;
+  updateFab();
+  window.scrollTo({top:0, behavior:"smooth"});
+  startScan();
+}
 function show(v){
   document.querySelectorAll(".view").forEach(s => s.classList.toggle("on", s.id === v));
   document.querySelectorAll("nav.tabs button").forEach(b => {
@@ -1941,12 +2096,15 @@ function show(v){
   if(v === "v-add") renderAddList();
   if(v === "v-prof") renderProfile();
   if(v === "v-scan"){ renderProfilePill(); if(lastRender) lastRender(); }
+  updateFab();
   window.scrollTo(0,0);
 }
 
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.v)));
 $("#startBtn").addEventListener("click", startScan);
+$("#newScan").addEventListener("click", newScan);
+new MutationObserver(updateFab).observe($("#result"), {childList:true});
 $("#stopBtn").addEventListener("click", stopScan);
 $("#torchBtn").addEventListener("click", toggleTorch);
 $("#zoomBtn").addEventListener("click", toggleZoom);
@@ -1962,6 +2120,9 @@ $("#result").addEventListener("click", e => {
   if(e.target.closest("[data-ocr]")) return startOcr("ingr");
   if(e.target.closest("[data-nutocr]")) return startOcr("nut");
   if(e.target.closest("[data-nutapply]")) return applyNutForm();
+  if(e.target.closest("[data-comptype]")){ const d = $("#ingrEd"); if(d){ d.open = true; const ta = $("#ingrEdit"); if(ta){ ta.focus(); ta.scrollIntoView({behavior:"smooth", block:"center"}); } } return; }
+  if(e.target.closest("[data-ingrapply]")){ const v = ($("#ingrEdit")||{}).value; if(v && v.trim()) applyIngredients(v.trim(), false); return; }
+  if(e.target.closest("[data-resetsaved]")) return resetSaved();
   if(e.target.closest("[data-type]")) return openTyping();
   if(e.target.closest("[data-method]")){ show("v-add"); $("#method").open = true; return; }
   const q = e.target.closest(".qbtn"); if(q) updatePortion(+q.dataset.g);
