@@ -779,6 +779,9 @@ const DB_EN = {
    ============================================================ */
 const STR = {
 ro:{
+ fromPhoto:"din fotografie",
+ a_noIngr:"Lista de ingrediente lipsește, deci nu pot verifica alergenii și restricțiile din profilul tău. Fotografiază ingredientele înainte să consumi produsul.",
+ incompleteHintIngr:"Lipsește lista de ingrediente, deci scorul nu include aditivii și gradul de procesare. Fotografiază ingredientele mai jos pentru un scor complet.",
  incomplete:"Scor incomplet",
  incompleteHint:"Lipsesc valorile nutriționale, deci scorul arată doar aditivii și gradul de procesare. Nu e comparabil cu scorul unui produs scanat. Adaugă tabelul nutrițional mai jos.",
  pNutriEst:"Profil nutrițional · Nutri-Score {g} (estimat)", pNovaEst:"Procesare · NOVA {n} din 4 (estimat)",
@@ -844,7 +847,7 @@ ro:{
  pNutri:"Profil nutrițional · Nutri-Score {g}", pAdd:"Aditivi · {n} cu risc", pAddNone:"Aditivi · fără aditivi cu risc", pNova:"Procesare · NOVA {n} din 4",
  forProfile:"Pentru profilul tău", nothing:"Nimic de semnalat pentru profilul tău.",
  additives:"Aditivi", additivesN:"Aditivi ({n})",
- noIngr:"Lista de ingrediente lipsește din baza de date. Fotografiaz-o de pe ambalaj.",
+ noIngr:"Lista de ingrediente lipsește din baza de date. Fotografiază-o de pe ambalaj.",
  noAdds:"Nu am găsit aditivi alimentari (coduri E) în ingrediente.",
  trust:"Aditivii sunt verificați după lista oficială UE (Regulamentul CE nr. 1333/2008).",
  euOk:"Autorizat în UE · Regulamentul (CE) nr. 1333/2008", euBan:"Interzis în UE", euUnknown:"Cod necunoscut listei noastre",
@@ -857,7 +860,7 @@ ro:{
  oneServing:"O porție ({g} g)", wholePack:"Tot pachetul ({g} g)",
  riHint:"RI = procent din aportul zilnic de referință pentru un adult (2000 kcal), conform Regulamentului UE nr. 1169/2011. La băuturi, valorile sunt la ml.",
  foot:"Scor orientativ, nu sfat medical. Datele despre produs provin din baza publică {link} și pot fi incomplete.",
- report:"Ai găsit o greșeală la acest produs? {link}.", reportLink:"Raporteaz-o aici",
+ report:"Ai găsit o greșeală la acest produs? {link}.", reportLink:"Raportează-o aici",
  ingredients:"Ingrediente", unnamed:"Produs fără nume", codeLbl:"Cod {c}",
  pastedTitle:"Analiză din ingrediente", pastedSub:"Fără valori nutriționale, scorul e incomplet: arată doar aditivii și gradul de procesare.",
  internalTitle:"Cod intern de magazin ({c})",
@@ -914,6 +917,9 @@ ro:{
  a_vegan:"Pare vegan conform analizei ingredientelor."
 },
 en:{
+ fromPhoto:"from photo",
+ a_noIngr:"The ingredient list is missing, so I can't check the allergens and restrictions in your profile. Photograph the ingredients before you eat this product.",
+ incompleteHintIngr:"The ingredient list is missing, so the score doesn't include additives and processing. Photograph the ingredients below for a complete score.",
  incomplete:"Incomplete score",
  incompleteHint:"Nutrition values are missing, so the score only reflects additives and processing. It can't be compared with a scanned product's score. Add the nutrition table below.",
  pNutriEst:"Nutrition · Nutri-Score {g} (estimated)", pNovaEst:"Processing · NOVA {n} of 4 (estimated)",
@@ -1140,7 +1146,7 @@ function computeScore(p, adds){
   if(NV[nv]) parts.push({key:"nova", label:t(p._estNova ? "pNovaEst" : "pNova",{n:nv}), val:NV[nv], w:.2});
   if(!parts.length) return null;
   const W = parts.reduce((s,x) => s+x.w, 0);
-  return {score:Math.round(parts.reduce((s,x) => s + x.val*x.w, 0)/W), parts, partial:parts.length < 3, noNutri:!parts.some(x => x.key === "nutri")};
+  return {score:Math.round(parts.reduce((s,x) => s + x.val*x.w, 0)/W), parts, partial:parts.length < 3, noNutri:!parts.some(x => x.key === "nutri"), noAdds: !adds};
 }
 function verdict(s){ const i = s >= 75 ? 3 : s >= 50 ? 2 : s >= 25 ? 1 : 0; return {t:t("v"+i), i}; }
 const VNEUTRAL = "--vc:#5B6B63;--vt:#fff;--seg:rgba(255,255,255,.3);--segon:#fff";
@@ -1214,6 +1220,7 @@ function personalize(ctx, grams){
   const [main, traces] = splitTraces(ctx.text || "");
   const add = (lvl, key, vars={}, pen=0, codes=[]) => { out.alerts.push({lvl, t:t(key, vars)}); out.pen += pen; if(lvl==="crit") out.crit = true; codes.forEach(c => out.mine.add(c)); };
 
+  if(!(ctx.text||"").trim() && (P.allergens.length || P.pku || P.vegan || P.preg || P.kidAge === "0")) add("warn","a_noIngr");
   P.allergens.forEach(id => {
     const A = ALLERGENS.find(x => x[0] === id); if(!A) return;
     const sc = id.startsWith("sulphur") ? SULF_CODES.filter(has) : [];
@@ -1324,7 +1331,7 @@ function scoreBlock(sc, me){
   const base = sc ? sc.score : 0;
   let shown = me.active ? Math.min(100, Math.max(0, base - me.pen)) : base;
   if(me.crit) shown = Math.min(shown, 5);
-  const incomplete = sc && sc.noNutri && !me.crit;
+  const incomplete = sc && (sc.noNutri || sc.noAdds) && !me.crit;
   const v = verdict(shown);
   const style = incomplete ? VNEUTRAL : VSTYLE[v.i];
   const segs = [0,1,2,3].map(i => `<b class="${i===v.i?'on':''}"></b>`).join("");
@@ -1338,7 +1345,7 @@ function scoreBlock(sc, me){
     <div class="meter">${segs}<i class="pin" style="left:${Math.min(99,Math.max(1,shown))}%"></i></div>
     <div class="meter-labels"><span>${t("ml0")}</span><span>${t("ml1")}</span><span>${t("ml2")}</span><span>${t("ml3")}</span></div>
     ${parts ? `<div class="parts">${parts}</div>` : ""}
-    ${incomplete ? `<p class="partial">${esc(t("incompleteHint"))}</p>` : sc && sc.partial ? `<p class="partial">${esc(t("partial"))}</p>` : ""}
+    ${incomplete ? `<p class="partial">${esc(t(sc.noAdds ? "incompleteHintIngr" : "incompleteHint"))}</p>` : sc && sc.partial ? `<p class="partial">${esc(t("partial"))}</p>` : ""}
   </div>`;
 }
 function alertsBlock(me){
@@ -1360,7 +1367,7 @@ function addItem(a, mine){
 }
 const TRUST = () => `<div class="trust">${esc(t("trust"))} <button class="linkish" data-method="1">${esc(t("method"))}</button></div>`;
 function additivesBlock(adds, mine){
-  if(adds === null) return `<h2>${esc(t("additives"))}</h2><div class="notice">${esc(t("noIngr"))}</div>`;
+  if(adds === null) return `<h2>${esc(t("additives"))}</h2><div class="notice">${esc(t("noIngr"))}${OCR_CTA()}</div>`;
   if(!adds.length) return `<h2>${esc(t("additives"))}</h2>${TRUST()}<div class="empty-ok">${esc(t("noAdds"))}</div>`;
   const sorted = [...adds].sort((x,y) => (y.b||0)-(x.b||0) || y.l-x.l);
   return `<h2>${esc(t("additivesN",{n:adds.length}))}</h2>${TRUST()}${sorted.map(a => addItem(a, mine)).join("")}`;
@@ -1416,18 +1423,28 @@ function updatePortion(g, fromInput){
 const OFF_LINK = `<a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>`;
 const FOOT = () => `<p class="foot">${esc(t("foot")).replace("{link}", OFF_LINK)}</p>`;
 
-let lastRender = null;
+let lastRender = null, prodCtx = null;
+function applyIngredients(text){
+  if(prodCtx){ prodCtx.p._ingr = text; renderProduct(prodCtx.code, prodCtx.p, true); const a = $("#alertsBox") || $("#result"); a.scrollIntoView({behavior:"smooth", block:"start"}); }
+  else renderPasted(text, true);
+}
 function renderProduct(code, p, quiet){
   lastRender = () => renderProduct(code, p, true);
   const name = (LANG === "en" ? p.product_name_en || p.product_name || p.product_name_ro : p.product_name_ro || p.product_name || p.product_name_en) || t("unnamed");
-  const ingr = (LANG === "en" ? p.ingredients_text_en || p.ingredients_text || p.ingredients_text_ro : p.ingredients_text_ro || p.ingredients_text || p.ingredients_text_en) || "";
+  const dbIngr = (LANG === "en" ? p.ingredients_text_en || p.ingredients_text || p.ingredients_text_ro : p.ingredients_text_ro || p.ingredients_text || p.ingredients_text_en) || "";
+  prodCtx = dbIngr ? null : {code, p};                       // produs fără ingrediente în baza de date: pozele se leagă de el
+  const ingr = dbIngr || p._ingr || "";
   let adds = null;
   if((p.additives_tags||[]).length) adds = fromTags(p.additives_tags);
   if(ingr){ const ex = extractFromText(ingr); adds = adds ? mergeAdds(adds, ex) : ex; }
-  const sc = computeScore(p, adds);
+  const q = {...p};
+  if(!q.nutriscore_grade && q.nutriments){ const e = estimateNutriScore(q.nutriments); if(e){ q.nutriscore_grade = e; q._estNS = 1; } }
+  if(!+q.nova_group){ const nv = estimateNova(norm(ingr), adds); if(nv){ q.nova_group = nv; q._estNova = 1; } }
+  const sc = computeScore(q, adds);
   if(!quiet) cur.g = +p.serving_quantity > 0 ? +p.serving_quantity : 100;
   cur.ctx = {adds, text:norm(ingr), nutr:p.nutriments, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags};
   const me = personalize(cur.ctx, cur.g);
+  const fromPhoto = !dbIngr && p._ingr;
   const report = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">${esc(t("reportLink"))}</a>`;
   $("#result").innerHTML = `
     <div class="product">
@@ -1439,7 +1456,7 @@ function renderProduct(code, p, quiet){
     ${additivesBlock(adds, me.mine)}
     ${portionBlock(p, cur.g)}
     ${lightsBlock(p.nutriments)}
-    ${ingr ? `<details class="ingr"><summary>${esc(t("ingredients"))}</summary><p>${esc(ingr)}</p></details>` : ""}
+    ${ingr ? `<details class="ingr"><summary>${esc(t("ingredients"))}${fromPhoto ? " · " + esc(t("fromPhoto")) : ""}</summary><p>${esc(ingr)}</p></details>` : ""}
     ${FOOT()}
     <p class="foot">${esc(t("report")).replace("{link}", report)}</p>`;
   if(quiet) return;
@@ -1495,6 +1512,7 @@ function applyNutForm(){
   const f = $("#result"); if(f) f.scrollIntoView({behavior:"smooth", block:"start"});
 }
 function renderPasted(text, quiet){
+  prodCtx = null;
   pasted.text = text || "";
   lastRender = () => renderPasted(pasted.text, true);
   const tx = norm(pasted.text);
@@ -1521,6 +1539,7 @@ function renderPasted(text, quiet){
 const OCR_CTA = () => `<div class="row"><button class="btn violet small" data-ocr="1">${esc(t("ocrBtn"))}</button><button class="linkish" data-type="1">${esc(t("typeIt"))}</button></div>`;
 function isInternal(code){ return /^2/.test(code) || (code.length === 13 && /^02/.test(code)); }
 function renderInternal(code){
+  prodCtx = null;
   lastRender = () => renderInternal(code);
   $("#result").innerHTML = `<div class="notice internal" style="margin-top:20px">
     <strong>${esc(t("internalTitle",{c:code}))}</strong>
@@ -1530,6 +1549,7 @@ function renderInternal(code){
   </div>`;
 }
 function renderNotFound(code){
+  prodCtx = null;
   lastRender = () => renderNotFound(code);
   const link = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener" style="color:var(--brand)">Open Food Facts</a>`;
   $("#result").innerHTML = `<div class="notice" style="margin-top:20px">
@@ -1717,14 +1737,14 @@ function parseNutrition(text){
 }
 
 function startOcr(mode){ ocrMode = mode || "ingr"; stopScan(); $("#ocrFile").value = ""; $("#ocrFile").click(); }
-function openTyping(){ pasted.nutr = null; $("#ocrBox").hidden = false; $("#ocrStatus").hidden = true; $("#pasteText").focus(); $("#ocrBox").scrollIntoView({behavior:"smooth", block:"center"}); }
+function openTyping(){ if(!prodCtx) pasted.nutr = null; $("#ocrBox").hidden = false; $("#ocrStatus").hidden = true; $("#pasteText").focus(); $("#ocrBox").scrollIntoView({behavior:"smooth", block:"center"}); }
 async function runOcr(file){
   if(!file || ocrBusy) return;
   const canvas = await cropImage(file);
   if(!canvas) return;
   ocrBusy = true;
   $("#ocrBox").hidden = false;
-  if(ocrMode === "ingr"){ $("#pasteText").value = ""; pasted.nutr = null; }
+  if(ocrMode === "ingr"){ $("#pasteText").value = ""; if(!prodCtx) pasted.nutr = null; }
   $("#ocrStatus").hidden = false;
   $("#ocrStatus").scrollIntoView({behavior:"smooth", block:"center"});
   ocrStatus(t("ocrPrep"), 0);
@@ -1749,7 +1769,7 @@ async function runOcr(file){
     if(text.length < 10){ ocrStatus(t("ocrNoText"), null, true); return; }
     $("#pasteText").value = text;
     ocrStatus(t("ocrDone"));
-    renderPasted(text, true);
+    applyIngredients(text);
   }catch(e){
     ocrStatus(t("ocrErr",{e:e.message}), null, true);
   }finally{ ocrBusy = false; }
@@ -1937,7 +1957,7 @@ $("#ocrBtn").addEventListener("click", () => startOcr("ingr"));
 $("#ocrAgain").addEventListener("click", () => startOcr("ingr"));
 $("#ocrFile").addEventListener("change", e => runOcr(e.target.files[0]));
 $("#typeToggle").addEventListener("click", openTyping);
-$("#pasteBtn").addEventListener("click", () => { const s = $("#pasteText").value.trim(); if(s) renderPasted(s); });
+$("#pasteBtn").addEventListener("click", () => { const s = $("#pasteText").value.trim(); if(s) applyIngredients(s); });
 $("#result").addEventListener("click", e => {
   if(e.target.closest("[data-ocr]")) return startOcr("ingr");
   if(e.target.closest("[data-nutocr]")) return startOcr("nut");
