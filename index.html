@@ -913,7 +913,7 @@ ro:{
  photoNoCode:"Nu am găsit un cod de bare în fotografie. Fă poza mai aproape, cu codul drept, fără reflexii, sau scrie cifrele de sub bare.",
  searching:"Se caută produsul", photoSearching:"Caut codul în fotografie",
  ocrPrep:"Pregătesc imaginea…", ocrReading:"Citesc textul…", ocrLang:"Descarc limba română (doar prima dată)…", ocrInit:"Pregătesc cititorul…",
- aiReading:"Citesc ambalajul…", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
+ aiReading:"Citesc ambalajul…", aiLimit:"Ai folosit citirile cu AI incluse luna aceasta. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiLimitDay:"Citirea cu AI nu mai e disponibilă azi. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiSaved:" Produsul a intrat în baza comună Good.2.eat, ca alți utilizatori să-l găsească direct.", sharedNote:"Date completate din baza comună Good.2.eat: citite cu AI de pe ambalaj de un alt utilizator. Pot conține greșeli de citire.", sharedReport:"Nu corespund cu ambalajul? Semnalează", sharedReported:"Mulțumim pentru semnalare. Poți citi chiar tu ambalajul cu AI, ca să corectezi produsul.", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
  aiBoth:"Gata: am citit ingredientele și tabelul nutrițional. Verifică valorile, apoi scorul se recalculează.", aiIngrOnly:"Am citit ingredientele. Tabelul nutrițional nu se vedea: fotografiază-l separat.", aiNutOnly:"Am citit tabelul nutrițional. Ingredientele nu se vedeau: fotografiază-le separat.", aiPortion:"Tabelul e dat pe porție, nu la 100 g; completează manual valorile la 100 g.", aiBtn:"Fotografiază spatele ambalajului",
  ocrNoText:"Nu am găsit text lizibil. Apropie telefonul de listă, evită reflexiile și încearcă din nou.",
  ocrDone:"Gata. Verifică textul de mai jos și corectează-l dacă e nevoie, apoi apasă din nou Analizează.",
@@ -1070,7 +1070,7 @@ en:{
  photoNoCode:"No barcode found in the photo. Take it closer, with the code straight and no glare, or type the digits under the bars.",
  searching:"Looking up the product", photoSearching:"Looking for the code in the photo",
  ocrPrep:"Preparing the image…", ocrReading:"Reading the text…", ocrLang:"Downloading English language data (first time only)…", ocrInit:"Starting the reader…",
- aiReading:"Reading the package…", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
+ aiReading:"Reading the package…", aiLimit:"You have used this month's AI readings. Tap the button again to use on-phone reading (less accurate).", aiLimitDay:"AI reading is unavailable for today. Tap the button again to use on-phone reading (less accurate).", aiSaved:" The product was added to the shared Good.2.eat database so other users find it directly.", sharedNote:"Data filled in from the shared Good.2.eat database: read with AI from the package by another user. Reading errors are possible.", sharedReport:"Doesn't match the package? Report it", sharedReported:"Thanks for reporting. You can read the package with AI yourself to correct the product.", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
  aiBoth:"Done: ingredients and nutrition table read. Check the values; the score updates.", aiIngrOnly:"Ingredients read. The nutrition table was not visible: photograph it separately.", aiNutOnly:"Nutrition table read. Ingredients were not visible: photograph them separately.", aiPortion:"The table is per serving, not per 100 g; enter the per-100 g values manually.", aiBtn:"Photograph the back of the pack",
  ocrNoText:"No readable text found. Move closer to the list, avoid glare and try again.",
  ocrDone:"Done. Check the text below, correct it if needed, then tap Analyse again.",
@@ -1577,6 +1577,7 @@ function renderProduct(code, p, quiet){
   const sv = getSaved(code);
   if(sv){ if(sv.ingr && p._ingr === undefined) p._ingr = sv.ingr; if(sv.nutr && p._nutr === undefined) p._nutr = sv.nutr; }
   lastRender = () => renderProduct(code, p, true);
+  sharedCtx = (p._sIngr || p._sNutr) ? {code, p} : null;
   const name = (LANG === "en" ? p.product_name_en || p.product_name || p.product_name_ro : p.product_name_ro || p.product_name || p.product_name_en) || t(p._notInDb ? "unknownProduct" : "unnamed");
   const dbIngr = (LANG === "en" ? p.ingredients_text_en || p.ingredients_text || p.ingredients_text_ro : p.ingredients_text_ro || p.ingredients_text || p.ingredients_text_en) || "";
   const dbN = p.nutriments || null;
@@ -1601,6 +1602,7 @@ function renderProduct(code, p, quiet){
       <div><h3>${esc(name)}</h3><p>${esc([p.brands, p.quantity].filter(Boolean).join(", "))}</p><p>${esc(t("codeLbl",{c:code}))}</p></div>
     </div>
     ${scoreBlock(sc, me)}
+    ${(p._sIngr || p._sNutr) ? `<div class="notice shared"><p style="margin:0">${esc(t("sharedNote"))}</p><button class="linkish" data-sharedreport="1">${esc(t("sharedReport"))}</button></div>` : ""}
     ${prodCtx ? completeBlock(p, dbIngr, ingr, eff, needsNutr) : ""}
     ${alertsBlock(me)}
     ${additivesBlock(adds, me.mine)}
@@ -1722,13 +1724,57 @@ async function loadProduct(raw){
       if(r.status === 404) continue;
       if(!r.ok) throw new Error("HTTP "+r.status);
       const j = await r.json();
-      if(j.status === 1 && j.product){ renderProduct(code, j.product); return; }
+      if(j.status === 1 && j.product){
+        let p = j.product;
+        if(needsShared(p)) p = withShared(p, await fetchShared(code));
+        renderProduct(code, p); return;
+      }
     }
-    isInternal(code) ? renderInternal(code) : renderProduct(code, {_notInDb:true});
+    if(isInternal(code)) return renderInternal(code);
+    renderProduct(code, withShared({_notInDb:true}, await fetchShared(code)));
   }catch(e){
     lastRender = null;
     $("#result").innerHTML = `<div class="notice">${esc(t("netErr",{e:e.message}))}</div>`;
   }
+}
+
+/* ---------- baza comună Good.2.eat (produse citite cu AI de alți utilizatori) ---------- */
+const offIngr = p => p.ingredients_text || p.ingredients_text_ro || p.ingredients_text_en || "";
+function needsShared(p){ return !offIngr(p) || !nutrComplete(p.nutriments); }
+async function fetchShared(code){
+  if(!AI_URL || isInternal(code)) return null;
+  try{
+    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch(`${AI_URL}/p/${code}`, {signal:ctl.signal, headers:{"X-Client-Id":clientId()}});
+    clearTimeout(to);
+    if(!r.ok) return null;
+    const j = await r.json();
+    return j.found ? j.product : null;
+  }catch(e){ return null; }
+}
+function withShared(p, s){
+  if(!s) return p;
+  const q = {...p, _orig:p, _shared:s};
+  if(!offIngr(p) && s.ingredients){ q.ingredients_text = s.ingredients; q._sIngr = 1; }
+  if(!nutrComplete(p.nutriments) && s.nutrition){
+    const sn = Object.fromEntries(Object.entries(s.nutrition).filter(([k,v]) => typeof v === "number"));
+    const before = Object.keys(p.nutriments || {}).length;
+    q.nutriments = {...sn, ...(p.nutriments || {})};
+    if(Object.keys(q.nutriments).length > before) q._sNutr = 1;
+  }
+  if(!(p.product_name || p.product_name_ro || p.product_name_en) && s.name) q.product_name = s.name;
+  if(!q._sIngr && !q._sNutr) return p;
+  q._notInDb = false;
+  return q;
+}
+let sharedCtx = null;
+async function reportShared(){
+  if(!sharedCtx) return;
+  const {code, p} = sharedCtx; sharedCtx = null;
+  try{ await fetch(`${AI_URL}/report`, {method:"POST", headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({code})}); }catch(e){}
+  renderProduct(code, p._orig || p, true);
+  $("#result").insertAdjacentHTML("afterbegin", `<div class="notice">${esc(t("sharedReported"))}</div>`);
+  $("#result").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 /* ---------- citire etichetă cu camera (OCR, gratuit, în telefon) ---------- */
@@ -1898,7 +1944,9 @@ async function shrinkImage(file, max){
   c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
   return c.toDataURL("image/jpeg", .85);
 }
+let aiOff = false;   // după limita atinsă, următoarea poză merge direct la citirea din telefon
 async function runAi(file){
+  if(aiOff) return false;
   ocrBusy = true;
   try{
     const card = inCard();
@@ -1907,8 +1955,12 @@ async function runAi(file){
     ocrStatus(t("aiReading"));
     const img = await shrinkImage(file, 1600);
     const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 40000);
-    const r = await fetch(AI_URL, {method:"POST", signal:ctl.signal, headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({image:img, media_type:"image/jpeg", lang:LANG})});
+    const r = await fetch(AI_URL, {method:"POST", signal:ctl.signal, headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({image:img, media_type:"image/jpeg", lang:LANG, code: prodCtx ? prodCtx.code : ""})});
     clearTimeout(to);
+    if(r.status === 429){
+      let e = {}; try{ e = await r.json(); }catch(x){}
+      aiOff = true; ocrStatus(t(e.error === "limit_global" ? "aiLimitDay" : "aiLimit"), null, true); return true;
+    }
     if(!r.ok) throw new Error("http " + r.status);
     const d = await r.json();
     const nutr = {}; Object.entries(d.nutrition || {}).forEach(([k,v]) => { if(typeof v === "number") nutr[k] = v; });
@@ -1918,7 +1970,7 @@ async function runAi(file){
     const wantI = !prodCtx || prodCtx.needsIngr, wantN = !prodCtx || prodCtx.needsNutr;
     if(hasI && wantI){ if(!inCard() && !prodCtx) $("#pasteText").value = d.ingredients; applyIngredients(d.ingredients, true); }
     if(hasN && wantN) applyNutrition(nutr);
-    ocrStatus(t(hasI && hasN ? "aiBoth" : hasI ? "aiIngrOnly" : "aiNutOnly"));
+    ocrStatus(t(hasI && hasN ? "aiBoth" : hasI ? "aiIngrOnly" : "aiNutOnly") + (d.saved ? t("aiSaved") : ""));
     return true;
   }catch(e){
     return false;          // rețea / server / limită: cădem înapoi pe citirea locală (Tesseract)
@@ -2175,6 +2227,7 @@ $("#result").addEventListener("click", e => {
   if(e.target.closest("[data-comptype]")){ const d = $("#ingrEd"); if(d){ d.open = true; const ta = $("#ingrEdit"); if(ta){ ta.focus(); ta.scrollIntoView({behavior:"smooth", block:"center"}); } } return; }
   if(e.target.closest("[data-ingrapply]")){ const v = ($("#ingrEdit")||{}).value; if(v && v.trim()) applyIngredients(v.trim(), false); return; }
   if(e.target.closest("[data-resetsaved]")) return resetSaved();
+  if(e.target.closest("[data-sharedreport]")) return reportShared();
   if(e.target.closest("[data-type]")) return openTyping();
   if(e.target.closest("[data-method]")){ show("v-add"); $("#method").open = true; return; }
   const q = e.target.closest(".qbtn"); if(q) updatePortion(+q.dataset.g);
