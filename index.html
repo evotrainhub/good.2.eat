@@ -226,6 +226,43 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
 .ed{margin-top:10px}
 .ed summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .ed textarea{margin-top:8px}
+.acts-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.easy{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.easy h2{margin:0 0 4px}
+.erow{display:flex;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.easy h2+.erow{border-top:0}
+.ebig{flex:none;width:96px;text-align:center;font-family:var(--display);font-weight:800;font-size:30px;line-height:1}
+.ebig small{display:block;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);margin-top:5px;line-height:1.2}
+.etxt{flex:1;min-width:0;font-size:15px}
+.etxt b{display:block;margin-top:3px}
+.ebar{height:8px;border-radius:99px;background:var(--line);margin-top:7px;overflow:hidden}
+.ebar i{display:block;height:100%;border-radius:99px}
+.ebar .b0{background:var(--c3)}.ebar .b1{background:var(--c2)}.ebar .b2{background:var(--c1)}.ebar .b3{background:var(--c0)}
+.easy .hid{margin:6px 0 0;padding:10px 12px;background:var(--mid-bg);border-radius:12px;font-size:15px}
+.easy .hid.ok{background:var(--lo-bg)}
+.cmp{margin-top:14px;background:var(--surface);border:2px solid var(--violet);border-radius:18px;padding:14px}
+.cmp h2{margin:0 0 6px;color:var(--violet)}
+.cmp .wl{font-weight:800;font-size:17px;margin:0 0 4px}
+.cmp ul{margin:4px 0 10px;padding-left:20px}
+.cmp table{width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed}
+.cmp th,.cmp td{padding:8px 5px;border-top:1px solid var(--line);text-align:center;vertical-align:middle}
+.cmp th:first-child,.cmp td:first-child{text-align:left;width:36%;color:var(--muted);font-weight:600}
+.cmp thead th{border-top:0;font-size:14px;color:var(--ink);font-weight:700;vertical-align:top}
+.cmp thead img,.cmp thead .ph{width:44px;height:44px;object-fit:contain;border-radius:8px;background:#fff;display:block;margin:0 auto 4px}
+.cmp .nm{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.cmp td.win{background:var(--lo-bg);font-weight:800;border-radius:8px}
+.cmp .badge{font-size:16px;min-width:44px;padding:4px 6px;display:inline-block}
+.cmpbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--violet-bg);border:2px solid var(--violet);border-radius:16px;padding:10px 14px;margin:0 0 12px;font-size:15px}
+.cmpbar[hidden],.shelf-toast[hidden]{display:none}
+.cmpbar b{color:var(--violet)}
+.cmpbar .sp{flex:1 1 180px}
+.alt-list{display:grid;gap:8px;margin-top:8px}
+.altbox h2{margin-bottom:2px}
+.shelf-toast{position:absolute;left:10px;right:10px;bottom:10px;border-radius:16px;padding:10px 14px;display:flex;gap:12px;align-items:center;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.35);z-index:5;cursor:pointer;background:var(--vc);color:var(--vt);border:0;text-align:left;font-size:16px}
+.shelf-toast .n{font-family:var(--display);font-size:28px;font-weight:800;flex:none}
+.shelf-toast .t{flex:1;min-width:0}
+.shelf-toast .t small{display:block;font-weight:600;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.idle-alt{background:none;border:0;color:#D9F7E8;text-decoration:underline;text-underline-offset:3px;font-size:15px;cursor:pointer;padding:6px}
 .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 82px);z-index:9;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:13px 22px;background:var(--brand);color:var(--on-brand);font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.28);white-space:nowrap}
 .fab svg{width:22px;height:22px}
 .fab[hidden]{display:none}
@@ -256,11 +293,14 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
 
   <section id="v-scan" class="view on">
     <button class="pill off" id="profPill"></button>
+    <div class="cmpbar" id="cmpBar" hidden></div>
     <div class="scanbox">
       <div id="reader"></div>
+      <button class="shelf-toast" id="shelfToast" hidden></button>
       <div class="scan-idle" id="idle">
         <div class="barcode-art" aria-hidden="true"></div>
         <button class="btn" id="startBtn" data-i18n="startCam"></button>
+        <button class="idle-alt" id="shelfStart" data-i18n="shelfStart"></button>
       </div>
     </div>
     <div id="stopRow" hidden>
@@ -268,6 +308,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
         <button class="btn ghost small" id="stopBtn" data-i18n="stopCam"></button>
         <button class="btn ghost small" id="torchBtn" hidden aria-pressed="false" data-i18n="torch"></button>
         <button class="btn ghost small" id="zoomBtn" hidden aria-pressed="false" data-i18n="zoom"></button>
+        <button class="btn ghost small" id="shelfBtn" aria-pressed="false" data-i18n="shelfBtn"></button>
       </div>
       <p class="hint" id="scanHint"></p>
     </div>
@@ -867,8 +908,20 @@ ro:{
  fAll:"Toți", lvl3:"Risc ridicat", lvl2:"Risc moderat", lvl1:"Fără îngrijorare majoră", lvl0:"Necatalogat",
  addCount:"{n} aditivi",
  profTitle:"Profilul meu", profLead:"Scorul și avertismentele se adaptează la ce alegi aici.",
+ k4:"4–6 ani", k7:"7–10 ani", k11:"11+ ani",
+ shelfStart:"sau mod raft: scanezi mai multe produse la rând", shelfBtn:"Mod raft", shelfOn:"Mod raft: ține camera pe produse, unul după altul. Vibrație dublă = alegere slabă. Atinge rezultatul pentru detalii.", shelfLoading:"Caut produsul…", shelfNoData:"Fără date suficiente", shelfTap:"atinge pentru detalii", shelfListH:"Scanate la raft ({n})", shelfListHint:"Atinge un produs ca să vezi toată analiza.", shelfErr:"Nu am putut căuta produsul (internet?)",
+ cmpBtn:"⇄ Compară cu alt produs", altBtn:"Alternative mai bune", cmpBarA:"Compari cu: {n}. Scanează al doilea produs.", cmpBarFirst:"Compară două produse: scanează primul produs.", cmpScanA:"Scanează primul", cmpScanB:"Scanează al doilea", cancel:"Anulează",
+ cmpSame:"Este același produs. Scanează alt produs ca să le compari.", cmpNeed:"Nu pot compara încă: acestui produs îi lipsesc date. Completează-l mai jos sau scanează alt produs.",
+ cmpBothPoor:"Atenție: și acesta are un scor slab. Caută o alternativă mai bună.", cmpH:"Comparație", cmpWin:"Alegerea mai bună: {n}", cmpWinMe:"Alegerea mai bună pentru tine: {n}", cmpTie:"Diferență mică între ele: alege după gust sau preț.", cmpIncomplete:"Unul dintre produse are date incomplete, deci comparația e orientativă.",
+ cmpRowScore:"Scor", cmpRowSugar:"Zahăr / 100 g", cmpRowSalt:"Sare / 100 g", cmpRowSat:"Grăsimi saturate / 100 g", cmpRowAdds:"Aditivi cu risc ridicat", cmpRowNova:"Ultraprocesat", yes:"da", no:"nu", cmpAgain:"Compară cu alt produs",
+ rCrit:"celălalt produs nu e potrivit pentru profilul tău", rSugar:"mai puțin zahăr ({w} g față de {l} g la 100 g)", rSalt:"mai puțină sare ({w} g față de {l} g la 100 g)", rSat:"mai puține grăsimi saturate ({w} g față de {l} g la 100 g)", rAdds:"mai puțini aditivi cu risc ridicat ({w} față de {l})", rNova:"nu e ultraprocesat", rNs:"Nutri-Score mai bun ({w} față de {l})",
+ altH:"Alternative mai bune", altLoading:"Caut produse din aceeași categorie vândute în România…", altNone:"Nu am găsit în Open Food Facts produse din aceeași categorie, vândute în România, cu scor clar mai bun.", altErr:"Nu am putut căuta alternative acum. Încearcă din nou peste un minut.", altNote:"Produse din aceeași categorie, marcate în Open Food Facts ca vândute în România, cu scor mai bun pentru profilul tău. Disponibilitatea în magazine poate diferi.", altNoCat:"Produsul nu are categorie în Open Food Facts, deci nu pot căuta alternative.",
+ easyH:"Zahăr și sare, pe înțeles", eTsp:"lingurițe de zahăr", eTsp1:"linguriță de zahăr", eSaltU:"sare", eIn:"în {g} g", eAdultSug:"{p}% din maximul zilnic de zahăr pentru un adult (30 g)", eAdultSalt:"{p}% din maximul zilnic de sare pentru un adult (6 g)", eKidSug:"Pentru copilul tău ({age}): {p}% din maximul de {max} g", eKidSalt:"Pentru copilul tău ({age}): {p}% din maximul de {max} g", eBabySug:"Sub 1 an: nu se recomandă zahăr adăugat.", eBabySalt:"Sub 1 an: {p}% din maximul de 1 g pe zi",
+ eHidden:"Zahăr adăugat sub {n} denumiri: {list}.", eHidden1:"Zahăr adăugat: {list}.", eNatural:"În ingrediente nu apare zahăr adăugat: zahărul vine din ingrediente precum laptele sau fructele.",
+ eNote:"Eticheta arată zahărul total, inclusiv cel natural din lapte sau fructe, iar maximele zilnice se referă la zahărul adăugat, deci procentul e acoperitor. Maxime zilnice după NHS (serviciul public de sănătate al Marii Britanii); 1 linguriță ≈ 4 g zahăr.",
+ a_saltBaby:"Conține sare adăugată: la sub 1 an nu se adaugă sare în mâncare (rinichii bebelușului nu o pot procesa).", a_riceDrink:"Băutură de orez: NHS recomandă să nu fie dată copiilor sub 5 ani (conține arsenic natural).",
  kidH:"Cumpăr pentru un copil", kidAria:"Vârsta copilului",
- kidHint:"Praguri mai stricte pentru zahăr, sare, îndulcitori, cofeină și coloranți. Sub 1 an: alertă pentru miere.",
+ kidHint:"Praguri mai stricte pentru zahăr, sare, îndulcitori, cofeină și coloranți, și maximele zilnice pe vârstă. Sub 1 an: alertă pentru miere și sare adăugată.",
  sportH:"Fac sport", sportAria:"Obiectiv sportiv",
  sportHint:"Masă musculară: proteine raportat la calorii. Anduranță: carbohidrați pe porție. Slăbire: calorii și sațietate.",
  condH:"Sănătate și stil alimentar", allH:"Alergii și intoleranțe",
@@ -929,7 +982,7 @@ ro:{
  aboutH:"Despre aplicație", feedback:"Spune-ne ce nu funcționează", privacyLink:"Politica de confidențialitate", installBtn:"Instalează aplicația pe telefon", installIos:"Pe iPhone: apasă Distribuie, apoi „Adaugă pe ecranul principal”.", installed:"Aplicația e instalată pe acest telefon.", appIdLbl:"ID anonim al aplicației (îl menționezi doar dacă ne ceri ștergerea datelor): {id}", versionLbl:"Good.2.eat · versiunea {v}", delH:"Ștergerea datelor tale", delBody:"Ai dreptul să ceri ștergerea produselor adăugate de tine în baza comună. Scrie-ne și include acest cod:",
  aiConsent:"Citirea cu AI trimite poza ambalajului la serverul Good.2.eat și la Anthropic (furnizorul AI), care extrage textul. Poza nu se păstrează; ingredientele și valorile citite intră în baza comună, ca alți utilizatori să găsească produsul.\n\nFotografiază doar ambalajul, fără persoane sau date personale.\n\nOK = folosesc citirea cu AI. Anulează = citesc doar în telefon (mai puțin precis).",
  fbBody:"Ce nu funcționează sau ce ai vrea să fie altfel?\n\n\n---\nVersiune: {v}\nLimba: {l}\nUltimul cod: {c}\nDispozitiv: {d}",
- aiReading:"Citesc ambalajul…", aiLimit:"Ai folosit citirile cu AI incluse luna aceasta. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiLimitDay:"Citirea cu AI nu mai e disponibilă azi. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiSaved:" Produsul a intrat în baza comună Good.2.eat, ca alți utilizatori să-l găsească direct.", sharedNote:"Date completate din baza comună Good.2.eat: citite cu AI de pe ambalaj de un alt utilizator. Pot conține greșeli de citire.", sharedReport:"Nu corespund cu ambalajul? Semnalează", sharedReported:"Mulțumim pentru semnalare. Poți citi chiar tu ambalajul cu AI, ca să corectezi produsul.", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
+ aiReading:"Citesc ambalajul…", aiLimit:"Ai folosit citirile cu AI incluse luna aceasta. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiLimitDay:"Citirea cu AI nu mai e disponibilă azi. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiSaved:" Produsul a intrat în baza comună Good.2.eat, ca alți utilizatori să-l găsească direct.", sharedNote:"Date completate din baza comună Good.2.eat: citite cu AI de pe ambalaj de un alt utilizator. Pot conține greșeli de citire.", sharedReport:"Nu corespund cu ambalajul? Semnalează", sharedVerified:"Verificat de {n} utilizatori Good.2.eat: datele corespund cu ambalajul.", sharedConfirm:"Corespunde cu ambalajul", sharedConfirmAsk:"Ai produsul în față? Confirmă dacă datele sunt corecte.", sharedThanks:"Mulțumim! Confirmarea ta ajută și alți utilizatori.", sharedReported:"Mulțumim pentru semnalare. Poți citi chiar tu ambalajul cu AI, ca să corectezi produsul.", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
  aiBoth:"Gata: am citit ingredientele și tabelul nutrițional. Verifică valorile, apoi scorul se recalculează.", aiIngrOnly:"Am citit ingredientele. Tabelul nutrițional nu se vedea: fotografiază-l separat.", aiNutOnly:"Am citit tabelul nutrițional. Ingredientele nu se vedeau: fotografiază-le separat.", aiPortion:"Tabelul e dat pe porție, nu la 100 g; completează manual valorile la 100 g.", aiBtn:"Fotografiază spatele ambalajului",
  ocrNoText:"Nu am găsit text lizibil. Apropie telefonul de listă, evită reflexiile și încearcă din nou.",
  ocrDone:"Gata. Verifică textul de mai jos și corectează-l dacă e nevoie, apoi apasă din nou Analizează.",
@@ -1027,8 +1080,20 @@ en:{
  fAll:"All", lvl3:"High risk", lvl2:"Moderate risk", lvl1:"No major concern", lvl0:"Not catalogued",
  addCount:"{n} additives",
  profTitle:"My profile", profLead:"The score and warnings adapt to what you choose here.",
+ k4:"4–6 years", k7:"7–10 years", k11:"11+ years",
+ shelfStart:"or shelf mode: scan several products in a row", shelfBtn:"Shelf mode", shelfOn:"Shelf mode: point the camera at products one after another. Double vibration = poor choice. Tap the result for details.", shelfLoading:"Looking up the product…", shelfNoData:"Not enough data", shelfTap:"tap for details", shelfListH:"Scanned at the shelf ({n})", shelfListHint:"Tap a product to see the full analysis.", shelfErr:"Could not look up the product (internet?)",
+ cmpBtn:"⇄ Compare with another product", altBtn:"Better alternatives", cmpBarA:"Comparing with: {n}. Scan the second product.", cmpBarFirst:"Compare two products: scan the first one.", cmpScanA:"Scan the first", cmpScanB:"Scan the second", cancel:"Cancel",
+ cmpSame:"This is the same product. Scan a different one to compare.", cmpNeed:"Can't compare yet: this product is missing data. Complete it below or scan another product.",
+ cmpBothPoor:"Note: this one also scores poorly. Look for a better alternative.", cmpH:"Comparison", cmpWin:"Better choice: {n}", cmpWinMe:"Better choice for you: {n}", cmpTie:"Little difference between them: choose by taste or price.", cmpIncomplete:"One of the products has incomplete data, so the comparison is indicative.",
+ cmpRowScore:"Score", cmpRowSugar:"Sugar / 100 g", cmpRowSalt:"Salt / 100 g", cmpRowSat:"Saturated fat / 100 g", cmpRowAdds:"High-risk additives", cmpRowNova:"Ultra-processed", yes:"yes", no:"no", cmpAgain:"Compare with another product",
+ rCrit:"the other product isn't suitable for your profile", rSugar:"less sugar ({w} g vs {l} g per 100 g)", rSalt:"less salt ({w} g vs {l} g per 100 g)", rSat:"less saturated fat ({w} g vs {l} g per 100 g)", rAdds:"fewer high-risk additives ({w} vs {l})", rNova:"not ultra-processed", rNs:"better Nutri-Score ({w} vs {l})",
+ altH:"Better alternatives", altLoading:"Looking for products in the same category sold in Romania…", altNone:"Found no products in Open Food Facts from the same category, sold in Romania, with a clearly better score.", altErr:"Could not search for alternatives right now. Try again in a minute.", altNote:"Products from the same category, marked in Open Food Facts as sold in Romania, with a better score for your profile. Store availability may differ.", altNoCat:"The product has no category in Open Food Facts, so I can't search for alternatives.",
+ easyH:"Sugar and salt, in plain terms", eTsp:"teaspoons of sugar", eTsp1:"teaspoon of sugar", eSaltU:"salt", eIn:"in {g} g", eAdultSug:"{p}% of an adult's daily sugar maximum (30 g)", eAdultSalt:"{p}% of an adult's daily salt maximum (6 g)", eKidSug:"For your child ({age}): {p}% of the {max} g maximum", eKidSalt:"For your child ({age}): {p}% of the {max} g maximum", eBabySug:"Under 1: no added sugar is recommended.", eBabySalt:"Under 1: {p}% of the 1 g daily maximum",
+ eHidden:"Added sugar under {n} names: {list}.", eHidden1:"Added sugar: {list}.", eNatural:"No added sugar in the ingredients: the sugar comes from ingredients like milk or fruit.",
+ eNote:"The label shows total sugar, including natural sugar from milk or fruit, while daily maximums refer to added sugar, so the percentage is an upper bound. Daily maximums from the NHS (UK public health service); 1 teaspoon ≈ 4 g sugar.",
+ a_saltBaby:"Contains added salt: no salt should be added to food under age 1 (a baby's kidneys can't process it).", a_riceDrink:"Rice drink: the NHS advises not to give it to children under 5 (it contains natural arsenic).",
  kidH:"Buying for a child", kidAria:"Child's age",
- kidHint:"Stricter limits for sugar, salt, sweeteners, caffeine and colours. Under 1: honey alert.",
+ kidHint:"Stricter limits for sugar, salt, sweeteners, caffeine and colours, plus daily maximums by age. Under 1: honey and added-salt alerts.",
  sportH:"I do sport", sportAria:"Sport goal",
  sportHint:"Muscle gain: protein per calorie. Endurance: carbohydrate per serving. Weight loss: calories and satiety.",
  condH:"Health and diet", allH:"Allergies and intolerances",
@@ -1089,7 +1154,7 @@ en:{
  aboutH:"About the app", feedback:"Tell us what isn't working", privacyLink:"Privacy policy", installBtn:"Install the app on your phone", installIos:"On iPhone: tap Share, then “Add to Home Screen”.", installed:"The app is installed on this phone.", appIdLbl:"Anonymous app ID (mention it only if you ask us to delete your data): {id}", versionLbl:"Good.2.eat · version {v}", delH:"Deleting your data", delBody:"You can ask us to delete the products you added to the shared database. Write to us and include this code:",
  aiConsent:"AI reading sends the package photo to the Good.2.eat server and to Anthropic (the AI provider), which extracts the text. The photo is not kept; the ingredients and values read go into the shared database so other users can find the product.\n\nPhotograph only the package, no people or personal data.\n\nOK = use AI reading. Cancel = read on the phone only (less accurate).",
  fbBody:"What isn't working, or what would you like to be different?\n\n\n---\nVersion: {v}\nLanguage: {l}\nLast code: {c}\nDevice: {d}",
- aiReading:"Reading the package…", aiLimit:"You have used this month's AI readings. Tap the button again to use on-phone reading (less accurate).", aiLimitDay:"AI reading is unavailable for today. Tap the button again to use on-phone reading (less accurate).", aiSaved:" The product was added to the shared Good.2.eat database so other users find it directly.", sharedNote:"Data filled in from the shared Good.2.eat database: read with AI from the package by another user. Reading errors are possible.", sharedReport:"Doesn't match the package? Report it", sharedReported:"Thanks for reporting. You can read the package with AI yourself to correct the product.", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
+ aiReading:"Reading the package…", aiLimit:"You have used this month's AI readings. Tap the button again to use on-phone reading (less accurate).", aiLimitDay:"AI reading is unavailable for today. Tap the button again to use on-phone reading (less accurate).", aiSaved:" The product was added to the shared Good.2.eat database so other users find it directly.", sharedNote:"Data filled in from the shared Good.2.eat database: read with AI from the package by another user. Reading errors are possible.", sharedReport:"Doesn't match the package? Report it", sharedVerified:"Verified by {n} Good.2.eat users: the data matches the package.", sharedConfirm:"Matches the package", sharedConfirmAsk:"Have the product in hand? Confirm if the data is correct.", sharedThanks:"Thanks! Your confirmation helps other users.", sharedReported:"Thanks for reporting. You can read the package with AI yourself to correct the product.", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
  aiBoth:"Done: ingredients and nutrition table read. Check the values; the score updates.", aiIngrOnly:"Ingredients read. The nutrition table was not visible: photograph it separately.", aiNutOnly:"Nutrition table read. Ingredients were not visible: photograph them separately.", aiPortion:"The table is per serving, not per 100 g; enter the per-100 g values manually.", aiBtn:"Photograph the back of the pack",
  ocrNoText:"No readable text found. Move closer to the list, avoid glare and try again.",
  ocrDone:"Done. Check the text below, correct it if needed, then tap Analyse again.",
@@ -1256,7 +1321,10 @@ const ALLERGENS = [
   ["sulphur-dioxide-and-sulphites","al_sulphites",/(sulfit|dioxid de sulf|sulphite|sulfite|sulphur dioxide|sulfur dioxide)/]
 ];
 const CONDS = ["preg","pku","gout","bp","diab","vegan"];
-const KID_OPTS = [["","kNo"],["0","k0"],["1","k1"],["3","k3"]];
+const KID_OPTS = [["","kNo"],["0","k0"],["1","k1"],["4","k4"],["7","k7"],["11","k11"]];
+/* maxime zilnice (NHS): sare în g; zahăr adăugat în g (sub 1 an: fără zahăr adăugat) */
+const ADULT_LIM = {salt:6, sugar:30};
+const KID_LIM = {"0":{salt:1, sugar:0}, "1":{salt:2, sugar:10}, "4":{salt:3, sugar:19}, "7":{salt:5, sugar:24}, "11":{salt:6, sugar:30}};
 const SPORT_OPTS = [["","kNo"],["muscle","sMuscle"],["endurance","sEnd"],["weight","sWeight"]];
 const CAF = /\b(cafein|cafea\b|guarana|extract de ceai|ceai negru|ceai verde|caffeine|coffee|tea extract|black tea|green tea)/;
 const ALC = /\b(alcool|etanol|vin\b|bere\b|lichior|coniac|vodca|whiske?y|rom\b|alcohol|ethanol|wine\b|beer\b|liqueur|brandy|vodka|rum\b)/;
@@ -1268,8 +1336,9 @@ const POLYOLS = ["E420","E421","E953","E965","E966","E967","E968"];
 
 function getProfile(){
   let P; try{ P = JSON.parse(localStorage.getItem(PK)) || {}; }catch(e){ P = {}; }
-  if(P.kids && P.kidAge === undefined) P.kidAge = "3";
+  if(P.kids && P.kidAge === undefined) P.kidAge = "4";
   delete P.kids;
+  if(P.kidAge === "3") P.kidAge = "4";
   P.allergens = P.allergens || []; P.kidAge = P.kidAge || ""; P.sport = P.sport || "";
   return P;
 }
@@ -1329,8 +1398,8 @@ function personalize(ctx, grams){
       const salt = v100("salt_100g");
       if(salt !== null && salt > 0.3) add("warn","a_saltYoung",{s:fmt(salt)},15);
     } else if(s100 !== null && s100 > 12.5) add("warn","a_sugarKid",{s:fmt(s100)},10);
-    const sp = per("sugars_100g");
-    if(sp !== null && sp >= 1) add("info","a_tsp",{n:fmt(sp/4), g:fmt(g)});
+    if(P.kidAge === "0" && /\b(sare|salt)\b(?! de (lamaie|amoniu))/.test(main)) add("warn","a_saltBaby",{},15);
+    if(["0","1","4"].includes(P.kidAge) && /(bautura|lapte|drink|milk)\b.{0,20}\b(orez|rice)|\brice (drink|milk)/.test(ctx.name || "")) add("warn","a_riceDrink",{},20);
   }
 
   if(P.sport){
@@ -1403,12 +1472,16 @@ function personalize(ctx, grams){
 }
 
 /* ---------- blocuri de rezultat ---------- */
-function scoreBlock(sc, me){
-  if(!sc && !me.crit) return `<div class="notice">${esc(t("noScore"))}</div>`;
+function shownOf(sc, me){
+  if(!sc && !me.crit) return null;
   const base = sc ? sc.score : 0;
   let shown = me.active ? Math.min(100, Math.max(0, base - me.pen)) : base;
   if(me.crit) shown = Math.min(shown, 5);
-  const incomplete = sc && (sc.noNutri || sc.noAdds) && !me.crit;
+  return {shown, base, crit:me.crit, incomplete: !!(sc && (sc.noNutri || sc.noAdds) && !me.crit), active:me.active};
+}
+function scoreBlock(sc, me){
+  if(!sc && !me.crit) return `<div class="notice">${esc(t("noScore"))}</div>`;
+  const {shown, base, incomplete} = shownOf(sc, me);
   const v = verdict(shown);
   const style = incomplete ? VNEUTRAL : VSTYLE[v.i];
   const segs = [0,1,2,3].map(i => `<b class="${i===v.i?'on':''}"></b>`).join("");
@@ -1470,6 +1543,65 @@ function ntTable(n, g){
   }).join("");
   return `<table class="nt">${rows}</table>`;
 }
+/* ---------- zahăr și sare pe înțeles ---------- */
+const SUGAR_NAMES = [
+  [/sirop de glucoza[- ]?fructoza|sirop de fructoza[- ]?glucoza|glucose[- ]fructose syrup|fructose[- ]glucose syrup|high[- ]fructose corn syrup/g,"sirop de glucoză-fructoză","glucose-fructose syrup"],
+  [/sirop de glucoza|glucose syrup/g,"sirop de glucoză","glucose syrup"],
+  [/sirop de fructoza|fructose syrup/g,"sirop de fructoză","fructose syrup"],
+  [/(sirop de )?zahar invertit|invert(ed)? sugar( syrup)?/g,"zahăr invertit","invert sugar"],
+  [/sirop de porumb|corn syrup/g,"sirop de porumb","corn syrup"],
+  [/sirop de agave|agave syrup/g,"sirop de agave","agave syrup"],
+  [/sirop de artar|maple syrup/g,"sirop de arțar","maple syrup"],
+  [/sirop de orez|rice syrup/g,"sirop de orez","rice syrup"],
+  [/sirop de zahar|sugar syrup/g,"sirop de zahăr","sugar syrup"],
+  [/melasa|molasses/g,"melasă","molasses"],
+  [/\bmiere\b|\bhoney\b/g,"miere","honey"],
+  [/dextroz[ae]?|dextrose/g,"dextroză","dextrose"],
+  [/\bglucoz[ae]?\b|\bglucose\b/g,"glucoză","glucose"],
+  [/\bfructoz[ae]?\b|\bfructose\b/g,"fructoză","fructose"],
+  [/\bmaltoz[ae]?\b|\bmaltose\b/g,"maltoză","maltose"],
+  [/\bzaharoz[ae]?\b|\bsucrose\b/g,"zaharoză","sucrose"],
+  [/(suc|piure) (concentrat )?de fructe concentrat|concentrat de suc|suc concentrat|fruit juice concentrate|concentrated fruit juice/g,"suc concentrat de fructe","fruit juice concentrate"],
+  [/extract de malt|malt extract|sirop de malt|malt syrup/g,"extract de malț","malt extract"],
+  [/\bzahar\b|\bsugar\b/g,"zahăr","sugar"]
+];
+function findSugars(text){
+  let tx = " " + (text || "") + " ";
+  const out = [];
+  SUGAR_NAMES.forEach(([re, ro, en]) => { if(re.test(tx)){ out.push(LANG === "en" ? en : ro); tx = tx.replace(re, " "); } re.lastIndex = 0; });
+  return out;
+}
+const pct = (v, max) => Math.round(v / max * 100);
+const barCls = q => q <= 33 ? "b0" : q <= 66 ? "b1" : q <= 100 ? "b2" : "b3";
+function easyBlock(ctx, g){
+  if(!ctx) return `<div id="easyBox"></div>`;
+  const n = ctx.nutr, s100 = num(n,"sugars_100g"), salt100 = num(n,"salt_100g");
+  const P = getProfile(), lim = KID_LIM[P.kidAge] || null;
+  const age = lim ? t(KID_OPTS.find(o => o[0] === P.kidAge)[1]).toLowerCase() : "";
+  const sugars = (ctx.text || "").trim() ? findSugars(ctx.text) : null;
+  const rows = [];
+  if(s100 !== null){
+    const sg = s100 * g / 100, tsp = sg / 4, ap = pct(sg, ADULT_LIM.sugar);
+    let kid = "", bar = ap;
+    if(lim && P.kidAge === "0") kid = `<b>${esc(t("eBabySug"))}</b>`;
+    else if(lim){ const kp = pct(sg, lim.sugar); bar = kp; kid = `<b>${esc(t("eKidSug",{age, p:kp, max:lim.sugar}))}</b>`; }
+    rows.push(`<div class="erow"><div class="ebig">${fmt(tsp)}<small>${esc(t(Math.abs(tsp - 1) < .05 ? "eTsp1" : "eTsp"))}</small></div>
+      <div class="etxt">${esc(t("eIn",{g:fmt(g)}))} · ${esc(t("eAdultSug",{p:ap}))}${kid}<div class="ebar"><i class="${barCls(bar)}" style="width:${Math.min(100,bar)}%"></i></div></div></div>`);
+  }
+  if(salt100 !== null){
+    const sl = salt100 * g / 100, ap = pct(sl, ADULT_LIM.salt);
+    let kid = "", bar = ap;
+    if(lim){ const kp = pct(sl, lim.salt); bar = kp; kid = `<b>${esc(P.kidAge === "0" ? t("eBabySalt",{p:kp}) : t("eKidSalt",{age, p:kp, max:lim.salt}))}</b>`; }
+    rows.push(`<div class="erow"><div class="ebig">${fmt(sl)} g<small>${esc(t("eSaltU"))}</small></div>
+      <div class="etxt">${esc(t("eIn",{g:fmt(g)}))} · ${esc(t("eAdultSalt",{p:ap}))}${kid}<div class="ebar"><i class="${barCls(bar)}" style="width:${Math.min(100,bar)}%"></i></div></div></div>`);
+  }
+  let hid = "";
+  if(sugars && sugars.length) hid = `<p class="hid">${esc(t(sugars.length > 1 ? "eHidden" : "eHidden1",{n:sugars.length, list:sugars.join(", ")}))}</p>`;
+  else if(sugars && s100 !== null && s100 >= 1) hid = `<p class="hid ok">${esc(t("eNatural"))}</p>`;
+  if(!rows.length && !hid) return `<div id="easyBox"></div>`;
+  return `<div class="easy" id="easyBox"><h2>${esc(t("easyH"))}</h2>${rows.join("")}${hid}${rows.length ? `<p class="hint">${esc(t("eNote"))}</p>` : ""}</div>`;
+}
+
 function portionBlock(p, g){
   const n = p.nutriments;
   if(!n || !NT.some(([k]) => num(n,k) !== null)) return "";
@@ -1494,6 +1626,7 @@ function updatePortion(g, fromInput){
   cur.g = g;
   if($("#ntBox")) $("#ntBox").innerHTML = ntTable(cur.ctx.nutr, g);
   const box = $("#alertsBox"); if(box) box.outerHTML = alertsBlock(personalize(cur.ctx, g));
+  const eb = $("#easyBox"); if(eb) eb.outerHTML = easyBlock(cur.ctx, g);
   document.querySelectorAll(".qbtn").forEach(b => b.setAttribute("aria-pressed", +b.dataset.g === g));
   if(!fromInput && $("#grams")) $("#grams").value = g;
 }
@@ -1612,8 +1745,11 @@ function renderProduct(code, p, quiet){
   if(!+q.nova_group){ const nv = estimateNova(norm(ingr), adds); if(nv){ q.nova_group = nv; q._estNova = 1; } }
   const sc = computeScore(q, adds);
   if(!quiet) cur.g = +p.serving_quantity > 0 ? +p.serving_quantity : 100;
-  cur.ctx = {adds, text:norm(ingr), nutr:eff, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags};
+  cur.ctx = {adds, text:norm(ingr), nutr:eff, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags, name:norm(name)};
   const me = personalize(cur.ctx, cur.g);
+  const so = shownOf(sc, me);
+  cur.sum = sumOf(code, name, p.image_front_small_url, so, eff, adds, q, p.categories_tags);
+  const acts = so ? `<div class="acts-row"><button class="btn ghost small" data-cmp="1">${esc(t("cmpBtn"))}</button>${(so.shown < 75 || so.crit) && !so.incomplete ? `<button class="btn ghost small" data-alt="1">${esc(t("altBtn"))}</button>` : ""}</div><div id="altBox" class="altbox"></div>` : "";
   const report = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">${esc(t("reportLink"))}</a>`;
   $("#result").innerHTML = `
     <div class="product">
@@ -1621,9 +1757,11 @@ function renderProduct(code, p, quiet){
       <div><h3>${esc(name)}</h3><p>${esc([p.brands, p.quantity].filter(Boolean).join(", "))}</p><p>${esc(t("codeLbl",{c:code}))}</p></div>
     </div>
     ${scoreBlock(sc, me)}
-    ${(p._sIngr || p._sNutr) ? `<div class="notice shared"><p style="margin:0">${esc(t("sharedNote"))}</p><button class="linkish" data-sharedreport="1">${esc(t("sharedReport"))}</button></div>` : ""}
+    ${acts}
+    ${(p._sIngr || p._sNutr) ? sharedNoticeHtml(code, p) : ""}
     ${prodCtx ? completeBlock(p, dbIngr, ingr, eff, needsNutr) : ""}
     ${alertsBlock(me)}
+    ${easyBlock(cur.ctx, cur.g)}
     ${additivesBlock(adds, me.mine)}
     ${portionBlock(q, cur.g)}
     ${lightsBlock(eff)}
@@ -1632,6 +1770,7 @@ function renderProduct(code, p, quiet){
     <p class="foot">${esc(t("report")).replace("{link}", report)}</p>`;
   openEditor = null;
   cur.hist = {code, name, brand:p.brands||"", img:p.image_front_small_url||"", score:sc?sc.score:null, t:Date.now()};
+  compareHook(code, quiet);
   if(quiet) return;
   saveHistory(cur.hist);
   $("#result").scrollIntoView({behavior:"smooth", block:"start"});
@@ -1709,7 +1848,7 @@ function renderPasted(text, quiet){
   const me = personalize(cur.ctx, cur.g);
   $("#result").innerHTML = `
     <div class="product"><div><h3>${esc(t("pastedTitle"))}</h3><p>${esc(t(nutr ? "pastedSubNut" : "pastedSub"))}</p></div></div>
-    ${scoreBlock(sc, me)}${alertsBlock(me)}
+    ${scoreBlock(sc, me)}${alertsBlock(me)}${easyBlock(cur.ctx, cur.g)}
     ${nutFormBlock(nutr, est)}
     ${adds ? additivesBlock(adds, me.mine) : ""}
     ${nutr ? portionBlock(p, cur.g) + lightsBlock(nutr) : ""}
@@ -1729,7 +1868,7 @@ function renderInternal(code){
   </div>`;
 }
 /* ---------- căutare produs ---------- */
-const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,product_name_en,brands,quantity,product_quantity,serving_quantity,serving_size,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro,ingredients_text_en";
+const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,product_name_en,brands,quantity,product_quantity,serving_quantity,serving_size,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro,ingredients_text_en,categories_tags";
 async function loadProduct(raw){
   const code = String(raw).replace(/\D/g,"");
   if(code.length < 8){ lastRender = null; $("#result").innerHTML = `<div class="notice">${esc(t("codeShort"))}</div>`; return; }
@@ -1757,6 +1896,220 @@ async function loadProduct(raw){
     lastRender = null;
     $("#result").innerHTML = `<div class="notice">${esc(t("netErr",{e:e.message}))}</div>`;
   }
+}
+
+/* ---------- rezumat produs (pentru comparație, alternative, mod raft) ---------- */
+function sumOf(code, name, img, so, eff, adds, q, cats){
+  return {code, name, img:img || "", has:!!so, shown:so ? so.shown : null, crit:so ? so.crit : false, incomplete:so ? so.incomplete : true, active:so ? so.active : false,
+    sugar:num(eff,"sugars_100g"), salt:num(eff,"salt_100g"), sat:num(eff,"saturated-fat_100g"),
+    hi: adds ? adds.filter(a => a.l >= 3 || a.b).length : null, nova: +q.nova_group || null, ns:(q.nutriscore_grade || "").toLowerCase(), cats:cats || []};
+}
+function pName(p){ return (LANG === "en" ? p.product_name_en || p.product_name || p.product_name_ro : p.product_name_ro || p.product_name || p.product_name_en) || ""; }
+/* evaluare rapidă a unui produs (fără să-l afișăm): scor general + profil */
+function quickEval(p){
+  const sv = p.code ? getSaved(p.code) : null;
+  const ingr = (LANG === "en" ? p.ingredients_text_en || p.ingredients_text || p.ingredients_text_ro : p.ingredients_text_ro || p.ingredients_text || p.ingredients_text_en) || (sv && sv.ingr) || "";
+  const nutr = nutrComplete(p.nutriments) ? p.nutriments : (sv && sv.nutr) ? {...(p.nutriments||{}), ...sv.nutr} : p.nutriments;
+  let adds = null;
+  if((p.additives_tags||[]).length) adds = fromTags(p.additives_tags);
+  if(ingr){ const ex = extractFromText(ingr); adds = adds ? mergeAdds(adds, ex) : ex; }
+  const q = {...p, nutriments: nutr || undefined};
+  if(!q.nutriscore_grade || !NS[String(q.nutriscore_grade).toLowerCase()]){ if(q.nutriments){ const e = estimateNutriScore(q.nutriments); if(e){ q.nutriscore_grade = e; q._estNS = 1; } } }
+  if(!+q.nova_group){ const nv = estimateNova(norm(ingr), adds); if(nv){ q.nova_group = nv; q._estNova = 1; } }
+  const sc = computeScore(q, adds);
+  const name = pName(p);
+  const ctx = {adds:adds || [], text:norm(ingr), nutr, allergens:p.allergens_tags, traces:p.traces_tags, analysis:p.ingredients_analysis_tags, name:norm(name)};
+  const me = personalize(ctx, 100);
+  const so = shownOf(sc, me);
+  return {so, sum: sumOf(p.code, name, p.image_front_small_url, so, nutr, adds, q, p.categories_tags), hasIngr: !!ingr};
+}
+const badgeStyle = so => !so ? "color:var(--muted)" : (so.incomplete ? VNEUTRAL : VSTYLE[verdict(so.shown).i]).replace(/--vc:([^;]+);--vt:([^;]+).*/,"background:$1;color:$2");
+
+/* ---------- comparație între două produse ---------- */
+let cmpA = null, cmpWaitFirst = false;
+function updateCmpBar(){
+  const b = $("#cmpBar"); if(!b) return;
+  if(!cmpA && !cmpWaitFirst){ b.hidden = true; b.innerHTML = ""; return; }
+  b.hidden = false;
+  const msg = cmpA ? esc(t("cmpBarA")).replace("{n}", `<b>${esc(cmpA.name)}</b>`) : esc(t("cmpBarFirst"));
+  b.innerHTML = `<span class="sp">${msg}</span>${scanning ? "" : `<button class="btn small" data-cmpscan="1">${esc(t(cmpA ? "cmpScanB" : "cmpScanA"))}</button>`}<button class="linkish" data-cmpcancel="1">${esc(t("cancel"))}</button>`;
+}
+function startCompare(){
+  shelf = false; updateShelfUi();
+  cmpA = cur.sum && cur.sum.has ? cur.sum : null;
+  cmpWaitFirst = !cmpA; cur.cmp = null;
+  track("compare");
+  newScan(); updateCmpBar();
+}
+function cancelCompare(){ cmpA = null; cmpWaitFirst = false; updateCmpBar(); }
+function compareHook(code, quiet){
+  if(cmpA && cmpA.code === code && !quiet && !cur.cmp){ $("#result").insertAdjacentHTML("afterbegin", `<div class="notice">${esc(t("cmpSame"))}</div>`); }
+  else if(cmpA && cmpA.code !== code){
+    if(cur.sum.has){ cur.cmp = {a:cmpA, b:cur.sum}; cmpA = null; updateCmpBar(); }
+    else $("#result").insertAdjacentHTML("afterbegin", `<div class="notice">${esc(t("cmpNeed"))}</div>`);
+  } else if(cur.cmp && cur.cmp.b.code === code) cur.cmp.b = cur.sum;
+  if(cmpWaitFirst && !quiet && cur.sum.has){ cmpWaitFirst = false; cmpA = cur.sum; updateCmpBar(); }
+  if(cur.cmp && cur.cmp.b.code === code) $("#result").insertAdjacentHTML("afterbegin", compareCard(cur.cmp));
+}
+function compareCard({a, b}){
+  let win = null;
+  if(a.crit !== b.crit) win = a.crit ? "b" : "a";
+  else if(Math.abs(a.shown - b.shown) >= 5) win = a.shown > b.shown ? "a" : "b";
+  const W = win === "a" ? a : b, Lo = win === "a" ? b : a;
+  const reasons = [];
+  if(win){
+    if(Lo.crit && !W.crit) reasons.push(t("rCrit"));
+    if(W.sugar !== null && Lo.sugar !== null && Lo.sugar - W.sugar >= 2 && W.sugar <= Lo.sugar * .8) reasons.push(t("rSugar",{w:fmt(W.sugar), l:fmt(Lo.sugar)}));
+    if(W.salt !== null && Lo.salt !== null && Lo.salt - W.salt >= .2) reasons.push(t("rSalt",{w:fmt(W.salt), l:fmt(Lo.salt)}));
+    if(W.sat !== null && Lo.sat !== null && Lo.sat - W.sat >= 1) reasons.push(t("rSat",{w:fmt(W.sat), l:fmt(Lo.sat)}));
+    if(W.hi !== null && Lo.hi !== null && Lo.hi > W.hi) reasons.push(t("rAdds",{w:W.hi, l:Lo.hi}));
+    if(Lo.nova === 4 && W.nova && W.nova < 4) reasons.push(t("rNova"));
+    if(reasons.length < 2 && NS[W.ns] !== undefined && NS[Lo.ns] !== undefined && NS[W.ns] > NS[Lo.ns]) reasons.push(t("rNs",{w:W.ns.toUpperCase(), l:Lo.ns.toUpperCase()}));
+  }
+  const r1 = v => v === null ? null : Math.round(v * 10);
+  const c = (x, y, lowerBetter) => { x = r1(x); y = r1(y); return (x === null || y === null || x === y) ? ["",""] : ((x < y) === lowerBetter ? ["win",""] : ["","win"]); };
+  const row = (label, va, vb, cls) => `<tr><td>${esc(label)}</td><td class="${cls[0]}">${va}</td><td class="${cls[1]}">${vb}</td></tr>`;
+  const g = v => v === null ? "–" : fmt(v) + " g";
+  const sc = s => `<span class="badge" style="${badgeStyle(s.has ? {shown:s.shown, incomplete:s.incomplete} : null)}">${s.shown ?? "–"}</span>`;
+  const scoreCls = win === "a" ? ["win",""] : win === "b" ? ["","win"] : ["",""];
+  const nova = s => s.nova ? esc(t(s.nova === 4 ? "yes" : "no")) : "–";
+  const head = s => `<th>${s.img ? `<img src="${esc(s.img)}" alt="">` : ""}<span class="nm">${esc(s.name)}</span></th>`;
+  return `<div class="cmp" id="cmpCard">
+    <h2>${esc(t("cmpH"))}</h2>
+    <p class="wl">${win ? esc(t(W.active ? "cmpWinMe" : "cmpWin",{n:W.name})) : esc(t("cmpTie"))}</p>
+    ${win && W.shown < 50 ? `<p class="hint" style="margin-top:0">${esc(t("cmpBothPoor"))}</p>` : ""}
+    ${reasons.length ? `<ul>${reasons.slice(0,3).map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
+    <table><thead><tr><th></th>${head(a)}${head(b)}</tr></thead><tbody>
+      ${row(t("cmpRowScore"), sc(a), sc(b), scoreCls)}
+      ${row(t("cmpRowSugar"), g(a.sugar), g(b.sugar), c(a.sugar, b.sugar, true))}
+      ${row(t("cmpRowSalt"), g(a.salt), g(b.salt), c(a.salt, b.salt, true))}
+      ${row(t("cmpRowSat"), g(a.sat), g(b.sat), c(a.sat, b.sat, true))}
+      ${row(t("cmpRowAdds"), a.hi ?? "–", b.hi ?? "–", c(a.hi, b.hi, true))}
+      ${row(t("cmpRowNova"), nova(a), nova(b), c(a.nova === 4 ? 1 : a.nova ? 0 : null, b.nova === 4 ? 1 : b.nova ? 0 : null, true))}
+    </tbody></table>
+    ${a.incomplete || b.incomplete ? `<p class="hint">${esc(t("cmpIncomplete"))}</p>` : ""}
+  </div>`;
+}
+
+/* ---------- alternative mai bune (Open Food Facts, vândute în România) ---------- */
+const ALT_FIELDS = "code,product_name,product_name_ro,product_name_en,brands,image_front_small_url,nutriscore_grade,nova_group,additives_tags,nutriments,ingredients_text,ingredients_text_ro,ingredients_text_en,allergens_tags,traces_tags,ingredients_analysis_tags,categories_tags";
+const GENERIC_CATS = /^en:(plant-based-foods-and-beverages|plant-based-foods|beverages|foods|snacks|sweet-snacks|salty-snacks|dairies|groceries|meals|fermented-foods|fermented-milk-products|non-alcoholic-beverages|cereals-and-potatoes|condiments|sauces|spreads|frozen-foods|breakfasts|desserts|meats|fishes|seafood|canned-foods)$/;
+const altCache = {};
+async function findAlternatives(sum){
+  if(altCache[sum.code]) return altCache[sum.code];
+  const tags = sum.cats.filter(c => /^en:/.test(c) && !GENERIC_CATS.test(c)).slice(-3).reverse();
+  if(!tags.length) return null;
+  const P = getProfile(), needIngr = P.allergens.length || P.pku || P.vegan || P.kidAge === "0";
+  const seen = new Set([sum.code]), found = [];
+  for(const tag of tags){
+    const url = `https://world.openfoodfacts.org/api/v2/search?categories_tags=${encodeURIComponent(tag)}&countries_tags=en:romania&fields=${ALT_FIELDS}&page_size=40&sort_by=unique_scans_n`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    for(const p of (j.products || [])){
+      if(!p.code || seen.has(p.code)) continue;
+      seen.add(p.code);
+      const e = quickEval(p);
+      if(!e.so || e.so.crit || e.so.incomplete || (needIngr && !e.hasIngr) || !e.sum.name) continue;
+      if(e.so.shown >= Math.max(50, sum.shown + 10)) found.push({p, e});
+    }
+    if(found.length >= 3) break;
+  }
+  found.sort((x, y) => y.e.so.shown - x.e.so.shown);
+  return (altCache[sum.code] = found.slice(0, 5));
+}
+async function showAlternatives(){
+  const box = $("#altBox"); if(!box || !cur.sum) return;
+  const sum = cur.sum;
+  track("alt_open");
+  if(!sum.cats.length){ box.innerHTML = `<div class="notice">${esc(t("altNoCat"))}</div>`; return; }
+  box.innerHTML = `<div class="notice">${esc(t("altLoading"))}</div>`;
+  let list;
+  try{ list = await findAlternatives(sum); }catch(e){ if(cur.sum === sum) box.innerHTML = `<div class="notice">${esc(t("altErr"))}</div>`; return; }
+  if(cur.sum !== sum || !$("#altBox")) return;
+  if(list === null){ box.innerHTML = `<div class="notice">${esc(t("altNoCat"))}</div>`; return; }
+  if(!list.length){ box.innerHTML = `<div class="notice">${esc(t("altNone"))}</div>`; return; }
+  track("alt_found");
+  box.innerHTML = `<h2>${esc(t("altH"))}</h2><p class="hint" style="margin-top:0">${esc(t("altNote"))}</p><div class="alt-list">${list.map(({p, e}) => `
+    <button class="hitem" data-open="${esc(p.code)}">
+      ${p.image_front_small_url ? `<img src="${esc(p.image_front_small_url)}" alt="">` : `<span class="ph"></span>`}
+      <span class="t"><b>${esc(e.sum.name)}</b><span>${esc(p.brands || p.code)}</span></span>
+      <span class="badge" style="${badgeStyle(e.so)}">${e.so.shown}</span>
+    </button>`).join("")}</div>`;
+}
+
+/* ---------- mod raft: scanare continuă ---------- */
+let shelf = false, shelfBusy = false, shelfLast = {code:"", t:0}, shelfItems = [];
+function updateShelfUi(){
+  const b = $("#shelfBtn"); if(b) b.setAttribute("aria-pressed", String(shelf));
+  if(scanning) $("#scanHint").textContent = t(shelf ? "shelfOn" : "scanHint");
+  if(!shelf){ const ts = $("#shelfToast"); if(ts) ts.hidden = true; }
+}
+function toggleShelf(on){
+  shelf = on === undefined ? !shelf : on;
+  if(shelf){ cmpA = null; cmpWaitFirst = false; updateCmpBar(); track("shelf_on"); }
+  updateShelfUi();
+}
+async function quickLookup(code){
+  const tries = [code];
+  if(code.length === 12) tries.push("0" + code);
+  if(code.length === 13 && code[0] === "0") tries.push(code.slice(1));
+  let p = null;
+  for(const c of tries){
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${c}.json?fields=${FIELDS}`);
+    if(r.status === 404) continue;
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    if(j.status === 1 && j.product){ p = j.product; break; }
+  }
+  if(!p) p = withShared({_notInDb:true}, await fetchShared(code));
+  else if(needsShared(p)) p = withShared(p, await fetchShared(code));
+  p.code = code;
+  const e = quickEval(p);
+  return {code, name: e.sum.name || t("unknownProduct"), brand: p.brands || "", img: p.image_front_small_url || "", so: e.so, score: e.so ? e.so.shown : null};
+}
+function showToast(it){
+  const ts = $("#shelfToast"); if(!ts) return;
+  ts.hidden = false; ts.dataset.code = it.code;
+  if(it.loading){ ts.setAttribute("style", VNEUTRAL); ts.innerHTML = `<span class="t">${esc(t("shelfLoading"))}<small>${esc(it.code)}</small></span>`; return; }
+  if(it.err){ ts.setAttribute("style", VNEUTRAL); ts.innerHTML = `<span class="t">${esc(t("shelfErr"))}<small>${esc(it.code)}</small></span>`; return; }
+  const so = it.so;
+  const v = so ? verdict(so.shown) : null;
+  ts.setAttribute("style", !so || so.incomplete ? VNEUTRAL : VSTYLE[v.i]);
+  const label = !so ? t("shelfNoData") : so.crit ? t("notForYou") : so.incomplete ? t("incomplete") : v.t;
+  ts.innerHTML = `${so ? `<span class="n">${so.shown}</span>` : ""}<span class="t">${esc(label)}<small>${esc(it.name)} · ${esc(t("shelfTap"))}</small></span>`;
+}
+function renderShelfList(){
+  if(!shelfItems.length) return;
+  lastRender = renderShelfList; prodCtx = null;
+  $("#result").innerHTML = `<h2>${esc(t("shelfListH",{n:shelfItems.length}))}</h2><p class="hint" style="margin-top:0">${esc(t("shelfListHint"))}</p><div class="hist">${shelfItems.map(x => `
+    <button class="hitem" data-open="${esc(x.code)}">
+      ${x.img ? `<img src="${esc(x.img)}" alt="">` : `<span class="ph"></span>`}
+      <span class="t"><b>${esc(x.name)}</b><span>${esc(x.brand || x.code)}</span></span>
+      <span class="badge" style="${badgeStyle(x.so)}">${x.so ? x.so.shown : "–"}</span>
+    </button>`).join("")}</div>`;
+}
+async function shelfHit(code){
+  const now = Date.now();
+  if(code.length < 8 || shelfBusy || (code === shelfLast.code && now - shelfLast.t < 6000)) return;
+  shelfBusy = true; shelfLast = {code, t:now};
+  if(navigator.vibrate) navigator.vibrate(40);
+  showToast({loading:true, code});
+  let it;
+  try{ it = await quickLookup(code); }catch(e){ it = {code, err:true}; }
+  shelfBusy = false; shelfLast.t = Date.now();
+  if(!shelf) return;
+  showToast(it);
+  if(it.err) return;
+  if(it.so && (it.so.crit || (!it.so.incomplete && it.so.shown < 50)) && navigator.vibrate) setTimeout(() => navigator.vibrate([140,90,140]), 120);
+  shelfItems = [it, ...shelfItems.filter(x => x.code !== code)].slice(0, 30);
+  saveHistory({code, name:it.name, brand:it.brand, img:it.img, score:it.score, t:Date.now()});
+  renderShelfList();
+}
+async function openProduct(code){
+  await stopScan();
+  $("#manualCode").value = code;
+  loadProduct(code);
 }
 
 /* ---------- baza comună Good.2.eat (produse citite cu AI de alți utilizatori) ---------- */
@@ -1789,6 +2142,24 @@ function withShared(p, s){
   return q;
 }
 let sharedCtx = null;
+const confKey = c => "good2eat.confirmed." + c;
+const wasConfirmed = c => { try{ return !!localStorage.getItem(confKey(c)); }catch(e){ return false; } };
+function sharedNoticeHtml(code, p){
+  const n = (p._shared && p._shared.confirms) || 0;
+  const verified = n >= 1;
+  const note = verified ? t("sharedVerified").replace("{n}", n + 1) : t("sharedNote");
+  const conf = (!verified && !wasConfirmed(code)) ? `<p style="margin:8px 0 0;font-size:14px">${esc(t("sharedConfirmAsk"))}</p><button class="linkish" data-sharedconfirm="1">${esc(t("sharedConfirm"))}</button> · ` : "";
+  return `<div class="notice shared"><p style="margin:0">${esc(note)}</p>${conf}<button class="linkish" data-sharedreport="1">${esc(t("sharedReport"))}</button></div>`;
+}
+async function confirmShared(btn){
+  if(!sharedCtx) return;
+  const {code} = sharedCtx;
+  try{ localStorage.setItem(confKey(code), "1"); }catch(e){}
+  try{ await fetch(`${AI_URL}/confirm`, {method:"POST", headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({code})}); }catch(e){}
+  track("shared_confirm");
+  const box = btn.closest(".notice");
+  if(box) box.innerHTML = `<p style="margin:0">${esc(t("sharedThanks"))}</p>`;
+}
 async function reportShared(){
   if(!sharedCtx) return;
   const {code, p} = sharedCtx; sharedCtx = null;
@@ -2015,7 +2386,7 @@ function askAiConsent(){
 }
 
 /* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
-const APP_VERSION = "0.9.0";
+const APP_VERSION = "0.10.0";
 function track(ev){
   if(!AI_URL) return;
   try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
@@ -2122,7 +2493,8 @@ async function startScan(){
         videoConstraints:{facingMode:"environment", width:{ideal:1920}, height:{ideal:1080}, advanced:[{focusMode:"continuous"}]}
       }, onCode, () => {});
     scanning = true; $("#stopRow").hidden = false; updateFab();
-    $("#scanHint").textContent = t("scanHint");
+    $("#scanHint").textContent = t(shelf ? "shelfOn" : "scanHint");
+    updateShelfUi(); updateCmpBar();
     setupCamTools();
     clearTimeout(hintTimer);
     hintTimer = setTimeout(() => { if(scanning) $("#scanHint").textContent = t("scanHintSlow"); }, 8000);
@@ -2158,9 +2530,12 @@ async function stopScan(){
   clearTimeout(hintTimer);
   if(qr && scanning){ try{ await qr.stop(); }catch(e){} }
   scanning = false; $("#stopRow").hidden = true; $("#idle").hidden = false; updateFab();
+  const ts = $("#shelfToast"); if(ts) ts.hidden = true;
+  updateCmpBar();
 }
 async function onCode(text){
   if(!scanning) return;
+  if(shelf) return shelfHit(parseScan(text));
   await stopScan();
   if(navigator.vibrate) navigator.vibrate(60);
   const code = parseScan(text);
@@ -2243,7 +2618,8 @@ function applyLang(){
   if($("#v-prof").classList.contains("on")) renderProfile();
   if($("#v-hist").classList.contains("on")) renderHistory();
   if($("#v-add").classList.contains("on")) renderAddList();
-  if(scanning) $("#scanHint").textContent = t("scanHint");
+  if(scanning) $("#scanHint").textContent = t(shelf ? "shelfOn" : "scanHint");
+  updateCmpBar();
   if(lastRender) lastRender();
 }
 function setLang(l){ LANG = l; try{ localStorage.setItem(LK, l); }catch(e){} applyLang(); }
@@ -2256,6 +2632,7 @@ function updateFab(){
   f.hidden = !($("#v-scan").classList.contains("on") && hasResult && !scanning);
 }
 async function newScan(){
+  cur.cmp = null;
   lastRender = null; prodCtx = null; cur.ctx = null; pasted.text = ""; pasted.nutr = null;
   $("#result").innerHTML = "";
   $("#manualCode").value = "";
@@ -2284,6 +2661,13 @@ $("#startBtn").addEventListener("click", startScan);
 $("#newScan").addEventListener("click", newScan);
 new MutationObserver(updateFab).observe($("#result"), {childList:true});
 $("#stopBtn").addEventListener("click", stopScan);
+$("#shelfBtn").addEventListener("click", () => toggleShelf());
+$("#shelfStart").addEventListener("click", () => { toggleShelf(true); startScan(); });
+$("#shelfToast").addEventListener("click", e => { const c = e.currentTarget.dataset.code; if(c && !shelfBusy) openProduct(c); });
+$("#cmpBar").addEventListener("click", e => {
+  if(e.target.closest("[data-cmpcancel]")) return cancelCompare();
+  if(e.target.closest("[data-cmpscan]")) return newScan();
+});
 $("#torchBtn").addEventListener("click", toggleTorch);
 $("#zoomBtn").addEventListener("click", toggleZoom);
 $("#photoCode").addEventListener("click", () => { $("#codeFile").value = ""; $("#codeFile").click(); });
@@ -2301,6 +2685,10 @@ $("#result").addEventListener("click", e => {
   if(e.target.closest("[data-comptype]")){ const d = $("#ingrEd"); if(d){ d.open = true; const ta = $("#ingrEdit"); if(ta){ ta.focus(); ta.scrollIntoView({behavior:"smooth", block:"center"}); } } return; }
   if(e.target.closest("[data-ingrapply]")){ const v = ($("#ingrEdit")||{}).value; if(v && v.trim()) applyIngredients(v.trim(), false); return; }
   if(e.target.closest("[data-resetsaved]")) return resetSaved();
+  if(e.target.closest("[data-cmp]")) return startCompare();
+  if(e.target.closest("[data-alt]")) return showAlternatives();
+  const op = e.target.closest("[data-open]"); if(op) return openProduct(op.dataset.open);
+  if(e.target.closest("[data-sharedconfirm]")) return confirmShared(e.target.closest("[data-sharedconfirm]"));
   if(e.target.closest("[data-sharedreport]")) return reportShared();
   if(e.target.closest("[data-type]")) return openTyping();
   if(e.target.closest("[data-method]")){ show("v-add"); $("#method").open = true; return; }
@@ -2347,8 +2735,16 @@ document.addEventListener("click", e => {
 applyLang();
 updateInstallUi();
 trackActive();
-const qp = new URLSearchParams(location.search).get("cod") || new URLSearchParams(location.search).get("code");
+const qs = new URLSearchParams(location.search);
+const qp = qs.get("cod") || qs.get("code");
 if(qp){ $("#manualCode").value = qp; loadProduct(qp); }
+else if(qs.get("a")){
+  const a = qs.get("a"); track("shortcut");
+  if(a === "raft"){ toggleShelf(true); startScan(); }
+  else if(a === "compare"){ cmpWaitFirst = true; updateCmpBar(); startScan(); }
+  else if(a === "scan") startScan();
+  try{ history.replaceState(null, "", location.pathname); }catch(e){}
+}
 </script>
 </body>
 </html>
