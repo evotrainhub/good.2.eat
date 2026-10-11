@@ -1,6 +1,6 @@
 /* Good.2.eat — service worker: aplicația se deschide repede și funcționează parțial fără internet.
    Schimbă VERSION la fiecare actualizare importantă, ca telefoanele să ia fișierele noi. */
-const VERSION = "g2e-0.10.0";
+const VERSION = "g2e-0.10.1";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./privacy.html",
                "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 const CDN = ["cdn.jsdelivr.net", "unpkg.com"];
