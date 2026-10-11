@@ -94,6 +94,7 @@ textarea{width:100%;min-height:120px;border:2px solid var(--line);background:var
 .part .bar{grid-column:1/-1;height:6px;background:var(--seg);border-radius:3px;overflow:hidden}
 .part .bar i{display:block;height:100%;background:var(--vt)}
 .partial{font-size:14px;opacity:.85;margin:12px 0 0}
+.why{margin-top:14px;font-size:14px;border-top:1px solid currentColor;border-color:rgba(0,0,0,.15);padding-top:10px}.why summary{cursor:pointer;font-weight:700}.why p{margin:8px 0 0;opacity:.92}
 
 .alerts{margin-top:16px;display:grid;gap:8px}
 .alerts h2{margin:6px 0 2px;color:var(--violet)}
@@ -877,6 +878,8 @@ ro:{
  ml0:"De evitat", ml1:"Slab", ml2:"Acceptabil", ml3:"Bun",
  notForYou:"Nepotrivit pentru tine", adjusted:"Ajustat pentru profilul tău", generalScore:" · scor general {n}",
  partial:"Scor parțial: lipsesc unele date, așa că s-a calculat doar din componentele disponibile.",
+ scWhy:"Ce înseamnă scorul?",
+ scWhyBody:"<p>Scorul este o <b>medie ponderată</b>, nu o măsurătoare medicală: <b>50% Nutri-Score</b> (zahăr, sare, grăsimi saturate, fibre), <b>30% aditivi</b> (−25 puncte pentru fiecare cu îngrijorare ridicată, −10 pentru cei moderați, încă −25 dacă e interzis în UE) și <b>20% NOVA</b> (cât de procesat e produsul).</p><p><b>75–100</b> bun · <b>50–74</b> acceptabil · <b>25–49</b> slab · <b>sub 25</b> de evitat. Diferențele de 3–5 puncte nu contează.</p><p>Profilul tău scade puncte suplimentar; o alertă critică (alergie, fenilcetonurie etc.) limitează scorul la 5. Un scor bun nu garantează absența aditivilor problematici: verifică lista de mai jos. Ponderile sunt orientative și nu înlocuiesc sfatul unui medic sau nutriționist.</p>",
  noScore:"Nu există suficiente date pentru un scor. Completează produsul cu două fotografii.",
  pNutri:"Profil nutrițional · Nutri-Score {g}", pAdd:"Aditivi · {n} cu risc", pAddNone:"Aditivi · fără aditivi cu risc", pNova:"Procesare · NOVA {n} din 4",
  forProfile:"Pentru profilul tău", nothing:"Nimic de semnalat pentru profilul tău.",
@@ -910,6 +913,8 @@ ro:{
  photoNoCode:"Nu am găsit un cod de bare în fotografie. Fă poza mai aproape, cu codul drept, fără reflexii, sau scrie cifrele de sub bare.",
  searching:"Se caută produsul", photoSearching:"Caut codul în fotografie",
  ocrPrep:"Pregătesc imaginea…", ocrReading:"Citesc textul…", ocrLang:"Descarc limba română (doar prima dată)…", ocrInit:"Pregătesc cititorul…",
+ aiReading:"Citesc ambalajul…", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
+ aiBoth:"Gata: am citit ingredientele și tabelul nutrițional. Verifică valorile, apoi scorul se recalculează.", aiIngrOnly:"Am citit ingredientele. Tabelul nutrițional nu se vedea: fotografiază-l separat.", aiNutOnly:"Am citit tabelul nutrițional. Ingredientele nu se vedeau: fotografiază-le separat.", aiPortion:"Tabelul e dat pe porție, nu la 100 g; completează manual valorile la 100 g.", aiBtn:"Fotografiază spatele ambalajului",
  ocrNoText:"Nu am găsit text lizibil. Apropie telefonul de listă, evită reflexiile și încearcă din nou.",
  ocrDone:"Gata. Verifică textul de mai jos și corectează-l dacă e nevoie, apoi apasă din nou Analizează.",
  ocrErr:"Citirea nu a funcționat ({e}). Verifică conexiunea sau scrie ingredientele manual.",
@@ -1030,6 +1035,8 @@ en:{
  ml0:"Avoid", ml1:"Poor", ml2:"Fair", ml3:"Good",
  notForYou:"Not suitable for you", adjusted:"Adjusted for your profile", generalScore:" · overall score {n}",
  partial:"Partial score: some data is missing, so only the available parts were used.",
+ scWhy:"What does the score mean?",
+ scWhyBody:"<p>The score is a <b>weighted average</b>, not a medical measurement: <b>50% Nutri-Score</b> (sugar, salt, saturated fat, fibre), <b>30% additives</b> (−25 points for each high-concern one, −10 for moderate, another −25 if banned in the EU) and <b>20% NOVA</b> (how processed the product is).</p><p><b>75–100</b> good · <b>50–74</b> acceptable · <b>25–49</b> poor · <b>below 25</b> avoid. Differences of 3–5 points are noise.</p><p>Your profile subtracts extra points; a critical alert (allergy, PKU, etc.) caps the score at 5. A good score does not guarantee no problematic additives: check the list below. Weights are indicative and do not replace advice from a doctor or dietitian.</p>",
  noScore:"Not enough data for a score. Complete the product with two photos.",
  pNutri:"Nutrition · Nutri-Score {g}", pAdd:"Additives · {n} of concern", pAddNone:"Additives · none of concern", pNova:"Processing · NOVA {n} of 4",
  forProfile:"For your profile", nothing:"Nothing to flag for your profile.",
@@ -1063,6 +1070,8 @@ en:{
  photoNoCode:"No barcode found in the photo. Take it closer, with the code straight and no glare, or type the digits under the bars.",
  searching:"Looking up the product", photoSearching:"Looking for the code in the photo",
  ocrPrep:"Preparing the image…", ocrReading:"Reading the text…", ocrLang:"Downloading English language data (first time only)…", ocrInit:"Starting the reader…",
+ aiReading:"Reading the package…", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
+ aiBoth:"Done: ingredients and nutrition table read. Check the values; the score updates.", aiIngrOnly:"Ingredients read. The nutrition table was not visible: photograph it separately.", aiNutOnly:"Nutrition table read. Ingredients were not visible: photograph them separately.", aiPortion:"The table is per serving, not per 100 g; enter the per-100 g values manually.", aiBtn:"Photograph the back of the pack",
  ocrNoText:"No readable text found. Move closer to the list, avoid glare and try again.",
  ocrDone:"Done. Check the text below, correct it if needed, then tap Analyse again.",
  ocrErr:"Reading failed ({e}). Check your connection or type the ingredients.",
@@ -1394,6 +1403,7 @@ function scoreBlock(sc, me){
     <div class="meter">${segs}<i class="pin" style="left:${Math.min(99,Math.max(1,shown))}%"></i></div>
     <div class="meter-labels"><span>${t("ml0")}</span><span>${t("ml1")}</span><span>${t("ml2")}</span><span>${t("ml3")}</span></div>
     ${parts ? `<div class="parts">${parts}</div>` : ""}
+    <details class="why"><summary>${esc(t("scWhy"))}</summary>${t("scWhyBody")}</details>
     ${incomplete ? `<p class="partial">${esc(t(sc.noAdds ? "incompleteHintIngr" : "incompleteHint"))}</p>` : sc && sc.partial ? `<p class="partial">${esc(t("partial"))}</p>` : ""}
   </div>`;
 }
@@ -1877,7 +1887,49 @@ function parseNutrition(text){
 
 function startOcr(mode){ ocrMode = mode || "ingr"; stopScan(); $("#ocrFile").value = ""; $("#ocrFile").click(); }
 function openTyping(){ if(!prodCtx) pasted.nutr = null; $("#ocrBox").hidden = false; $("#ocrStatus").hidden = true; $("#pasteText").focus(); $("#ocrBox").scrollIntoView({behavior:"smooth", block:"center"}); }
+/* ---------- citire cu AI printr-un Worker Cloudflare (o singură poză: ingrediente + tabel) ---------- */
+const AI_URL = "https://good2eat-ocr.ruxandra-boghian.workers.dev";   // ← lipește aici adresa Worker-ului, ex: "https://good2eat-ocr.CONTUL-TAU.workers.dev"
+if(AI_URL){ STR.ro.ocrBtn = STR.ro.aiBtn; STR.en.ocrBtn = STR.en.aiBtn; }
+function clientId(){ try{ let c = localStorage.getItem("good2eat.cid"); if(!c){ c = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)+Date.now()); localStorage.setItem("good2eat.cid", c); } return c; }catch(e){ return "anon"; } }
+async function shrinkImage(file, max){
+  const bmp = await createImageBitmap(file, {imageOrientation:"from-image"});
+  const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas"); c.width = Math.round(bmp.width*k); c.height = Math.round(bmp.height*k);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", .85);
+}
+async function runAi(file){
+  ocrBusy = true;
+  try{
+    const card = inCard();
+    if(!card){ $("#ocrBox").hidden = false; if(ocrMode === "ingr"){ $("#pasteText").value = ""; pasted.nutr = null; } }
+    ocrTarget().hidden = false; ocrTarget().scrollIntoView({behavior:"smooth", block:"center"});
+    ocrStatus(t("aiReading"));
+    const img = await shrinkImage(file, 1600);
+    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 40000);
+    const r = await fetch(AI_URL, {method:"POST", signal:ctl.signal, headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({image:img, media_type:"image/jpeg", lang:LANG})});
+    clearTimeout(to);
+    if(!r.ok) throw new Error("http " + r.status);
+    const d = await r.json();
+    const nutr = {}; Object.entries(d.nutrition || {}).forEach(([k,v]) => { if(typeof v === "number") nutr[k] = v; });
+    const perPortion = d.nutrition_per === "portion";
+    const hasN = Object.keys(nutr).length >= 3 && !perPortion, hasI = !!d.ingredients;
+    if(!hasI && !hasN){ ocrStatus(t(perPortion ? "aiPortion" : "aiNothing"), null, true); return true; }
+    const wantI = !prodCtx || prodCtx.needsIngr, wantN = !prodCtx || prodCtx.needsNutr;
+    if(hasI && wantI){ if(!inCard() && !prodCtx) $("#pasteText").value = d.ingredients; applyIngredients(d.ingredients, true); }
+    if(hasN && wantN) applyNutrition(nutr);
+    ocrStatus(t(hasI && hasN ? "aiBoth" : hasI ? "aiIngrOnly" : "aiNutOnly"));
+    return true;
+  }catch(e){
+    return false;          // rețea / server / limită: cădem înapoi pe citirea locală (Tesseract)
+  }finally{ ocrBusy = false; }
+}
 async function runOcr(file){
+  if(!file || ocrBusy) return;
+  if(AI_URL && await runAi(file)) return;
+  return runOcrLocal(file);
+}
+async function runOcrLocal(file){
   if(!file || ocrBusy) return;
   const canvas = await cropImage(file);
   if(!canvas) return;
