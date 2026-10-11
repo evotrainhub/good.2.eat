@@ -129,6 +129,8 @@ details.ingr{margin-top:14px}
 details.ingr summary{cursor:pointer;font-weight:700;color:var(--brand)}
 details.ingr p{font-size:15px;color:var(--muted)}
 .foot{font-size:13px;color:var(--muted);margin-top:22px;line-height:1.45}
+.appfoot{font-size:13px;color:var(--muted);margin:26px 0 90px;text-align:center}.appfoot a,.about a{color:var(--brand);font-weight:600}
+.about{margin-top:30px;padding-top:6px;border-top:1px solid var(--line)}.about p{margin:10px 0}
 .foot a{color:var(--brand)}
 
 .hist{display:grid;gap:8px}
@@ -286,6 +288,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
       <div class="row"><button class="btn" id="pasteBtn" data-i18n="analyse"></button><button class="btn ghost small" id="ocrAgain" data-i18n="anotherPhoto"></button></div>
     </div>
     <div id="result" aria-live="polite"></div>
+    <p class="appfoot"><a href="#" class="fb-link" data-i18n="feedback"></a> · <a href="privacy.html" class="pv-link" data-i18n="privacyLink"></a></p>
   </section>
 
   <section id="v-hist" class="view">
@@ -330,6 +333,15 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
     <div class="chips al" id="allergenList"></div>
     <p class="private" data-i18n="private"></p>
     <div class="row"><button class="btn violet" id="profDone" data-i18n="profDone"></button><button class="btn ghost small" id="profReset" data-i18n="profReset"></button></div>
+    <div class="about">
+      <h3 class="sub-h" data-i18n="aboutH"></h3>
+      <button class="btn small" id="installBtn" hidden data-i18n="installBtn"></button>
+      <p class="hint" id="installHint" hidden></p>
+      <p><a href="#" class="fb-link" data-i18n="feedback"></a></p>
+      <p><a href="privacy.html" class="pv-link" data-i18n="privacyLink"></a></p>
+      <p class="hint" id="appIdLine"></p>
+      <p class="hint" id="versionLine"></p>
+    </div>
   </section>
 </div>
 
@@ -913,6 +925,9 @@ ro:{
  photoNoCode:"Nu am găsit un cod de bare în fotografie. Fă poza mai aproape, cu codul drept, fără reflexii, sau scrie cifrele de sub bare.",
  searching:"Se caută produsul", photoSearching:"Caut codul în fotografie",
  ocrPrep:"Pregătesc imaginea…", ocrReading:"Citesc textul…", ocrLang:"Descarc limba română (doar prima dată)…", ocrInit:"Pregătesc cititorul…",
+ aboutH:"Despre aplicație", feedback:"Spune-ne ce nu funcționează", privacyLink:"Politica de confidențialitate", installBtn:"Instalează aplicația pe telefon", installIos:"Pe iPhone: apasă Distribuie, apoi „Adaugă pe ecranul principal”.", installed:"Aplicația e instalată pe acest telefon.", appIdLbl:"ID anonim al aplicației (îl menționezi doar dacă ne ceri ștergerea datelor): {id}", versionLbl:"Versiunea {v} (test)",
+ aiConsent:"Citirea cu AI trimite poza ambalajului la serverul Good.2.eat și la Anthropic (furnizorul AI), care extrage textul. Poza nu se păstrează; ingredientele și valorile citite intră în baza comună, ca alți utilizatori să găsească produsul.\n\nFotografiază doar ambalajul, fără persoane sau date personale.\n\nOK = folosesc citirea cu AI. Anulează = citesc doar în telefon (mai puțin precis).",
+ fbBody:"Ce nu funcționează sau ce ai vrea să fie altfel?\n\n\n---\nVersiune: {v}\nLimba: {l}\nUltimul cod: {c}\nDispozitiv: {d}",
  aiReading:"Citesc ambalajul…", aiLimit:"Ai folosit citirile cu AI incluse luna aceasta. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiLimitDay:"Citirea cu AI nu mai e disponibilă azi. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiSaved:" Produsul a intrat în baza comună Good.2.eat, ca alți utilizatori să-l găsească direct.", sharedNote:"Date completate din baza comună Good.2.eat: citite cu AI de pe ambalaj de un alt utilizator. Pot conține greșeli de citire.", sharedReport:"Nu corespund cu ambalajul? Semnalează", sharedReported:"Mulțumim pentru semnalare. Poți citi chiar tu ambalajul cu AI, ca să corectezi produsul.", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
  aiBoth:"Gata: am citit ingredientele și tabelul nutrițional. Verifică valorile, apoi scorul se recalculează.", aiIngrOnly:"Am citit ingredientele. Tabelul nutrițional nu se vedea: fotografiază-l separat.", aiNutOnly:"Am citit tabelul nutrițional. Ingredientele nu se vedeau: fotografiază-le separat.", aiPortion:"Tabelul e dat pe porție, nu la 100 g; completează manual valorile la 100 g.", aiBtn:"Fotografiază spatele ambalajului",
  ocrNoText:"Nu am găsit text lizibil. Apropie telefonul de listă, evită reflexiile și încearcă din nou.",
@@ -1070,6 +1085,9 @@ en:{
  photoNoCode:"No barcode found in the photo. Take it closer, with the code straight and no glare, or type the digits under the bars.",
  searching:"Looking up the product", photoSearching:"Looking for the code in the photo",
  ocrPrep:"Preparing the image…", ocrReading:"Reading the text…", ocrLang:"Downloading English language data (first time only)…", ocrInit:"Starting the reader…",
+ aboutH:"About the app", feedback:"Tell us what isn't working", privacyLink:"Privacy policy", installBtn:"Install the app on your phone", installIos:"On iPhone: tap Share, then “Add to Home Screen”.", installed:"The app is installed on this phone.", appIdLbl:"Anonymous app ID (mention it only if you ask us to delete your data): {id}", versionLbl:"Version {v} (beta)",
+ aiConsent:"AI reading sends the package photo to the Good.2.eat server and to Anthropic (the AI provider), which extracts the text. The photo is not kept; the ingredients and values read go into the shared database so other users can find the product.\n\nPhotograph only the package, no people or personal data.\n\nOK = use AI reading. Cancel = read on the phone only (less accurate).",
+ fbBody:"What isn't working, or what would you like to be different?\n\n\n---\nVersion: {v}\nLanguage: {l}\nLast code: {c}\nDevice: {d}",
  aiReading:"Reading the package…", aiLimit:"You have used this month's AI readings. Tap the button again to use on-phone reading (less accurate).", aiLimitDay:"AI reading is unavailable for today. Tap the button again to use on-phone reading (less accurate).", aiSaved:" The product was added to the shared Good.2.eat database so other users find it directly.", sharedNote:"Data filled in from the shared Good.2.eat database: read with AI from the package by another user. Reading errors are possible.", sharedReport:"Doesn't match the package? Report it", sharedReported:"Thanks for reporting. You can read the package with AI yourself to correct the product.", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
  aiBoth:"Done: ingredients and nutrition table read. Check the values; the score updates.", aiIngrOnly:"Ingredients read. The nutrition table was not visible: photograph it separately.", aiNutOnly:"Nutrition table read. Ingredients were not visible: photograph them separately.", aiPortion:"The table is per serving, not per 100 g; enter the per-100 g values manually.", aiBtn:"Photograph the back of the pack",
  ocrNoText:"No readable text found. Move closer to the list, avoid glare and try again.",
@@ -1726,11 +1744,13 @@ async function loadProduct(raw){
       const j = await r.json();
       if(j.status === 1 && j.product){
         let p = j.product;
+        track(needsShared(p) ? "scan_off_partial" : "scan_off_full");
         if(needsShared(p)) p = withShared(p, await fetchShared(code));
         renderProduct(code, p); return;
       }
     }
-    if(isInternal(code)) return renderInternal(code);
+    if(isInternal(code)){ track("scan_internal"); return renderInternal(code); }
+    track("scan_not_found");
     renderProduct(code, withShared({_notInDb:true}, await fetchShared(code)));
   }catch(e){
     lastRender = null;
@@ -1931,7 +1951,7 @@ function parseNutrition(text){
   return out;
 }
 
-function startOcr(mode){ ocrMode = mode || "ingr"; stopScan(); $("#ocrFile").value = ""; $("#ocrFile").click(); }
+function startOcr(mode){ ocrMode = mode || "ingr"; stopScan(); askAiConsent(); $("#ocrFile").value = ""; $("#ocrFile").click(); }
 function openTyping(){ if(!prodCtx) pasted.nutr = null; $("#ocrBox").hidden = false; $("#ocrStatus").hidden = true; $("#pasteText").focus(); $("#ocrBox").scrollIntoView({behavior:"smooth", block:"center"}); }
 /* ---------- citire cu AI printr-un Worker Cloudflare (o singură poză: ingrediente + tabel) ---------- */
 const AI_URL = "https://good2eat-ocr.ruxandra-boghian.workers.dev";   // ← lipește aici adresa Worker-ului, ex: "https://good2eat-ocr.CONTUL-TAU.workers.dev"
@@ -1978,9 +1998,61 @@ async function runAi(file){
 }
 async function runOcr(file){
   if(!file || ocrBusy) return;
-  if(AI_URL && await runAi(file)) return;
+  if(AI_URL && aiConsentOk() && await runAi(file)) return;
+  track("ocr_local");
   return runOcrLocal(file);
 }
+
+/* ---------- acord pentru citirea cu AI (o singură dată) ---------- */
+const AIOK = "good2eat.aiok";
+let aiDeclined = false;
+function aiConsentOk(){ try{ return localStorage.getItem(AIOK) === "1"; }catch(e){ return false; } }
+function askAiConsent(){
+  if(!AI_URL || aiOff || aiDeclined || aiConsentOk()) return;
+  if(confirm(t("aiConsent"))){ try{ localStorage.setItem(AIOK, "1"); }catch(e){} }
+  else { aiDeclined = true; track("ai_declined"); }
+}
+
+/* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
+const APP_VERSION = "0.9.0";
+function track(ev){
+  if(!AI_URL) return;
+  try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
+}
+function trackActive(){
+  try{
+    const d = new Date().toISOString().slice(0,10), m = d.slice(0,7);
+    if(!localStorage.getItem("good2eat.seen")){ localStorage.setItem("good2eat.seen", d); track("new_user"); }
+    if(localStorage.getItem("good2eat.day") !== d){
+      localStorage.setItem("good2eat.day", d); track("active_day");
+      if(matchMedia("(display-mode: standalone)").matches || navigator.standalone) track("active_day_pwa");
+    }
+    if(localStorage.getItem("good2eat.month") !== m){ localStorage.setItem("good2eat.month", m); track("active_month"); }
+  }catch(e){}
+}
+
+/* ---------- feedback ---------- */
+function openFeedback(){
+  track("feedback");
+  const body = t("fbBody", {v:APP_VERSION, l:LANG, c:(prodCtx && prodCtx.code) || ($("#manualCode").value || "-"), d:navigator.userAgent.slice(0,140)});
+  location.href = `mailto:evotrainhub@gmail.com?subject=${encodeURIComponent("Good.2.eat — feedback")}&body=${encodeURIComponent(body)}`;
+}
+
+/* ---------- instalare ca aplicație + service worker ---------- */
+let installEvt = null;
+function updateInstallUi(){
+  const b = $("#installBtn"), hint = $("#installHint"); if(!b) return;
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  b.hidden = !installEvt || standalone;
+  hint.hidden = !(standalone || (ios && !standalone));
+  hint.textContent = standalone ? t("installed") : t("installIos");
+  $("#appIdLine").textContent = t("appIdLbl", {id: clientId()});
+  $("#versionLine").textContent = t("versionLbl", {v: APP_VERSION});
+}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; updateInstallUi(); });
+window.addEventListener("appinstalled", () => { installEvt = null; track("install"); updateInstallUi(); });
+if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 async function runOcrLocal(file){
   if(!file || ocrBusy) return;
   const canvas = await cropImage(file);
@@ -2160,6 +2232,7 @@ function renderProfile(){
 
 /* ---------- aplicarea limbii pe interfață ---------- */
 function applyLang(){
+  setTimeout(() => { try{ updateInstallUi(); }catch(e){} }, 0);
   document.documentElement.lang = LANG;
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
   document.querySelectorAll("[data-i18n-ph]").forEach(el => el.placeholder = t(el.dataset.i18nPh));
@@ -2265,7 +2338,14 @@ $("#profDone").addEventListener("click", () => show("v-scan"));
 $("#profReset").addEventListener("click", () => { setProfile({allergens:[]}); renderProfile(); });
 
 $(".barcode-art").innerHTML = [3,1,2,1,4,1,1,3,2,1,1,2,3,1,2,4,1,2,1,3,1,1,2].map(w => `<i style="width:${w}px"></i>`).join("");
+document.addEventListener("click", e => {
+  if(e.target.closest(".fb-link")){ e.preventDefault(); return openFeedback(); }
+  if(e.target.closest(".pv-link")) track("privacy_open");
+  if(e.target.closest("#installBtn") && installEvt){ installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; updateInstallUi(); }); }
+});
 applyLang();
+updateInstallUi();
+trackActive();
 const qp = new URLSearchParams(location.search).get("cod") || new URLSearchParams(location.search).get("code");
 if(qp){ $("#manualCode").value = qp; loadProduct(qp); }
 </script>
