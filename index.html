@@ -130,6 +130,7 @@ details.ingr summary{cursor:pointer;font-weight:700;color:var(--brand)}
 details.ingr p{font-size:15px;color:var(--muted)}
 .foot{font-size:13px;color:var(--muted);margin-top:22px;line-height:1.45}
 .appfoot{font-size:13px;color:var(--muted);margin:26px 0 90px;text-align:center}.appfoot a,.about a{color:var(--brand);font-weight:600}
+.deld{font-size:14px;color:var(--muted);margin:10px 0}.deld summary{cursor:pointer}.deld code{word-break:break-all;user-select:all}
 .about{margin-top:30px;padding-top:6px;border-top:1px solid var(--line)}.about p{margin:10px 0}
 .foot a{color:var(--brand)}
 
@@ -339,7 +340,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
       <p class="hint" id="installHint" hidden></p>
       <p><a href="#" class="fb-link" data-i18n="feedback"></a></p>
       <p><a href="privacy.html" class="pv-link" data-i18n="privacyLink"></a></p>
-      <p class="hint" id="appIdLine"></p>
+      <details class="deld"><summary id="delSum"></summary><p class="hint" id="delBody"></p><p class="hint"><code id="appIdCode"></code></p></details>
       <p class="hint" id="versionLine"></p>
     </div>
   </section>
@@ -925,7 +926,7 @@ ro:{
  photoNoCode:"Nu am găsit un cod de bare în fotografie. Fă poza mai aproape, cu codul drept, fără reflexii, sau scrie cifrele de sub bare.",
  searching:"Se caută produsul", photoSearching:"Caut codul în fotografie",
  ocrPrep:"Pregătesc imaginea…", ocrReading:"Citesc textul…", ocrLang:"Descarc limba română (doar prima dată)…", ocrInit:"Pregătesc cititorul…",
- aboutH:"Despre aplicație", feedback:"Spune-ne ce nu funcționează", privacyLink:"Politica de confidențialitate", installBtn:"Instalează aplicația pe telefon", installIos:"Pe iPhone: apasă Distribuie, apoi „Adaugă pe ecranul principal”.", installed:"Aplicația e instalată pe acest telefon.", appIdLbl:"ID anonim al aplicației (îl menționezi doar dacă ne ceri ștergerea datelor): {id}", versionLbl:"Versiunea {v} (test)",
+ aboutH:"Despre aplicație", feedback:"Spune-ne ce nu funcționează", privacyLink:"Politica de confidențialitate", installBtn:"Instalează aplicația pe telefon", installIos:"Pe iPhone: apasă Distribuie, apoi „Adaugă pe ecranul principal”.", installed:"Aplicația e instalată pe acest telefon.", appIdLbl:"ID anonim al aplicației (îl menționezi doar dacă ne ceri ștergerea datelor): {id}", versionLbl:"Good.2.eat · versiunea {v}", delH:"Ștergerea datelor tale", delBody:"Ai dreptul să ceri ștergerea produselor adăugate de tine în baza comună. Scrie-ne și include acest cod:",
  aiConsent:"Citirea cu AI trimite poza ambalajului la serverul Good.2.eat și la Anthropic (furnizorul AI), care extrage textul. Poza nu se păstrează; ingredientele și valorile citite intră în baza comună, ca alți utilizatori să găsească produsul.\n\nFotografiază doar ambalajul, fără persoane sau date personale.\n\nOK = folosesc citirea cu AI. Anulează = citesc doar în telefon (mai puțin precis).",
  fbBody:"Ce nu funcționează sau ce ai vrea să fie altfel?\n\n\n---\nVersiune: {v}\nLimba: {l}\nUltimul cod: {c}\nDispozitiv: {d}",
  aiReading:"Citesc ambalajul…", aiLimit:"Ai folosit citirile cu AI incluse luna aceasta. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiLimitDay:"Citirea cu AI nu mai e disponibilă azi. Apasă din nou butonul ca să folosești citirea din telefon (mai puțin precisă).", aiSaved:" Produsul a intrat în baza comună Good.2.eat, ca alți utilizatori să-l găsească direct.", sharedNote:"Date completate din baza comună Good.2.eat: citite cu AI de pe ambalaj de un alt utilizator. Pot conține greșeli de citire.", sharedReport:"Nu corespund cu ambalajul? Semnalează", sharedReported:"Mulțumim pentru semnalare. Poți citi chiar tu ambalajul cu AI, ca să corectezi produsul.", aiNothing:"Nu am putut citi poza (prea întunecată, blurată sau tăiată). Fotografiază spatele ambalajului, drept și bine luminat.",
@@ -1085,7 +1086,7 @@ en:{
  photoNoCode:"No barcode found in the photo. Take it closer, with the code straight and no glare, or type the digits under the bars.",
  searching:"Looking up the product", photoSearching:"Looking for the code in the photo",
  ocrPrep:"Preparing the image…", ocrReading:"Reading the text…", ocrLang:"Downloading English language data (first time only)…", ocrInit:"Starting the reader…",
- aboutH:"About the app", feedback:"Tell us what isn't working", privacyLink:"Privacy policy", installBtn:"Install the app on your phone", installIos:"On iPhone: tap Share, then “Add to Home Screen”.", installed:"The app is installed on this phone.", appIdLbl:"Anonymous app ID (mention it only if you ask us to delete your data): {id}", versionLbl:"Version {v} (beta)",
+ aboutH:"About the app", feedback:"Tell us what isn't working", privacyLink:"Privacy policy", installBtn:"Install the app on your phone", installIos:"On iPhone: tap Share, then “Add to Home Screen”.", installed:"The app is installed on this phone.", appIdLbl:"Anonymous app ID (mention it only if you ask us to delete your data): {id}", versionLbl:"Good.2.eat · version {v}", delH:"Deleting your data", delBody:"You can ask us to delete the products you added to the shared database. Write to us and include this code:",
  aiConsent:"AI reading sends the package photo to the Good.2.eat server and to Anthropic (the AI provider), which extracts the text. The photo is not kept; the ingredients and values read go into the shared database so other users can find the product.\n\nPhotograph only the package, no people or personal data.\n\nOK = use AI reading. Cancel = read on the phone only (less accurate).",
  fbBody:"What isn't working, or what would you like to be different?\n\n\n---\nVersion: {v}\nLanguage: {l}\nLast code: {c}\nDevice: {d}",
  aiReading:"Reading the package…", aiLimit:"You have used this month's AI readings. Tap the button again to use on-phone reading (less accurate).", aiLimitDay:"AI reading is unavailable for today. Tap the button again to use on-phone reading (less accurate).", aiSaved:" The product was added to the shared Good.2.eat database so other users find it directly.", sharedNote:"Data filled in from the shared Good.2.eat database: read with AI from the package by another user. Reading errors are possible.", sharedReport:"Doesn't match the package? Report it", sharedReported:"Thanks for reporting. You can read the package with AI yourself to correct the product.", aiNothing:"Could not read the photo (too dark, blurry or cropped). Photograph the back of the pack, straight and well lit.",
@@ -2047,7 +2048,7 @@ function updateInstallUi(){
   b.hidden = !installEvt || standalone;
   hint.hidden = !(standalone || (ios && !standalone));
   hint.textContent = standalone ? t("installed") : t("installIos");
-  $("#appIdLine").textContent = t("appIdLbl", {id: clientId()});
+  $("#delSum").textContent = t("delH"); $("#delBody").textContent = t("delBody"); $("#appIdCode").textContent = clientId();
   $("#versionLine").textContent = t("versionLbl", {v: APP_VERSION});
 }
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; updateInstallUi(); });
