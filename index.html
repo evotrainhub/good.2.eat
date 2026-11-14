@@ -2284,7 +2284,7 @@ async function confirmShared(btn){
   if(!sharedCtx) return;
   const {code} = sharedCtx;
   try{ localStorage.setItem(confKey(code), "1"); }catch(e){}
-  try{ await fetch(`${AI_URL}/confirm`, {method:"POST", headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({code})}); }catch(e){}
+  try{ await fetch(`${AI_URL}/confirm`, {method:"POST", headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({code, store: isStoreCode(code) ? storeOf(code) : ""})}); }catch(e){}
   track("shared_confirm");
   const box = btn.closest(".notice");
   if(box) box.innerHTML = `<p style="margin:0">${esc(t("sharedThanks"))}</p>`;
@@ -2292,7 +2292,7 @@ async function confirmShared(btn){
 async function reportShared(){
   if(!sharedCtx) return;
   const {code, p} = sharedCtx; sharedCtx = null;
-  try{ await fetch(`${AI_URL}/report`, {method:"POST", headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({code})}); }catch(e){}
+  try{ await fetch(`${AI_URL}/report`, {method:"POST", headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({code, store: isStoreCode(code) ? storeOf(code) : ""})}); }catch(e){}
   renderProduct(code, p._orig || p, true);
   $("#result").insertAdjacentHTML("afterbegin", `<div class="notice">${esc(t("sharedReported"))}</div>`);
   $("#result").scrollIntoView({behavior:"smooth", block:"start"});
