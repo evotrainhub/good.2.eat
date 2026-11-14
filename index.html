@@ -16,7 +16,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root{
   --paper:#F3FAF6; --surface:#FFFFFF; --ink:#0F241A; --muted:#4D6257; --line:#D3E5DA;
@@ -57,8 +56,11 @@ h2{font-family:var(--display);font-weight:600;font-size:22px;margin:26px 0 10px;
 .pill.off::before{background:var(--line)}
 
 .scanbox{position:relative;background:#0A1A12;border-radius:24px;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;border:3px solid var(--brand)}
-#reader{width:100%;height:100%}
-#reader video{object-fit:cover}
+#reader{width:100%;height:100%;position:relative}
+#camVideo{width:100%;height:100%;object-fit:cover;display:block}
+#camVideo[hidden]{display:none}
+.scanguide{display:none;position:absolute;left:10%;right:10%;top:50%;height:2px;background:rgba(255,72,72,.9);box-shadow:0 0 10px rgba(255,72,72,.9);transform:translateY(-50%);pointer-events:none}
+#camVideo:not([hidden]) + .scanguide{display:block}
 .scan-idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#D9F7E8;text-align:center;padding:20px}
 .barcode-art{display:flex;gap:3px;height:56px;align-items:stretch}
 .barcode-art i{display:block;background:#5CF0A8;border-radius:1px}
@@ -295,7 +297,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
     <button class="pill off" id="profPill"></button>
     <div class="cmpbar" id="cmpBar" hidden></div>
     <div class="scanbox">
-      <div id="reader"></div>
+      <div id="reader"><video id="camVideo" playsinline muted autoplay hidden></video><div class="scanguide" aria-hidden="true"></div></div>
       <button class="shelf-toast" id="shelfToast" hidden></button>
       <div class="scan-idle" id="idle">
         <div class="barcode-art" aria-hidden="true"></div>
@@ -315,7 +317,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
     <button class="linkish" id="photoCode" data-i18n="photoCode"></button>
     <input type="file" id="codeFile" accept="image/*" capture="environment" hidden>
     <form class="row" id="manualForm" autocomplete="off">
-      <input id="manualCode" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="codePh" data-i18n-aria="codeAria">
+      <input id="manualCode" enterkeyhint="search" autocapitalize="off" autocorrect="off" spellcheck="false" data-i18n-ph="codePh" data-i18n-aria="codeAria">
       <button class="btn" type="submit" data-i18n="search"></button>
     </form>
     <div class="alt">
@@ -858,6 +860,13 @@ ro:{
  compDone:"Produs completat de tine",
  compSub:"Codul a identificat produsul, dar baza de date nu are toate datele. Două fotografii dau un scor complet.",
  compSubNone:"Codul nu e încă în baza de date. Două fotografii dau un scor complet.",
+ storeQ:"Codurile scurte care încep cu 2 sunt ale lanțului de magazine. Din ce magazin e produsul?", storeOther:"Altul",
+ offlineNote:"Ești fără internet: afișez datele salvate pe telefon la ultima scanare.",
+ offlineNo:"Ești fără internet, iar produsul nu e salvat pe telefon. Încearcă din nou când ai semnal.",
+ nameSearching:"Caut produse după nume", nameH:"Rezultate pentru „{q}”", nameHint:"Atinge produsul potrivit. Scorul ține cont de profilul tău.",
+ nameNone:"Nu am găsit produse cu acest nume. Încearcă alt cuvânt sau adaugă marca.", nameShort:"Scrie cel puțin 3 litere din numele produsului.",
+ nameRate:"Prea multe căutări într-un minut (Open Food Facts permite 10 pe minut). Încearcă din nou peste un minut.",
+ nameErr:"Căutarea nu a funcționat ({e}). Verifică conexiunea și încearcă din nou.",
  compSubDone:"Ai adăugat datele lipsă. Le poți corecta oricând.",
  rowName:"Nume și poză", rowIngr:"Ingrediente", rowNutr:"Valori nutriționale",
  stFound:"găsite", stMissing:"lipsesc", stDb:"din baza de date", stMine:"adăugate de tine",
@@ -890,7 +899,7 @@ ro:{
  scanHint:"Ține telefonul la 15–20 cm, cu codul drept și bine luminat.",
  scanHintSlow:"Nu-l prinde? Încearcă lanterna sau zoom-ul, depărtează puțin telefonul, ori fotografiază codul.",
  photoCode:"Camera nu vede codul? Fotografiază-l",
- codePh:"Sau scrie codul de sub bare", codeAria:"Cod de bare", search:"Caută",
+ codePh:"Cod de bare sau numele produsului", codeAria:"Cod de bare", search:"Caută",
  ocrBtn:"Fotografiază ingredientele", typeIt:"sau scrie-le",
  pastePh:"Ex.: făină de grâu, zahăr, emulgator: lecitină de soia (E322), conservant: sorbat de potasiu, colorant E150d...",
  pasteAria:"Lista de ingrediente",
@@ -967,7 +976,7 @@ ro:{
  ingredients:"Ingrediente", unnamed:"Produs fără nume", codeLbl:"Cod {c}",
  pastedTitle:"Analiză din ingrediente", pastedSub:"Fără valori nutriționale, scorul e incomplet: arată doar aditivii și gradul de procesare.",
  internalTitle:"Cod intern de magazin ({c})",
- internalP1:"Codurile care încep cu 2 sunt create de magazin pentru produsele cântărite sau ambalate la raion: mezeluri, brânzeturi, carne, produse de patiserie. Conțin de obicei articolul și greutatea sau prețul, nu sunt înregistrate în nicio bază de date publică și nicio aplicație nu le poate identifica.",
+ internalP1:"Codurile de 13 cifre care încep cu 21–29 sunt create de magazin pentru produsele cântărite sau ambalate la raion: mezeluri, brânzeturi, carne, produse de patiserie. Conțin de obicei articolul și greutatea sau prețul, nu sunt înregistrate în nicio bază de date publică și nicio aplicație nu le poate identifica.",
  internalP2:"Fotografiază eticheta cu ingredientele și o analizez de acolo.",
  notFoundTitle:"Produsul {c} nu e încă în baza de date publică.",
  notFoundP:"Fotografiază lista de ingrediente de pe ambalaj și o analizez direct.",
@@ -1030,6 +1039,13 @@ en:{
  compDone:"Product completed by you",
  compSub:"The code identified the product, but the database lacks some data. Two photos give a complete score.",
  compSubNone:"The code isn't in the database yet. Two photos give a complete score.",
+ storeQ:"Short codes starting with 2 belong to the store chain. Which shop is this product from?", storeOther:"Other",
+ offlineNote:"You are offline: showing the data saved on your phone at the last scan.",
+ offlineNo:"You are offline and this product is not saved on your phone. Try again when you have signal.",
+ nameSearching:"Searching products by name", nameH:"Results for “{q}”", nameHint:"Tap the right product. The score follows your profile.",
+ nameNone:"No products found with this name. Try another word or add the brand.", nameShort:"Type at least 3 letters of the product name.",
+ nameRate:"Too many searches in one minute (Open Food Facts allows 10 per minute). Try again in a minute.",
+ nameErr:"The search failed ({e}). Check your connection and try again.",
  compSubDone:"You added the missing data. You can correct it any time.",
  rowName:"Name and photo", rowIngr:"Ingredients", rowNutr:"Nutrition values",
  stFound:"found", stMissing:"missing", stDb:"from the database", stMine:"added by you",
@@ -1062,7 +1078,7 @@ en:{
  scanHint:"Hold the phone 15–20 cm away, with the code straight and well lit.",
  scanHintSlow:"Not catching it? Try the torch or zoom, move the phone back a little, or take a photo of the code.",
  photoCode:"Camera can't see the code? Take a photo",
- codePh:"Or type the number under the bars", codeAria:"Barcode", search:"Search",
+ codePh:"Barcode or product name", codeAria:"Barcode", search:"Search",
  ocrBtn:"Photograph the ingredients", typeIt:"or type them",
  pastePh:"E.g.: wheat flour, sugar, emulsifier: soy lecithin (E322), preservative: potassium sorbate, colour E150d...",
  pasteAria:"Ingredient list",
@@ -1139,7 +1155,7 @@ en:{
  ingredients:"Ingredients", unnamed:"Unnamed product", codeLbl:"Code {c}",
  pastedTitle:"Ingredient analysis", pastedSub:"Without nutrition values the score is incomplete: it only reflects additives and processing.",
  internalTitle:"In-store code ({c})",
- internalP1:"Codes starting with 2 are created by the shop for products weighed or packed in store: cold cuts, cheese, meat, bakery items. They usually hold the item number and the weight or price, are not registered in any public database, and no app can identify them.",
+ internalP1:"13-digit codes starting with 21–29 are created by the shop for products weighed or packed in store: cold cuts, cheese, meat, bakery items. They usually hold the item number and the weight or price, are not registered in any public database, and no app can identify them.",
  internalP2:"Photograph the label with the ingredients and I'll analyse it from there.",
  notFoundTitle:"Product {c} is not in the public database yet.",
  notFoundP:"Photograph the ingredient list on the pack and I'll analyse it directly.",
@@ -1754,11 +1770,13 @@ function renderProduct(code, p, quiet){
   $("#result").innerHTML = `
     <div class="product">
       ${p.image_front_small_url ? `<img src="${esc(p.image_front_small_url)}" alt="">` : ""}
-      <div><h3>${esc(name)}</h3><p>${esc([p.brands, p.quantity].filter(Boolean).join(", "))}</p><p>${esc(t("codeLbl",{c:code}))}</p></div>
+      <div><h3>${esc(name)}</h3><p>${esc([p.brands, p.quantity].filter(Boolean).join(", "))}</p><p>${esc(t("codeLbl",{c:code}))}${storeOf(code) && storeOf(code) !== "other" ? " · " + esc(storeOf(code)) : ""}</p></div>
     </div>
+    ${p._offline ? `<div class="notice">${esc(t("offlineNote"))}</div>` : ""}
     ${scoreBlock(sc, me)}
     ${acts}
     ${(p._sIngr || p._sNutr) ? sharedNoticeHtml(code, p) : ""}
+    ${prodCtx && isStoreCode(code) ? storeBlock(code) : ""}
     ${prodCtx ? completeBlock(p, dbIngr, ingr, eff, needsNutr) : ""}
     ${alertsBlock(me)}
     ${easyBlock(cur.ctx, cur.g)}
@@ -1856,7 +1874,19 @@ function renderPasted(text, quiet){
   if(!quiet) $("#result").scrollIntoView({behavior:"smooth", block:"start"});
 }
 const OCR_CTA = () => `<div class="row"><button class="btn violet small" data-ocr="1">${esc(t("ocrBtn"))}</button><button class="linkish" data-type="1">${esc(t("typeIt"))}</button></div>`;
-function isInternal(code){ return /^2/.test(code) || (code.length === 13 && /^02/.test(code)); }
+/* cântărite la raion (greutatea sau prețul sunt în cod): nu au sens într-o bază de date */
+function isInternal(code){ return (code.length === 13 && /^2[1-9]/.test(code)) || (code.length === 13 && /^02/.test(code)) || (code.length === 12 && /^2/.test(code)); }
+/* coduri de marcă proprie ale lanțului (ex. Lidl): fixe, dar valabile doar în lanțul respectiv */
+function isStoreCode(code){ return (code.length === 8 && code[0] === "2") || (code.length === 13 && code.startsWith("20")); }
+const STORES = ["Lidl","Kaufland","Penny","Profi","Mega Image","Carrefour","Auchan"];
+const storeKey = c => "good2eat.store." + c;
+function storeOf(code){ try{ return localStorage.getItem(storeKey(code)) || ""; }catch(e){ return ""; } }
+function setStore(code, s){ try{ localStorage.setItem(storeKey(code), s); }catch(e){} }
+function storeBlock(code){
+  const cur = storeOf(code);
+  return `<div class="notice"><p style="margin:0 0 4px">${esc(t("storeQ"))}</p><div class="chips">${[...STORES.map(s => [s, s]), ["other", t("storeOther")]].map(([v, l]) =>
+    `<button class="chip" data-store="${esc(v)}" aria-pressed="${v === cur}">${esc(l)}</button>`).join("")}</div></div>`;
+}
 function renderInternal(code){
   prodCtx = null;
   lastRender = () => renderInternal(code);
@@ -1871,9 +1901,31 @@ function renderInternal(code){
 const FIELDS = "allergens_tags,traces_tags,ingredients_analysis_tags,product_name,product_name_ro,product_name_en,brands,quantity,product_quantity,serving_quantity,serving_size,image_front_small_url,additives_tags,nutriscore_grade,nova_group,nutriments,ingredients_text,ingredients_text_ro,ingredients_text_en,categories_tags,compared_to_category";
 /* cerere de produs la Open Food Facts, cu memorie pe 15 minute (limita OFF: 15 cereri de produs pe minut) */
 const offMem = new Map();
+const PCK = "good2eat.prodcache";
+function slimForCache(p){
+  const o = {};
+  FIELDS.split(",").forEach(k => { if(p[k] !== undefined && p[k] !== null && p[k] !== "") o[k] = p[k]; });
+  if(o.nutriments) o.nutriments = Object.fromEntries(Object.entries(o.nutriments).filter(([k]) => /_100g$/.test(k)));
+  return o;
+}
+function cachePut(code, p){
+  try{
+    const o = JSON.parse(localStorage.getItem(PCK)) || {};
+    o[code] = {t:Date.now(), p:slimForCache(p)};
+    const keep = Object.keys(o).sort((a,b) => o[b].t - o[a].t).slice(0, 80);
+    localStorage.setItem(PCK, JSON.stringify(Object.fromEntries(keep.map(k => [k, o[k]]))));
+  }catch(e){}
+}
+function cacheGet(code){ try{ const o = JSON.parse(localStorage.getItem(PCK)) || {}; return o[code] ? o[code].p : null; }catch(e){ return null; } }
 async function offProduct(code){
   const hit = offMem.get(code);
   if(hit && Date.now() - hit.t < 15*60*1000) return hit.p;
+  const saved = cacheGet(code);
+  if(navigator.onLine === false){ if(saved) return {...saved, _offline:1}; throw new Error("offline"); }
+  try{ return await offFetch(code); }
+  catch(e){ if(saved) return {...saved, _offline:1}; throw e; }
+}
+async function offFetch(code){
   const tries = [code];
   if(code.length === 12) tries.push("0"+code);
   if(code.length === 13 && code[0] === "0") tries.push(code.slice(1));
@@ -1888,6 +1940,7 @@ async function offProduct(code){
   }
   offMem.set(code, {p, t:Date.now()});
   if(offMem.size > 80) offMem.delete(offMem.keys().next().value);
+  if(p) cachePut(code, p);
   return p;
 }
 async function loadProduct(raw){
@@ -1899,15 +1952,17 @@ async function loadProduct(raw){
     if(found){
       let p = {...found};
       track(needsShared(p) ? "scan_off_partial" : "scan_off_full");
-      if(needsShared(p)) p = withShared(p, await fetchShared(code));
+      if(needsShared(p) && !p._offline){ p = withShared(p, await fetchShared(code)); if(p._sIngr || p._sNutr) cachePut(code, p); }
       renderProduct(code, p); return;
     }
     if(isInternal(code)){ track("scan_internal"); return renderInternal(code); }
     track("scan_not_found");
-    renderProduct(code, withShared({_notInDb:true}, await fetchShared(code)));
+    const sp = withShared({_notInDb:true}, await fetchShared(code));
+    if(sp._sIngr || sp._sNutr) cachePut(code, sp);
+    renderProduct(code, sp);
   }catch(e){
     lastRender = null;
-    $("#result").innerHTML = `<div class="notice">${esc(e.message === "429" ? t("offRate") : t("netErr",{e:e.message}))}</div>`;
+    $("#result").innerHTML = `<div class="notice">${esc(e.message === "offline" ? t("offlineNo") : e.message === "429" ? t("offRate") : t("netErr",{e:e.message}))}</div>`;
   }
 }
 
@@ -2083,6 +2138,43 @@ async function showAlternatives(){
     </button>`).join("")}</div>`;
 }
 
+/* ---------- căutare după nume (Open Food Facts, căutare text: max. 10 pe minut) ---------- */
+async function searchByName(q){
+  q = q.trim();
+  prodCtx = null; lastRender = null;
+  if(q.replace(/[^\p{L}]/gu, "").length < 3){ $("#result").innerHTML = `<div class="notice">${esc(t("nameShort"))}</div>`; return; }
+  $("#result").innerHTML = `<div class="spinner" role="status" aria-label="${esc(t("nameSearching"))}"></div>`;
+  track("name_search");
+  const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=24&sort_by=unique_scans_n&fields=${ALT_FIELDS},quantity`;
+  let prods;
+  try{
+    if(navigator.onLine === false) throw new Error("offline");
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
+    const r = await fetch(url, {signal:ctl.signal});
+    clearTimeout(to);
+    if(r.status === 429) throw new Error("429");
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    prods = ((await r.json()).products || []).filter(p => p.code).map(slimProd);
+  }catch(e){
+    $("#result").innerHTML = `<div class="notice">${esc(e.message === "429" ? t("nameRate") : t("nameErr", {e: e.name === "AbortError" ? "timeout" : e.message}))}</div>`;
+    return;
+  }
+  renderNameResults(q, prods);
+}
+function renderNameResults(q, prods){
+  lastRender = () => renderNameResults(q, prods); prodCtx = null;
+  if(!prods.length){ $("#result").innerHTML = `<div class="notice">${esc(t("nameNone"))}</div>`; return; }
+  $("#result").innerHTML = `<h2>${esc(t("nameH",{q}))}</h2><p class="hint" style="margin-top:0">${esc(t("nameHint"))}</p><div class="hist">${prods.map(p => {
+    const e = quickEval(p);
+    return `<button class="hitem" data-open="${esc(p.code)}">
+      ${p.image_front_small_url ? `<img src="${esc(p.image_front_small_url)}" alt="">` : `<span class="ph"></span>`}
+      <span class="t"><b>${esc(e.sum.name || t("unnamed"))}</b><span>${esc([p.brands, p.quantity].filter(Boolean).join(" · ") || p.code)}</span></span>
+      <span class="badge" style="${badgeStyle(e.so)}">${e.so ? e.so.shown : "–"}</span>
+    </button>`;
+  }).join("")}</div>`;
+  $("#result").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
 /* ---------- mod raft: scanare continuă ---------- */
 let shelf = false, shelfBusy = false, shelfLast = {code:"", t:0}, shelfItems = [];
 function updateShelfUi(){
@@ -2155,7 +2247,8 @@ async function fetchShared(code){
   if(!AI_URL || isInternal(code)) return null;
   try{
     const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 5000);
-    const r = await fetch(`${AI_URL}/p/${code}`, {signal:ctl.signal, headers:{"X-Client-Id":clientId()}});
+    const st = isStoreCode(code) ? storeOf(code) : "";
+    const r = await fetch(`${AI_URL}/p/${code}${st ? "?store=" + encodeURIComponent(st) : ""}`, {signal:ctl.signal, headers:{"X-Client-Id":clientId()}});
     clearTimeout(to);
     if(!r.ok) return null;
     const j = await r.json();
@@ -2383,7 +2476,7 @@ async function runAi(file){
     ocrStatus(t("aiReading"));
     const img = await shrinkImage(file, 1600);
     const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 40000);
-    const r = await fetch(AI_URL, {method:"POST", signal:ctl.signal, headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({image:img, media_type:"image/jpeg", lang:LANG, code: prodCtx ? prodCtx.code : ""})});
+    const r = await fetch(AI_URL, {method:"POST", signal:ctl.signal, headers:{"Content-Type":"application/json","X-Client-Id":clientId()}, body:JSON.stringify({image:img, media_type:"image/jpeg", lang:LANG, code: prodCtx ? prodCtx.code : "", store: prodCtx && isStoreCode(prodCtx.code) ? storeOf(prodCtx.code) : ""})});
     clearTimeout(to);
     if(r.status === 429){
       let e = {}; try{ e = await r.json(); }catch(x){}
@@ -2422,7 +2515,7 @@ function askAiConsent(){
 }
 
 /* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
-const APP_VERSION = "0.10.1";
+const APP_VERSION = "0.11.0";
 function track(ev){
   if(!AI_URL) return;
   try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
@@ -2500,7 +2593,10 @@ async function runOcrLocal(file){
 }
 
 /* ---------- scanner coduri de bare ---------- */
-let qr = null, scanning = false, hintTimer = null, zoomCap = null;
+/* Motor: BarcodeDetector nativ, unde telefonul îl are (Android/Chrome), altfel ZXing-C++ compilat în WebAssembly
+   (iPhone și restul), servit din vendor/ ca să meargă și fără CDN. */
+const SCAN_FORMATS = ["ean_13","ean_8","upc_a","upc_e","code_128","itf","code_39","databar","databar_expanded","qr_code","data_matrix"];
+let det = null, detP = null, camStream = null, camTrack = null, scanning = false, hintTimer = null, zoomCap = null, scanGen = 0, resumeScan = false;
 function parseScan(text){
   const s = String(text).trim();
   let m = s.match(/\/01\/(\d{14})/);
@@ -2510,61 +2606,87 @@ function parseScan(text){
   const d = s.replace(/\D/g,"");
   return d.length === 14 && d.startsWith("0") ? d.slice(1) : d;
 }
-function ensureQr(){
-  if(qr) return qr;
-  const F = Html5QrcodeSupportedFormats;
-  qr = new Html5Qrcode("reader", {
-    formatsToSupport:[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.ITF,F.CODE_39,F.RSS_14,F.RSS_EXPANDED,F.QR_CODE,F.DATA_MATRIX],
-    verbose:false, experimentalFeatures:{useBarCodeDetectorIfSupported:true}
-  });
-  return qr;
+function getDetector(){
+  if(det) return Promise.resolve(det);
+  if(detP) return detP;
+  detP = (async () => {
+    let D = window.BarcodeDetector, fmts = [];
+    if(D){ try{ fmts = await D.getSupportedFormats(); }catch(e){ fmts = []; } }
+    if(!fmts.includes("ean_13")){
+      if(!window.BarcodeDetectionAPI) await loadScript("vendor/barcode-detector.js");
+      const api = window.BarcodeDetectionAPI;
+      api.setZXingModuleOverrides({locateFile:(p, pre) => p.endsWith(".wasm") ? new URL("vendor/zxing_reader.wasm", location.href).href : pre + p});
+      D = api.BarcodeDetector; fmts = await D.getSupportedFormats();
+    }
+    det = new D({formats: SCAN_FORMATS.filter(f => fmts.includes(f))});
+    return det;
+  })();
+  detP.catch(() => { detP = null; });
+  return detP;
 }
 async function startScan(){
-  if(typeof Html5Qrcode === "undefined"){ $("#result").innerHTML = `<div class="notice">${esc(t("scanLibErr"))}</div>`; return; }
-  try{
-    ensureQr();
-    $("#idle").hidden = true;
-    await qr.start({facingMode:"environment"}, {
-        fps:15, disableFlip:true,
-        videoConstraints:{facingMode:"environment", width:{ideal:1920}, height:{ideal:1080}, advanced:[{focusMode:"continuous"}]}
-      }, onCode, () => {});
-    scanning = true; $("#stopRow").hidden = false; updateFab();
-    $("#scanHint").textContent = t(shelf ? "shelfOn" : "scanHint");
-    updateShelfUi(); updateCmpBar();
-    setupCamTools();
-    clearTimeout(hintTimer);
-    hintTimer = setTimeout(() => { if(scanning) $("#scanHint").textContent = t("scanHintSlow"); }, 8000);
-  }catch(e){
-    $("#idle").hidden = false;
-    $("#result").innerHTML = `<div class="notice">${esc(t("camErr"))}</div>`;
+  if(scanning) return;
+  const gen = ++scanGen;
+  $("#idle").hidden = true;
+  let d, s;
+  try{ d = await getDetector(); }
+  catch(e){ if(gen === scanGen){ $("#idle").hidden = false; $("#result").innerHTML = `<div class="notice">${esc(t("scanLibErr"))}</div>`; } return; }
+  try{ s = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:{ideal:"environment"}, width:{ideal:1920}, height:{ideal:1080}}}); }
+  catch(e){ if(gen === scanGen){ $("#idle").hidden = false; $("#result").innerHTML = `<div class="notice">${esc(t("camErr"))}</div>`; } return; }
+  if(gen !== scanGen){ s.getTracks().forEach(x => x.stop()); return; }
+  camStream = s; camTrack = s.getVideoTracks()[0];
+  try{ await camTrack.applyConstraints({advanced:[{focusMode:"continuous"}]}); }catch(e){}
+  const v = $("#camVideo"); v.srcObject = s; v.hidden = false;
+  try{ await v.play(); }catch(e){}
+  if(gen !== scanGen) return;
+  scanning = true; $("#stopRow").hidden = false; updateFab();
+  $("#scanHint").textContent = t(shelf ? "shelfOn" : "scanHint");
+  updateShelfUi(); updateCmpBar();
+  setupCamTools();
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => { if(scanning) $("#scanHint").textContent = t("scanHintSlow"); }, 8000);
+  scanLoop(gen, d, v);
+}
+async function scanLoop(gen, d, v){
+  while(gen === scanGen && scanning){
+    if(v.readyState >= 2 && v.videoWidth){
+      try{
+        const res = await d.detect(v);
+        if(gen !== scanGen || !scanning) return;
+        const hit = res.find(r => r.rawValue);
+        if(hit) onCode(hit.rawValue);
+      }catch(e){}
+    }
+    await new Promise(r => setTimeout(r, 80));
   }
 }
 function setupCamTools(){
   $("#torchBtn").hidden = true; $("#zoomBtn").hidden = true; zoomCap = null;
   try{
-    const caps = qr.getRunningTrackCameraCapabilities();
-    if(caps.torchFeature().isSupported()){ $("#torchBtn").hidden = false; $("#torchBtn").setAttribute("aria-pressed","false"); }
-    const zoom = caps.zoomFeature();
-    if(zoom.isSupported() && zoom.max() >= 2){ zoomCap = zoom; $("#zoomBtn").hidden = false; $("#zoomBtn").setAttribute("aria-pressed","false"); }
+    const c = camTrack && camTrack.getCapabilities ? camTrack.getCapabilities() : {};
+    if(c.torch){ $("#torchBtn").hidden = false; $("#torchBtn").setAttribute("aria-pressed","false"); }
+    if(c.zoom && c.zoom.max >= 2){ zoomCap = c.zoom; $("#zoomBtn").hidden = false; $("#zoomBtn").setAttribute("aria-pressed","false"); }
   }catch(e){}
 }
 async function toggleTorch(){
   try{
     const on = $("#torchBtn").getAttribute("aria-pressed") !== "true";
-    await qr.getRunningTrackCameraCapabilities().torchFeature().apply(on);
+    await camTrack.applyConstraints({advanced:[{torch:on}]});
     $("#torchBtn").setAttribute("aria-pressed", String(on));
   }catch(e){ $("#torchBtn").hidden = true; }
 }
 async function toggleZoom(){
   try{
     const on = $("#zoomBtn").getAttribute("aria-pressed") !== "true";
-    await zoomCap.apply(on ? 2 : Math.max(1, zoomCap.min()));
+    await camTrack.applyConstraints({advanced:[{zoom: on ? 2 : Math.max(1, zoomCap.min || 1)}]});
     $("#zoomBtn").setAttribute("aria-pressed", String(on));
   }catch(e){ $("#zoomBtn").hidden = true; }
 }
 async function stopScan(){
+  scanGen++;
   clearTimeout(hintTimer);
-  if(qr && scanning){ try{ await qr.stop(); }catch(e){} }
+  if(camStream){ camStream.getTracks().forEach(x => x.stop()); camStream = null; camTrack = null; }
+  const v = $("#camVideo"); if(v){ v.srcObject = null; v.hidden = true; }
   scanning = false; $("#stopRow").hidden = true; $("#idle").hidden = false; updateFab();
   const ts = $("#shelfToast"); if(ts) ts.hidden = true;
   updateCmpBar();
@@ -2580,17 +2702,40 @@ async function onCode(text){
 }
 async function scanPhoto(file){
   if(!file) return;
-  if(typeof Html5Qrcode === "undefined"){ $("#result").innerHTML = `<div class="notice">${esc(t("scanLibErr"))}</div>`; return; }
   await stopScan();
   $("#result").innerHTML = `<div class="spinner" role="status" aria-label="${esc(t("photoSearching"))}"></div>`;
   try{
-    const code = parseScan(await ensureQr().scanFile(file, false));
+    const d = await getDetector();
+    const bmp = await createImageBitmap(file, {imageOrientation:"from-image"});
+    let res = [];
+    for(const max of [2000, 1200, 0]){
+      const k = max ? Math.min(1, max / Math.max(bmp.width, bmp.height)) : 1;
+      const c = document.createElement("canvas"); c.width = Math.round(bmp.width*k); c.height = Math.round(bmp.height*k);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      try{ res = await d.detect(c); }catch(e){ res = []; }
+      if(res.some(r => r.rawValue) || k === 1) break;
+    }
+    const hit = res.find(r => r.rawValue);
+    if(!hit) throw new Error("none");
+    const code = parseScan(hit.rawValue);
     $("#manualCode").value = code;
     loadProduct(code);
   }catch(e){
     lastRender = null;
     $("#result").innerHTML = `<div class="notice">${esc(t("photoNoCode"))}</div>`;
   }
+}
+/* camera se oprește când aplicația trece în fundal și repornește când revii */
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){ if(scanning){ resumeScan = true; stopScan(); } }
+  else if(resumeScan){ resumeScan = false; if($("#v-scan").classList.contains("on")) startScan(); }
+});
+/* pornire automată: dacă accesul la cameră e deja dat, sau aplicația e deschisă de pe ecranul telefonului */
+async function autoStart(fromApp){
+  let perm = "";
+  try{ perm = (await navigator.permissions.query({name:"camera"})).state; }catch(e){}
+  if(perm === "denied") return;
+  if(perm === "granted" || fromApp) startScan();
 }
 
 /* ---------- istoric ---------- */
@@ -2708,13 +2853,19 @@ $("#torchBtn").addEventListener("click", toggleTorch);
 $("#zoomBtn").addEventListener("click", toggleZoom);
 $("#photoCode").addEventListener("click", () => { $("#codeFile").value = ""; $("#codeFile").click(); });
 $("#codeFile").addEventListener("change", e => scanPhoto(e.target.files[0]));
-$("#manualForm").addEventListener("submit", e => { e.preventDefault(); stopScan(); loadProduct($("#manualCode").value); });
+$("#manualForm").addEventListener("submit", e => {
+  e.preventDefault(); stopScan();
+  const v = $("#manualCode").value.trim(); if(!v) return;
+  if(/\p{L}/u.test(v) && v.replace(/\D/g, "").length < 8) searchByName(v); else loadProduct(v);
+});
 $("#ocrBtn").addEventListener("click", () => startOcr("ingr"));
 $("#ocrAgain").addEventListener("click", () => startOcr("ingr"));
 $("#ocrFile").addEventListener("change", e => runOcr(e.target.files[0]));
 $("#typeToggle").addEventListener("click", openTyping);
 $("#pasteBtn").addEventListener("click", () => { const s = $("#pasteText").value.trim(); if(s) applyIngredients(s); });
 $("#result").addEventListener("click", e => {
+  const stb = e.target.closest("[data-store]");
+  if(stb && prodCtx){ setStore(prodCtx.code, stb.dataset.store); document.querySelectorAll("[data-store]").forEach(b => b.setAttribute("aria-pressed", String(b === stb))); track("store_pick"); return; }
   if(e.target.closest("[data-ocr]")) return startOcr("ingr");
   if(e.target.closest("[data-nutocr]")) return startOcr("nut");
   if(e.target.closest("[data-nutapply]")) return applyNutForm();
@@ -2781,6 +2932,13 @@ else if(qs.get("a")){
   else if(a === "scan") startScan();
   try{ history.replaceState(null, "", location.pathname); }catch(e){}
 }
+else{
+  const fromApp = qs.get("src") === "pwa" || matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  if(qs.has("src")){ try{ history.replaceState(null, "", location.pathname); }catch(e){} }
+  autoStart(!!fromApp);
+}
+/* motorul de scanare se pregătește în fundal, ca prima scanare să fie rapidă */
+setTimeout(() => { getDetector().then(d => { const c = document.createElement("canvas"); c.width = c.height = 8; return d.detect(c); }).catch(() => {}); }, 1200);
 </script>
 </body>
 </html>

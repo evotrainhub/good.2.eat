@@ -1,8 +1,9 @@
 /* Good.2.eat — service worker: aplicația se deschide repede și funcționează parțial fără internet.
    Schimbă VERSION la fiecare actualizare importantă, ca telefoanele să ia fișierele noi. */
-const VERSION = "g2e-0.10.1";
+const VERSION = "g2e-0.11.0";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./privacy.html",
-               "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
+               "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png",
+               "./vendor/barcode-detector.js", "./vendor/zxing_reader.wasm"];
 const CDN = ["cdn.jsdelivr.net", "unpkg.com"];
 
 self.addEventListener("install", e => {
