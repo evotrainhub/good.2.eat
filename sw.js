@@ -1,9 +1,12 @@
 /* Good.2.eat — service worker: aplicația se deschide repede și funcționează parțial fără internet.
    Schimbă VERSION la fiecare actualizare importantă, ca telefoanele să ia fișierele noi. */
-const VERSION = "g2e-0.11.1";
+const VERSION = "g2e-0.11.2";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./privacy.html",
                "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png",
-               "./vendor/barcode-detector.js", "./vendor/zxing_reader.wasm"];
+               "./vendor/barcode-detector.js", "./vendor/zxing_reader.wasm",
+               "./vendor/fonts/atkinson-hyperlegible-latin-400-normal.woff2", "./vendor/fonts/atkinson-hyperlegible-latin-700-normal.woff2",
+               "./vendor/fonts/atkinson-hyperlegible-latin-ext-400-normal.woff2", "./vendor/fonts/atkinson-hyperlegible-latin-ext-700-normal.woff2",
+               "./vendor/fonts/bricolage-grotesque-latin-opsz-normal.woff2", "./vendor/fonts/bricolage-grotesque-latin-ext-opsz-normal.woff2"];
 const CDN = ["cdn.jsdelivr.net", "unpkg.com"];
 
 self.addEventListener("install", e => {
