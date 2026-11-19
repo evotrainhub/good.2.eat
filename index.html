@@ -398,7 +398,6 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
       <p><a href="#" class="fb-link" data-i18n="feedback"></a></p>
       <p><a href="privacy.html" class="pv-link" data-i18n="privacyLink"></a></p>
       <details class="deld"><summary id="delSum"></summary><p class="hint" id="delBody"></p><p class="hint"><code id="appIdCode"></code></p></details>
-      <p class="hint" id="versionLine"></p>
     </div>
   </section>
 </div>
@@ -2677,7 +2676,6 @@ function updateInstallUi(){
   hint.hidden = !(standalone || (ios && !standalone));
   hint.textContent = standalone ? t("installed") : t("installIos");
   $("#delSum").textContent = t("delH"); $("#delBody").textContent = t("delBody"); $("#appIdCode").textContent = clientId();
-  $("#versionLine").textContent = t("versionLbl", {v: APP_VERSION});
 }
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; updateInstallUi(); });
 window.addEventListener("appinstalled", () => { installEvt = null; track("install"); updateInstallUi(); });
