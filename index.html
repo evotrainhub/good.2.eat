@@ -141,12 +141,14 @@ details.ingr p{font-size:15px;color:var(--muted)}
 .about{margin-top:30px;padding-top:6px;border-top:1px solid var(--line)}.about p{margin:10px 0}
 .foot a{color:var(--brand)}
 
-.hist{display:grid;gap:8px}
-.hitem{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px;cursor:pointer;text-align:left;width:100%}
+.hist{display:grid;gap:8px;grid-template-columns:minmax(0,1fr)}
+.hitem{min-width:0;display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px;cursor:pointer;text-align:left;width:100%}
 .hitem img,.hitem .ph{width:44px;height:44px;border-radius:10px;object-fit:contain;flex:none;background:#fff}
 .hitem .t{flex:1;min-width:0}
 .hitem .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hitem .t span{font-size:14px;color:var(--muted)}
+.hitem .t span{display:block;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.backtoast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 86px);z-index:70;background:#1E2A24;color:#fff;border-radius:999px;padding:10px 18px;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.3);max-width:calc(100vw - 32px);text-align:center}
+.backtoast[hidden]{display:none}
 .badge{font-family:var(--display);font-weight:800;font-size:18px;min-width:52px;text-align:center;border-radius:12px;padding:6px 8px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
 .chip{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:15px}
@@ -424,6 +426,8 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
     </div>
   </div>
 </div>
+
+<div id="backToast" class="backtoast" hidden role="status"></div>
 
 <nav class="tabs" data-i18n-aria="navAria">
   <button data-v="v-scan" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8 8v8M11 8v8M14 8v8M17 8v8"/></svg><span data-i18n="navScan"></span></button>
@@ -930,7 +934,7 @@ ro:{
  ocrHint:"Încadrează doar lista de ingrediente, bine luminată, fără reflexii. Poți corecta textul citit înainte de analiză.",
  analyse:"Analizează ingredientele", anotherPhoto:"Altă fotografie",
  navScan:"Scanează", navHist:"Istoric", navProf:"Profil", navAdd:"Aditivi", navAria:"Navigare",
- histTitle:"Produse scanate", histEmpty:"Produsele scanate apar aici. Scanează primul produs din fila Scanează.", histClear:"Șterge istoricul",
+ backExit:"Apasă din nou „înapoi” ca să ieși din aplicație.", histTitle:"Produse scanate", histEmpty:"Produsele scanate apar aici. Scanează primul produs din fila Scanează.", histClear:"Șterge istoricul",
  addTitle:"Lista de aditivi", method:"Cum analizăm",
  m1:"Lista conține aditivii autorizați în Uniunea Europeană prin Regulamentul (CE) nr. 1333/2008, așa cum apar în baza de date oficială a Comisiei Europene. Câțiva aditivi interziși sunt păstrați și marcați „interzis în UE”, ca să-i poți recunoaște pe produse vechi sau din import.",
  m2:"Toți aditivii autorizați sunt legali. Culoarea arată ce spun evaluările și cercetările recente: EFSA (Autoritatea Europeană pentru Siguranța Alimentară), IARC (agenția OMS pentru cercetarea cancerului) și studii publicate în reviste de specialitate.",
@@ -1121,7 +1125,7 @@ en:{
  ocrHint:"Frame only the ingredient list, well lit and without glare. You can correct the text before it is analysed.",
  analyse:"Analyse ingredients", anotherPhoto:"Another photo",
  navScan:"Scan", navHist:"History", navProf:"Profile", navAdd:"Additives", navAria:"Navigation",
- histTitle:"Scanned products", histEmpty:"Scanned products appear here. Scan your first product in the Scan tab.", histClear:"Clear history",
+ backExit:"Press back again to leave the app.", histTitle:"Scanned products", histEmpty:"Scanned products appear here. Scan your first product in the Scan tab.", histClear:"Clear history",
  addTitle:"Additive list", method:"How we analyse",
  m1:"The list contains the additives authorised in the European Union under Regulation (EC) No 1333/2008, as listed in the European Commission's official database. A few banned additives are kept and marked “banned in the EU” so you can recognise them on old or imported products.",
  m2:"All authorised additives are legal. The colour shows what recent assessments and research say: EFSA (European Food Safety Authority), IARC (the WHO cancer research agency) and peer-reviewed studies.",
@@ -3018,6 +3022,38 @@ $("#manualForm").addEventListener("submit", e => {
 $("#ocrBtn").addEventListener("click", () => startOcr("ingr"));
 $("#ocrAgain").addEventListener("click", () => startOcr("ingr"));
 $("#ocrFile").addEventListener("change", e => runOcr(e.target.files[0]));
+
+/* ---------- butonul „înapoi” al telefonului ----------
+   Ținem mereu o intrare de rezervă în istoricul browserului. „Înapoi” o consumă, iar aplicația face un pas înapoi în interior:
+   închide fereastra deschisă, oprește camera, trece din Istoric/Profil/Aditivi la Scanează, golește rezultatul.
+   Pe ecranul gol de scanare, prima apăsare arată un mesaj, a doua iese din aplicație. */
+let backArmed = false, backExitTimer = 0;
+function armBack(){ if(backArmed) return; backArmed = true; try{ history.pushState({g2e:1}, ""); }catch(e){} }
+function stepBack(){
+  if(!$("#aiAsk").hidden){ $("#aiAsk").hidden = true; return true; }
+  if(!$("#cropper").hidden){ $("#cropCancel").click(); return true; }
+  if(!$("#v-scan").classList.contains("on")){ show("v-scan"); return true; }
+  if(scanning){ stopScan(); return true; }
+  if($("#result").innerHTML.trim() || !$("#ocrBox").hidden){
+    cur.cmp = null; lastRender = null; prodCtx = null; cur.ctx = null; pasted.text = ""; pasted.nutr = null;
+    $("#result").innerHTML = ""; $("#manualCode").value = ""; $("#pasteText").value = "";
+    $("#ocrBox").hidden = true; $("#ocrStatus").hidden = true;
+    updateFab(); window.scrollTo({top:0});
+    return true;
+  }
+  return false;
+}
+window.addEventListener("popstate", () => {
+  backArmed = false;
+  if(stepBack()){ armBack(); return; }
+  // ecranul principal: avertizăm o dată; dacă utilizatorul rămâne, reîncărcăm rezerva la următoarea atingere
+  const tst = $("#backToast");
+  tst.textContent = t("backExit"); tst.hidden = false;
+  clearTimeout(backExitTimer);
+  backExitTimer = setTimeout(() => { tst.hidden = true; }, 2500);
+});
+// rezerva se pune la prima atingere: intrările adăugate fără o atingere sunt sărite de Chrome la „înapoi”
+["pointerdown","keydown"].forEach(ev => document.addEventListener(ev, () => { if(!backArmed){ $("#backToast").hidden = true; armBack(); } }, {capture:true}));
 $("#aiAskYes").addEventListener("click", () => closeAiAsk(true));
 $("#aiAskNo").addEventListener("click", () => closeAiAsk(false));
 $("#aiAsk").addEventListener("keydown", e => { if(e.key === "Escape"){ $("#aiAsk").hidden = true; } });
