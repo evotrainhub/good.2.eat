@@ -271,6 +271,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
 .cmpbar b{color:var(--violet)}
 .cmpbar .sp{flex:1 1 180px}
 .alt-list{display:grid;gap:8px;margin-top:8px}
+.refitem{cursor:default;grid-template-columns:minmax(0,1fr) auto}.refitem .t b,.refitem .t span{white-space:normal;overflow:visible;text-overflow:clip}
 .altbox h2{margin-bottom:2px}
 .tog.sub{margin-left:18px;border-left:3px solid var(--line);padding-left:12px}
 .tips{margin:8px 0 0;padding-left:20px}
@@ -947,6 +948,7 @@ ro:{
  profTitle:"Profilul meu", profLead:"Scorul și avertismentele se adaptează la ce alegi aici.",
  k4:"4–6 ani", k7:"7–10 ani", k11:"11+ ani",
  shelfStart:"sau mod raft: scanezi mai multe produse la rând", shelfBtn:"Mod raft", shelfOn:"Mod raft: ține camera pe produse, unul după altul. Vibrație dublă = alegere slabă. Atinge rezultatul pentru detalii.", shelfLoading:"Caut produsul…", shelfNoData:"Fără date suficiente", shelfTap:"atinge pentru detalii", shelfListH:"Scanate la raft ({n})", shelfListHint:"Atinge un produs ca să vezi toată analiza.", shelfErr:"Nu am putut căuta produsul (internet?)",
+ refH:"Față de produsele din baza noastră: {c}", refRank:"Din cele {n} produse de tip „{c}” verificate de noi: {b} scor mai bun, {s} scor apropiat, {w} scor mai slab.", refTop:"Niciunul dintre cele {n} produse de tip „{c}” verificate de noi nu are un scor clar mai bun.", refCrit:"Nu se potrivește profilului tău; mai jos sunt variante din aceeași categorie.", refBetter:"Variante cu scor mai bun:", refBest:"Cele mai bune din bază, pentru comparație:", refVals:"zahăr {z} · sare {s} · grăsimi saturate {g} (la 100 g)", refCmp:"⇄ Compară", refSrc:"Sursa", refNote:"Valorile produselor din bază sunt preluate de pe paginile magazinelor online; rețetele se mai schimbă, verifică eticheta din magazin.",
  cmpBtn:"⇄ Compară cu alt produs", altBtn:"Alternative mai bune", cmpBarA:"Compari cu: {n}. Scanează al doilea produs.", cmpBarFirst:"Compară două produse: scanează primul produs.", cmpScanA:"Scanează primul", cmpScanB:"Scanează al doilea", cancel:"Anulează",
  cmpSame:"Este același produs. Scanează alt produs ca să le compari.", cmpNeed:"Nu pot compara încă: acestui produs îi lipsesc date. Completează-l mai jos sau scanează alt produs.",
  cmpBothPoor:"Atenție: și acesta are un scor slab. Caută o alternativă mai bună.", cmpH:"Comparație", cmpWin:"Alegerea mai bună: {n}", cmpWinMe:"Alegerea mai bună pentru tine: {n}", cmpTie:"Diferență mică între ele: alege după gust sau preț.", cmpIncomplete:"Unul dintre produse are date incomplete, deci comparația e orientativă.",
@@ -1138,6 +1140,7 @@ en:{
  profTitle:"My profile", profLead:"The score and warnings adapt to what you choose here.",
  k4:"4–6 years", k7:"7–10 years", k11:"11+ years",
  shelfStart:"or shelf mode: scan several products in a row", shelfBtn:"Shelf mode", shelfOn:"Shelf mode: point the camera at products one after another. Double vibration = poor choice. Tap the result for details.", shelfLoading:"Looking up the product…", shelfNoData:"Not enough data", shelfTap:"tap for details", shelfListH:"Scanned at the shelf ({n})", shelfListHint:"Tap a product to see the full analysis.", shelfErr:"Could not look up the product (internet?)",
+ refH:"Compared with products in our database: {c}", refRank:"Of the {n} „{c}” products we checked: {b} a better score, {s} about the same score, {w} a worse score.", refTop:"None of the {n} „{c}” products we checked scores clearly better.", refCrit:"Not a match for your profile; below are options from the same category.", refBetter:"Options with a better score:", refBest:"The best ones in our database, for comparison:", refVals:"sugar {z} · salt {s} · saturated fat {g} (per 100 g)", refCmp:"⇄ Compare", refSrc:"Source", refNote:"Database values come from online shop pages; recipes change, so check the label in store.",
  cmpBtn:"⇄ Compare with another product", altBtn:"Better alternatives", cmpBarA:"Comparing with: {n}. Scan the second product.", cmpBarFirst:"Compare two products: scan the first one.", cmpScanA:"Scan the first", cmpScanB:"Scan the second", cancel:"Cancel",
  cmpSame:"This is the same product. Scan a different one to compare.", cmpNeed:"Can't compare yet: this product is missing data. Complete it below or scan another product.",
  cmpBothPoor:"Note: this one also scores poorly. Look for a better alternative.", cmpH:"Comparison", cmpWin:"Better choice: {n}", cmpWinMe:"Better choice for you: {n}", cmpTie:"Little difference between them: choose by taste or price.", cmpIncomplete:"One of the products has incomplete data, so the comparison is indicative.",
@@ -1864,7 +1867,7 @@ function renderProduct(code, p, quiet){
   const me = personalize(cur.ctx, cur.g);
   const so = shownOf(sc, me);
   cur.sum = sumOf(code, name, p.image_front_small_url, so, eff, adds, q, p.categories_tags, p.compared_to_category);
-  const acts = so ? `<div class="acts-row"><button class="btn ghost small" data-cmp="1">${esc(t("cmpBtn"))}</button>${(so.shown < 75 || so.crit) && !so.incomplete ? `<button class="btn ghost small" data-alt="1">${esc(t("altBtn"))}</button>` : ""}</div><div id="altBox" class="altbox"></div>` : "";
+  const acts = so ? `<div class="acts-row"><button class="btn ghost small" data-cmp="1">${esc(t("cmpBtn"))}</button>${(so.shown < 75 || so.crit) && !so.incomplete ? `<button class="btn ghost small" data-alt="1">${esc(t("altBtn"))}</button>` : ""}</div><div id="altBox" class="altbox"></div><div id="refBox" class="altbox"></div>` : "";
   const report = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">${esc(t("reportLink"))}</a>`;
   $("#result").innerHTML = `
     <div class="product">
@@ -1889,6 +1892,7 @@ function renderProduct(code, p, quiet){
   cur.hist = {code, name, brand:p.brands||"", img:p.image_front_small_url||"", score:sc?sc.score:null, t:Date.now()};
   compareHook(code, quiet);
   if(quiet) return;
+  showRef(name, cur.sum);
   saveHistory(cur.hist);
   $("#result").scrollIntoView({behavior:"smooth", block:"start"});
 }
@@ -2257,6 +2261,86 @@ async function showAlternatives(){
       <span class="t"><b>${esc(e.sum.name)}</b><span>${esc(p.brands || p.code)}</span>${world ? `<span class="alt-w">${esc(t("altWorld"))}</span>` : ""}</span>
       <span class="badge" style="${badgeStyle(e.so)}">${e.so.shown}</span>
     </button>`).join("")}</div>`;
+}
+
+/* ---------- comparație cu baza proprie (produse verificate de noi, ref.json) ---------- */
+const REF_CATS = [
+  ["topita",        "Brânză topită",        /branza topita|processed-cheese/],
+  ["cremaBranza",   "Brânză tartinabilă",   /crema de branza|branza (pufoasa|tartinabila)|cream-cheese|crema de urda/],
+  ["cascaval",      "Cașcaval",             /cascaval|kashkaval/],
+  ["ciocNeagra",    "Ciocolată neagră",     /ciocolata (neagra|amaruie)|dark-chocolate/],
+  ["ciocLapte",     "Ciocolată cu lapte",   /ciocolata|milk-chocolate|en:chocolates$/],
+  ["biscCopii",     "Biscuiți pentru copii",/biscuit\w* .*(copii|bebe|bebelus|luni\b)|baby-biscuit|biscuits-for-babies/],
+  ["crenvursti",    "Crenvurști",           /crenvurst|frankfurter|wiener/],
+  ["sunca",         "Șuncă",                /\bsunca\b|\bhams?\b|en:hams/],
+  ["mezeluri",      "Mezeluri",             /\bsalam|kaizer|bacon|\btoba\b|parizer|mezel|salami/],
+  ["smantanaGatit", "Smântână de gătit",    /smantana (lichida|de gatit)|cooking-cream/],
+  ["smantana",      "Smântână",             /\bsmantana\b|sour-cream/],
+  ["post",          "Produse de post",      /(pate|pasta|crema) vegetal|fainosag|^vegetal\b|plant-based-spread|vegetable-pate/],
+  ["lapte",         "Lapte",                /^lapte\b(?! praf| condensat)|en:(whole-|semi-skimmed-|skimmed-|uht-)?milks$/]
+];
+let refData = null;
+async function loadRef(){
+  if(refData) return refData;
+  try{ const r = await fetch("./ref.json"); if(r.ok) refData = await r.json(); }catch(e){}
+  return refData;
+}
+function refCatOf(name, cats){
+  const nm = norm(name || "");
+  const tags = (cats || []).join(" ");
+  for(const [k, label, re] of REF_CATS){ if(re.test(nm) || re.test(tags)) return {k, label}; }
+  return null;
+}
+/* produsele din bază, în forma Open Food Facts, ca să le notăm cu aceleași reguli ca produsul scanat */
+function refProd(x, i){
+  const nutr = {"energy-kcal_100g":x.kcal, "fat_100g":x.fat, "saturated-fat_100g":x.sat, "carbohydrates_100g":x.carb, "sugars_100g":x.sug, "proteins_100g":x.prot, "salt_100g":x.salt};
+  Object.keys(nutr).forEach(k => { if(nutr[k] === null || nutr[k] === undefined) delete nutr[k]; });
+  return {code:"ref-" + i, product_name:x.name, brands:x.brand, nutriments:nutr, ingredients_text:x.ingr || "",
+    additives_tags:(x.adds || []).map(e => "en:" + e.toLowerCase())};
+}
+async function showRef(name, sum){
+  const box = $("#refBox"); if(!box || !sum || !sum.has || sum.incomplete) return;
+  const cat = refCatOf(name, sum.cats); if(!cat) return;
+  const data = await loadRef(); if(!data || cur.sum !== sum || !$("#refBox")) return;
+  const P = getProfile(), needIngr = P.allergens.length || P.pku || P.vegan || P.post || P.palm || P.kidAge === "0";
+  const nb = norm(name);
+  const items = [];
+  data.forEach((x, i) => {
+    if(x.cat !== cat.k) return;
+    const e = quickEval(refProd(x, i));
+    if(!e.so || e.so.incomplete || (needIngr && !e.hasIngr)) return;
+    e.sum.brand = x.brand; e.sum.src = x.src; e.sum.ingr = x.ingr;
+    items.push(e.sum);
+  });
+  if(items.length < 5) return;
+  items.sort((a, b) => (a.crit - b.crit) || (b.shown - a.shown));
+  refList = items;
+  const better = items.filter(x => !x.crit && x.shown > sum.shown + 4);
+  const worse = items.filter(x => x.crit || x.shown < sum.shown - 4).length;
+  const same = items.length - better.length - worse;
+  const msg = sum.crit ? t("refCrit") : better.length === 0 ? t("refTop",{n:items.length, c:cat.label}) : t("refRank",{n:items.length, c:cat.label, b:refN(better.length), s:refN(same), w:refN(worse)});
+  const show = (better.length ? better : items.filter(x => !x.crit)).slice(0, 3);
+  const g = v => v === null ? "–" : fmt(v) + " g";
+  box.innerHTML = `<h2>${esc(t("refH",{c:cat.label}))}</h2>
+    <p class="wl" style="margin:4px 0">${esc(msg)}</p>
+    <p class="hint" style="margin-top:0">${esc(t(better.length ? "refBetter" : "refBest"))}</p>
+    <div class="alt-list">${show.map(x => `
+      <div class="hitem refitem">
+        <span class="t"><b>${esc(x.name)}</b><span>${esc(x.brand || "")}</span><span>${esc(t("refVals",{z:g(x.sugar), s:g(x.salt), g:g(x.sat)}))}</span></span>
+        <span class="badge" style="${badgeStyle({shown:x.shown, incomplete:false})}">${x.shown}</span>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin:-2px 0 4px"><button class="btn ghost small" data-refcmp="${esc(x.code)}">${esc(t("refCmp"))}</button>${x.src ? `<a class="linkish" href="${esc(x.src)}" target="_blank" rel="noopener" style="align-self:center">${esc(t("refSrc"))}</a>` : ""}</div>`).join("")}</div>
+    <p class="hint">${esc(t("refNote"))}</p>`;
+  track("ref_shown");
+}
+let refList = [];
+const refN = n => LANG === "en" ? `${n} ${n === 1 ? "has" : "have"}` : `${n} ${n === 1 ? "are" : "au"}`;
+function refCompare(code){
+  const a = refList.find(x => x.code === code); if(!a || !cur.sum) return;
+  track("ref_cmp");
+  const old = $("#refCmpCard"); if(old) old.remove();
+  $("#refBox").insertAdjacentHTML("afterbegin", `<div id="refCmpCard">${compareCard({a, b:cur.sum})}</div>`);
+  $("#refCmpCard").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 /* ---------- căutare după nume (Open Food Facts, căutare text: max. 10 pe minut) ---------- */
@@ -2646,7 +2730,7 @@ function closeAiAsk(ok){
 }
 
 /* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
-const APP_VERSION = "0.12.0";
+const APP_VERSION = "0.13.0";
 function track(ev){
   if(!AI_URL) return;
   try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
@@ -3069,6 +3153,7 @@ $("#result").addEventListener("click", e => {
   if(e.target.closest("[data-ingrapply]")){ const v = ($("#ingrEdit")||{}).value; if(v && v.trim()) applyIngredients(v.trim(), false); return; }
   if(e.target.closest("[data-resetsaved]")) return resetSaved();
   if(e.target.closest("[data-cmp]")) return startCompare();
+  const rc = e.target.closest("[data-refcmp]"); if(rc) return refCompare(rc.dataset.refcmp);
   if(e.target.closest("[data-alt]")) return showAlternatives();
   const op = e.target.closest("[data-open]"); if(op) return openProduct(op.dataset.open);
   if(e.target.closest("[data-sharedconfirm]")) return confirmShared(e.target.closest("[data-sharedconfirm]"));
