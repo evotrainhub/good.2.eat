@@ -2342,7 +2342,8 @@ let refList = [];
 function refRanks(sum, items, ck){
   const rows = [["sugar","refRowSugar"],["salt","refRowSalt"],["sat","refRowSat"],["hi","refRowAdds"]].map(([k, lbl]) => {
     const v = sum[k]; if(v === null || v === undefined) return "";
-    if(k === "sugar" && ck === "lapte") return "";   // la lapte, zahărul e lactoza naturală
+    // la lactate, zahărul de până la ~5 g e mai ales lactoză naturală: nu-l clasăm
+    if(k === "sugar" && /^(lapte|cascaval|cremaBranza|topita|smantana|smantanaGatit)$/.test(ck) && (ck === "lapte" || v <= 5)) return "";
     const vals = items.map(x => x[k]).filter(x => x !== null && x !== undefined);
     if(vals.length < 5) return "";
     const n = vals.length + 1, rank = vals.filter(x => x < v).length + 1;
