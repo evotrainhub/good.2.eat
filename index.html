@@ -951,7 +951,7 @@ ro:{
  shelfStart:"sau mod raft: scanezi mai multe produse la rând", shelfBtn:"Mod raft", shelfOn:"Mod raft: ține camera pe produse, unul după altul. Vibrație dublă = alegere slabă. Atinge rezultatul pentru detalii.", shelfLoading:"Caut produsul…", shelfNoData:"Fără date suficiente", shelfTap:"atinge pentru detalii", shelfListH:"Scanate la raft ({n})", shelfListHint:"Atinge un produs ca să vezi toată analiza.", shelfErr:"Nu am putut căuta produsul (internet?)",
  refRanksH:"Locul lui pe fiecare criteriu (1 = cel mai puțin):", refRowSugar:"zahăr", refRowSalt:"sare", refRowSat:"grăsimi saturate", refRowAdds:"aditivi de evitat", refPlace:"locul {r} din {n}", refRange:"în bază: între {lo} și {hi}",
  altSeeRef:"Mai jos ai variantele din baza noastră.", refH:"Față de produsele din baza noastră: {c}", refRank:"Din cele {n} produse de tip „{c}” verificate de noi: {b} scor mai bun, {s} scor apropiat, {w} scor mai slab.", refTop:"Niciunul dintre cele {n} produse de tip „{c}” verificate de noi nu are un scor clar mai bun.", refCrit:"Nu se potrivește profilului tău; mai jos sunt variante din aceeași categorie.", refBetter:"Variante cu scor mai bun:", refBest:"Cele mai bune din bază, pentru comparație:", refVals:"zahăr {z} · sare {s} · grăsimi saturate {g} (la 100 g)", refCmp:"⇄ Compară", refSrc:"Sursa", refNote:"Valorile produselor din bază sunt preluate de pe paginile magazinelor online; rețetele se mai schimbă, verifică eticheta din magazin.",
- cmpBtn:"⇄ Compară cu alt produs", altBtn:"Alternative mai bune", cmpBarA:"Compari cu: {n}. Scanează al doilea produs.", cmpBarFirst:"Compară două produse: scanează primul produs.", cmpScanA:"Scanează primul", cmpScanB:"Scanează al doilea", cancel:"Anulează",
+ cmpBtn:"⇄ Compară cu alt produs", altBtn:"↓ Alternative mai bune", cmpBarA:"Compari cu: {n}. Scanează al doilea produs.", cmpBarFirst:"Compară două produse: scanează primul produs.", cmpScanA:"Scanează primul", cmpScanB:"Scanează al doilea", cancel:"Anulează",
  cmpSame:"Este același produs. Scanează alt produs ca să le compari.", cmpNeed:"Nu pot compara încă: acestui produs îi lipsesc date. Completează-l mai jos sau scanează alt produs.",
  cmpBothPoor:"Atenție: și acesta are un scor slab. Caută o alternativă mai bună.", cmpH:"Comparație", cmpWin:"Alegerea mai bună: {n}", cmpWinMe:"Alegerea mai bună pentru tine: {n}", cmpTie:"Diferență mică între ele: alege după gust sau preț.", cmpIncomplete:"Unul dintre produse are date incomplete, deci comparația e orientativă.",
  cmpRowScore:"Scor", cmpRowSugar:"Zahăr / 100 g", cmpRowSalt:"Sare / 100 g", cmpRowSat:"Grăsimi saturate / 100 g", cmpRowAdds:"Aditivi cu îngrijorare ridicată", cmpRowNova:"Ultraprocesat", yes:"da", no:"nu", cmpAgain:"Compară cu alt produs",
@@ -1145,7 +1145,7 @@ en:{
  shelfStart:"or shelf mode: scan several products in a row", shelfBtn:"Shelf mode", shelfOn:"Shelf mode: point the camera at products one after another. Double vibration = poor choice. Tap the result for details.", shelfLoading:"Looking up the product…", shelfNoData:"Not enough data", shelfTap:"tap for details", shelfListH:"Scanned at the shelf ({n})", shelfListHint:"Tap a product to see the full analysis.", shelfErr:"Could not look up the product (internet?)",
  refRanksH:"Its place on each criterion (1 = the least):", refRowSugar:"sugar", refRowSalt:"salt", refRowSat:"saturated fat", refRowAdds:"additives to avoid", refPlace:"place {r} of {n}", refRange:"in our database: {lo} to {hi}",
  altSeeRef:"See the options from our database below.", refH:"Compared with products in our database: {c}", refRank:"Of the {n} „{c}” products we checked: {b} a better score, {s} about the same score, {w} a worse score.", refTop:"None of the {n} „{c}” products we checked scores clearly better.", refCrit:"Not a match for your profile; below are options from the same category.", refBetter:"Options with a better score:", refBest:"The best ones in our database, for comparison:", refVals:"sugar {z} · salt {s} · saturated fat {g} (per 100 g)", refCmp:"⇄ Compare", refSrc:"Source", refNote:"Database values come from online shop pages; recipes change, so check the label in store.",
- cmpBtn:"⇄ Compare with another product", altBtn:"Better alternatives", cmpBarA:"Comparing with: {n}. Scan the second product.", cmpBarFirst:"Compare two products: scan the first one.", cmpScanA:"Scan the first", cmpScanB:"Scan the second", cancel:"Cancel",
+ cmpBtn:"⇄ Compare with another product", altBtn:"↓ Better alternatives", cmpBarA:"Comparing with: {n}. Scan the second product.", cmpBarFirst:"Compare two products: scan the first one.", cmpScanA:"Scan the first", cmpScanB:"Scan the second", cancel:"Cancel",
  cmpSame:"This is the same product. Scan a different one to compare.", cmpNeed:"Can't compare yet: this product is missing data. Complete it below or scan another product.",
  cmpBothPoor:"Note: this one also scores poorly. Look for a better alternative.", cmpH:"Comparison", cmpWin:"Better choice: {n}", cmpWinMe:"Better choice for you: {n}", cmpTie:"Little difference between them: choose by taste or price.", cmpIncomplete:"One of the products has incomplete data, so the comparison is indicative.",
  cmpRowScore:"Score", cmpRowSugar:"Sugar / 100 g", cmpRowSalt:"Salt / 100 g", cmpRowSat:"Saturated fat / 100 g", cmpRowAdds:"High-risk additives", cmpRowNova:"Ultra-processed", yes:"yes", no:"no", cmpAgain:"Compare with another product",
@@ -1896,7 +1896,7 @@ function renderProduct(code, p, quiet){
   const me = personalize(cur.ctx, cur.g);
   const so = shownOf(sc, me);
   cur.sum = sumOf(code, name, p.image_front_small_url, so, eff, adds, q, p.categories_tags, p.compared_to_category);
-  const acts = so ? `<div class="acts-row"><button class="btn ghost small" data-cmp="1">${esc(t("cmpBtn"))}</button>${(so.shown < 75 || so.crit) && !so.incomplete ? `<button class="btn ghost small" data-alt="1">${esc(t("altBtn"))}</button>` : ""}</div><div id="altBox" class="altbox"></div><div id="refBox" class="altbox"></div>` : "";
+  const acts = so ? `<div class="acts-row"><button class="btn ghost small" data-cmp="1">${esc(t("cmpBtn"))}</button><button class="btn ghost small" data-alt="1" id="altBtn" hidden>${esc(t("altBtn"))}</button></div><div id="refBox" class="altbox"></div>` : "";
   const report = `<a href="https://world.openfoodfacts.org/product/${esc(code)}" target="_blank" rel="noopener">${esc(t("reportLink"))}</a>`;
   $("#result").innerHTML = `
     <div class="product">
@@ -2212,107 +2212,7 @@ function compareCard({a, b}){
   </div>`;
 }
 
-/* ---------- alternative mai bune (Open Food Facts, vândute în România) ---------- */
 const ALT_FIELDS = "code,product_name,product_name_ro,product_name_en,brands,image_front_small_url,nutriscore_grade,nova_group,additives_tags,nutriments,ingredients_text,ingredients_text_ro,ingredients_text_en,allergens_tags,traces_tags,ingredients_analysis_tags,categories_tags";
-const GENERIC_CATS = /^en:(plant-based-foods-and-beverages|plant-based-foods|beverages|foods|snacks|sweet-snacks|salty-snacks|dairies|groceries|meals|fermented-foods|fermented-milk-products|non-alcoholic-beverages|cereals-and-potatoes|condiments|sauces|spreads|frozen-foods|breakfasts|desserts|meats|fishes|seafood|canned-foods)$/;
-const altCache = {};
-/* categoria cu care comparăm: cea folosită de Open Food Facts pentru comparații, altfel cea mai specifică */
-function altTag(sum){ return altTags(sum)[0] || null; }
-/* categoriile încercate, de la cea mai specifică la cea mai largă (max. 3) */
-function altTags(sum){
-  const ok = c => /^en:/.test(c || "") && !GENERIC_CATS.test(c);
-  const list = [];
-  if(ok(sum.cmpCat)) list.push(sum.cmpCat);
-  [...sum.cats].reverse().forEach(c => { if(ok(c) && !list.includes(c)) list.push(c); });
-  return list.slice(0, 3);
-}
-const ALT_NUT = ["energy-kcal_100g","fat_100g","saturated-fat_100g","carbohydrates_100g","sugars_100g","fiber_100g","proteins_100g","salt_100g"];
-const slimProd = p => ({...p, nutriments: p.nutriments ? Object.fromEntries(ALT_NUT.filter(k => p.nutriments[k] !== undefined).map(k => [k, p.nutriments[k]])) : undefined});
-const ALT_KEY = "good2eat.altcat";
-function altCacheGet(tag){
-  try{ const o = JSON.parse(localStorage.getItem(ALT_KEY)) || {}; const e = o[tag]; return e && Date.now() - e.t < 3*24*3600*1000 ? e.p : null; }catch(e){ return null; }
-}
-function altCachePut(tag, prods){
-  try{
-    const o = JSON.parse(localStorage.getItem(ALT_KEY)) || {};
-    o[tag] = {t:Date.now(), p:prods};
-    const keep = Object.keys(o).sort((a,b) => o[b].t - o[a].t).slice(0, 8);
-    localStorage.setItem(ALT_KEY, JSON.stringify(Object.fromEntries(keep.map(k => [k, o[k]]))));
-  }catch(e){}
-}
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-async function offSearch(tag, world){
-  const ck = (world ? "w:" : "") + tag;
-  const c = altCacheGet(ck); if(c) return c;
-  const url = `https://world.openfoodfacts.org/api/v2/search?categories_tags=${encodeURIComponent(tag)}${world ? "" : "&countries_tags=en:romania"}&fields=${ALT_FIELDS}&page_size=50&sort_by=unique_scans_n`;
-  let last = "net";
-  for(let a = 0; a < 2; a++){
-    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
-    try{
-      const r = await fetch(url, {signal:ctl.signal});
-      clearTimeout(to);
-      if(r.status === 429) throw new Error("429");
-      if(r.ok){ const j = await r.json(); const prods = (j.products || []).map(slimProd); altCachePut(ck, prods); return prods; }
-      last = "HTTP " + r.status;
-    }catch(e){ clearTimeout(to); if(e.message === "429") throw e; last = "net"; }
-    if(a === 0) await sleep(2000);
-  }
-  throw new Error(last);
-}
-async function findAlternatives(sum){
-  if(altCache[sum.code]) return altCache[sum.code];
-  const tags = altTags(sum);
-  if(!tags.length) return null;
-  const P = getProfile(), needIngr = P.allergens.length || P.pku || P.vegan || P.post || P.palm || P.kidAge === "0";
-  const found = [], seen = new Set([sum.code]);
-  const take = (prods, tag, world) => {
-    for(const p of prods){
-      if(!p.code || seen.has(p.code) || !(p.categories_tags || []).includes(tag)) continue;
-      seen.add(p.code);
-      const e = quickEval(p);
-      if(!e.so || e.so.crit || e.so.incomplete || (needIngr && !e.hasIngr) || !e.sum.name) continue;
-      if(e.so.shown >= Math.max(50, sum.shown + 10)) found.push({p, e, world});
-    }
-  };
-  // întâi produse vândute în România, din categorii tot mai largi; abia apoi din alte țări, la categoria cea mai specifică
-  for(const tag of tags){ take(await offSearch(tag), tag, false); if(found.length >= 3) break; }
-  if(!found.length) take(await offSearch(tags[0], true), tags[0], true);
-  found.sort((x, y) => (x.world - y.world) || (y.e.so.shown - x.e.so.shown));
-  return (altCache[sum.code] = found.slice(0, 5));
-}
-/* ce să cauți pe raft, din regulile aplicației: merge și când nu găsim produse */
-function altTips(sum){
-  const tips = [];
-  const hi = ((cur.ctx && cur.ctx.adds) || []).filter(a => a.l >= 3 || a.b).map(a => a.c);
-  if(hi.length) tips.push(t("tipAdd",{c:[...new Set(hi)].slice(0, 4).join(", ")}));
-  const lower = (v, hiT, key) => { if(v !== null && v > hiT) tips.push(t(key,{to:fmt(Math.max(hiT, v >= 6 ? Math.round(v * 2 / 3) : Math.round(v * 2 / 3 * 10) / 10)), v:fmt(v)})); };
-  lower(sum.sugar, 12.5, "tipSugar");
-  lower(sum.salt, 1.5, "tipSalt");
-  lower(sum.sat, 5, "tipSat");
-  if(sum.nova === 4) tips.push(t("tipNova"));
-  tips.push(t("tipCmp"));
-  return `<h3 style="margin:12px 0 0;font-size:16px">${esc(t("tipsH"))}</h3><ul class="tips">${tips.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
-}
-async function showAlternatives(){
-  const box = $("#altBox"); if(!box || !cur.sum) return;
-  const sum = cur.sum;
-  track("alt_open");
-  if(!altTag(sum)){ box.innerHTML = `<div class="notice">${esc(t("altNoCat"))}${altTips(sum)}</div>`; return; }
-  box.innerHTML = `<div class="notice">${esc(t("altLoading"))}</div>`;
-  let list;
-  const refHint = () => $("#refBox") && $("#refBox").innerHTML.trim() ? ` ${t("altSeeRef")}` : "";
-  try{ list = await findAlternatives(sum); }catch(e){ if(cur.sum === sum && $("#altBox")) $("#altBox").innerHTML = `<div class="notice">${esc(t(e.message === "429" ? "altRate" : "altErr") + refHint())}</div>`; return; }
-  if(cur.sum !== sum || !$("#altBox")) return;
-  if(list === null){ box.innerHTML = `<div class="notice">${esc(t("altNoCat"))}${altTips(sum)}</div>`; return; }
-  if(!list.length){ box.innerHTML = `<div class="notice">${esc(t("altNone") + refHint())}${altTips(sum)}</div>`; return; }
-  track("alt_found");
-  box.innerHTML = `<h2>${esc(t("altH"))}</h2><p class="hint" style="margin-top:0">${esc(t("altNote"))}</p><div class="alt-list">${list.map(({p, e, world}) => `
-    <button class="hitem" data-open="${esc(p.code)}">
-      ${p.image_front_small_url ? `<img src="${esc(p.image_front_small_url)}" alt="">` : `<span class="ph"></span>`}
-      <span class="t"><b>${esc(e.sum.name)}</b><span>${esc(p.brands || p.code)}</span>${world ? `<span class="alt-w">${esc(t("altWorld"))}</span>` : ""}</span>
-      <span class="badge" style="${badgeStyle(e.so)}">${e.so.shown}</span>
-    </button>`).join("")}</div>`;
-}
 
 /* ---------- comparație cu baza proprie (produse verificate de noi, ref.json) ---------- */
 const REF_CATS = [
@@ -2384,6 +2284,7 @@ async function showRef(name, sum){
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin:-2px 0 4px"><button class="btn ghost small" data-refcmp="${esc(x.code)}">${esc(t("refCmp"))}</button>${x.src ? `<a class="linkish" href="${esc(x.src)}" target="_blank" rel="noopener" style="align-self:center">${esc(t("refSrc"))}</a>` : ""}</div>`).join("")}</div>
     <p class="hint">${esc(t("refNote"))}</p>`;
+  const ab = $("#altBtn"); if(ab && better.length && !sum.crit) ab.hidden = false;   // butonul apare doar dacă avem în bază variante mai bune
   track("ref_shown");
 }
 let refList = [];
@@ -2800,7 +2701,7 @@ function closeAiAsk(ok){
 }
 
 /* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
-const APP_VERSION = "0.14.0";
+const APP_VERSION = "0.14.1";
 function track(ev){
   if(!AI_URL) return;
   try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
@@ -3224,7 +3125,7 @@ $("#result").addEventListener("click", e => {
   if(e.target.closest("[data-resetsaved]")) return resetSaved();
   if(e.target.closest("[data-cmp]")) return startCompare();
   const rc = e.target.closest("[data-refcmp]"); if(rc) return refCompare(rc.dataset.refcmp);
-  if(e.target.closest("[data-alt]")) return showAlternatives();
+  if(e.target.closest("[data-alt]")){ track("alt_open"); const rb = $("#refBox"); if(rb) rb.scrollIntoView({behavior:"smooth", block:"start"}); return; }
   const op = e.target.closest("[data-open]"); if(op) return openProduct(op.dataset.open);
   if(e.target.closest("[data-sharedconfirm]")) return confirmShared(e.target.closest("[data-sharedconfirm]"));
   if(e.target.closest("[data-sharedreport]")) return reportShared();
