@@ -271,6 +271,7 @@ table.nt{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
 .cmpbar b{color:var(--violet)}
 .cmpbar .sp{flex:1 1 180px}
 .alt-list{display:grid;gap:8px;margin-top:8px}
+.refranks{margin:0 0 10px;padding-left:18px}.refranks li{margin:2px 0}.refranks li.ok b{color:#0a7a45}.refranks li.bad b{color:#b3261e}.refranks .hint{font-size:14px}
 .refitem{cursor:default;grid-template-columns:minmax(0,1fr) auto}.refitem .t b,.refitem .t span{white-space:normal;overflow:visible;text-overflow:clip}
 .altbox h2{margin-bottom:2px}
 .tog.sub{margin-left:18px;border-left:3px solid var(--line);padding-left:12px}
@@ -948,6 +949,7 @@ ro:{
  profTitle:"Profilul meu", profLead:"Scorul și avertismentele se adaptează la ce alegi aici.",
  k4:"4–6 ani", k7:"7–10 ani", k11:"11+ ani",
  shelfStart:"sau mod raft: scanezi mai multe produse la rând", shelfBtn:"Mod raft", shelfOn:"Mod raft: ține camera pe produse, unul după altul. Vibrație dublă = alegere slabă. Atinge rezultatul pentru detalii.", shelfLoading:"Caut produsul…", shelfNoData:"Fără date suficiente", shelfTap:"atinge pentru detalii", shelfListH:"Scanate la raft ({n})", shelfListHint:"Atinge un produs ca să vezi toată analiza.", shelfErr:"Nu am putut căuta produsul (internet?)",
+ refRanksH:"Locul lui pe fiecare criteriu (1 = cel mai puțin):", refRowSugar:"zahăr", refRowSalt:"sare", refRowSat:"grăsimi saturate", refRowAdds:"aditivi de evitat", refPlace:"locul {r} din {n}", refRange:"în bază: între {lo} și {hi}",
  refH:"Față de produsele din baza noastră: {c}", refRank:"Din cele {n} produse de tip „{c}” verificate de noi: {b} scor mai bun, {s} scor apropiat, {w} scor mai slab.", refTop:"Niciunul dintre cele {n} produse de tip „{c}” verificate de noi nu are un scor clar mai bun.", refCrit:"Nu se potrivește profilului tău; mai jos sunt variante din aceeași categorie.", refBetter:"Variante cu scor mai bun:", refBest:"Cele mai bune din bază, pentru comparație:", refVals:"zahăr {z} · sare {s} · grăsimi saturate {g} (la 100 g)", refCmp:"⇄ Compară", refSrc:"Sursa", refNote:"Valorile produselor din bază sunt preluate de pe paginile magazinelor online; rețetele se mai schimbă, verifică eticheta din magazin.",
  cmpBtn:"⇄ Compară cu alt produs", altBtn:"Alternative mai bune", cmpBarA:"Compari cu: {n}. Scanează al doilea produs.", cmpBarFirst:"Compară două produse: scanează primul produs.", cmpScanA:"Scanează primul", cmpScanB:"Scanează al doilea", cancel:"Anulează",
  cmpSame:"Este același produs. Scanează alt produs ca să le compari.", cmpNeed:"Nu pot compara încă: acestui produs îi lipsesc date. Completează-l mai jos sau scanează alt produs.",
@@ -1140,6 +1142,7 @@ en:{
  profTitle:"My profile", profLead:"The score and warnings adapt to what you choose here.",
  k4:"4–6 years", k7:"7–10 years", k11:"11+ years",
  shelfStart:"or shelf mode: scan several products in a row", shelfBtn:"Shelf mode", shelfOn:"Shelf mode: point the camera at products one after another. Double vibration = poor choice. Tap the result for details.", shelfLoading:"Looking up the product…", shelfNoData:"Not enough data", shelfTap:"tap for details", shelfListH:"Scanned at the shelf ({n})", shelfListHint:"Tap a product to see the full analysis.", shelfErr:"Could not look up the product (internet?)",
+ refRanksH:"Its place on each criterion (1 = the least):", refRowSugar:"sugar", refRowSalt:"salt", refRowSat:"saturated fat", refRowAdds:"additives to avoid", refPlace:"place {r} of {n}", refRange:"in our database: {lo} to {hi}",
  refH:"Compared with products in our database: {c}", refRank:"Of the {n} „{c}” products we checked: {b} a better score, {s} about the same score, {w} a worse score.", refTop:"None of the {n} „{c}” products we checked scores clearly better.", refCrit:"Not a match for your profile; below are options from the same category.", refBetter:"Options with a better score:", refBest:"The best ones in our database, for comparison:", refVals:"sugar {z} · salt {s} · saturated fat {g} (per 100 g)", refCmp:"⇄ Compare", refSrc:"Source", refNote:"Database values come from online shop pages; recipes change, so check the label in store.",
  cmpBtn:"⇄ Compare with another product", altBtn:"Better alternatives", cmpBarA:"Comparing with: {n}. Scan the second product.", cmpBarFirst:"Compare two products: scan the first one.", cmpScanA:"Scan the first", cmpScanB:"Scan the second", cancel:"Cancel",
  cmpSame:"This is the same product. Scan a different one to compare.", cmpNeed:"Can't compare yet: this product is missing data. Complete it below or scan another product.",
@@ -2323,6 +2326,7 @@ async function showRef(name, sum){
   const g = v => v === null ? "–" : fmt(v) + " g";
   box.innerHTML = `<h2>${esc(t("refH",{c:cat.label}))}</h2>
     <p class="wl" style="margin:4px 0">${esc(msg)}</p>
+    ${refRanks(sum, items, cat.k)}
     <p class="hint" style="margin-top:0">${esc(t(better.length ? "refBetter" : "refBest"))}</p>
     <div class="alt-list">${show.map(x => `
       <div class="hitem refitem">
@@ -2334,6 +2338,22 @@ async function showRef(name, sum){
   track("ref_shown");
 }
 let refList = [];
+/* locul produsului scanat pe fiecare nutrient (1 = cel mai puțin), printre produsele din bază */
+function refRanks(sum, items, ck){
+  const rows = [["sugar","refRowSugar"],["salt","refRowSalt"],["sat","refRowSat"],["hi","refRowAdds"]].map(([k, lbl]) => {
+    const v = sum[k]; if(v === null || v === undefined) return "";
+    if(k === "sugar" && ck === "lapte") return "";   // la lapte, zahărul e lactoza naturală
+    const vals = items.map(x => x[k]).filter(x => x !== null && x !== undefined);
+    if(vals.length < 5) return "";
+    const n = vals.length + 1, rank = vals.filter(x => x < v).length + 1;
+    const lo = Math.min(...vals, v), hi = Math.max(...vals, v);
+    if(hi - lo < ({sugar:1.5, salt:0.3, sat:1, hi:1})[k]) return "";   // diferențe prea mici ca să conteze
+    const u = k === "hi" ? "" : " g";
+    const cls = rank <= Math.ceil(n / 3) ? "ok" : rank > Math.floor(n * 2 / 3) ? "bad" : "";
+    return `<li class="${cls}"><b>${esc(t(lbl))}</b>: ${esc(t("refPlace",{r:rank, n}))} <span class="hint">(${esc(fmt(v) + u)}; ${esc(t("refRange",{lo:fmt(lo) + u, hi:fmt(hi) + u}))})</span></li>`;
+  }).filter(Boolean);
+  return rows.length ? `<p style="margin:8px 0 2px;font-weight:700">${esc(t("refRanksH"))}</p><ul class="refranks">${rows.join("")}</ul>` : "";
+}
 const refN = n => LANG === "en" ? `${n} ${n === 1 ? "has" : "have"}` : `${n} ${n === 1 ? "are" : "au"}`;
 function refCompare(code){
   const a = refList.find(x => x.code === code); if(!a || !cur.sum) return;
@@ -2730,7 +2750,7 @@ function closeAiAsk(ok){
 }
 
 /* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
-const APP_VERSION = "0.13.0";
+const APP_VERSION = "0.13.1";
 function track(ev){
   if(!AI_URL) return;
   try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
