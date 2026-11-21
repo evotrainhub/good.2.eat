@@ -2220,15 +2220,20 @@ const REF_CATS = [
   ["cremaBranza",   "Brânză tartinabilă",   /crema de branza|branza (pufoasa|tartinabila)|cream-cheese|crema de urda/],
   ["cascaval",      "Cașcaval",             /cascaval|kashkaval/],
   ["branzaProaspata","Brânză proaspătă, ricotta, urdă", /ricotta|\burda\b|branza (proaspata|de vaci)|cottage|en:fresh-cheeses|en:ricotta/],
-  ["ciocNeagra",    "Ciocolată neagră",     /ciocolata (neagra|amaruie)|dark-chocolate/],
-  ["ciocLapte",     "Ciocolată cu lapte",   /ciocolata|milk-chocolate|en:chocolates$/],
-  ["biscCopii",     "Biscuiți pentru copii",/biscuit\w* .*(copii|bebe|bebelus|luni\b)|baby-biscuit|biscuits-for-babies/],
+  ["iaurt",         "Iaurt",                /^iaurt|\biaurt (natural|grecesc|cu)|yogh?urts?\b|en:yogh?urts/],
+  ["biscuiti",      "Biscuiți",             /^biscuit|\bbiscuiti\b|cookies|en:biscuits/],
+  ["cereale",       "Cereale de mic dejun", /^cereale|musli|muesli|granola|corn ?flakes|fulgi de (ovaz|porumb|grau)|pernite|breakfast-cereals|en:(rolled-)?oat-flakes/],
+  ["ciocNeagra",    "Ciocolată neagră",     /^(tableta .*)?ciocolata (neagra|amaruie)|dark-chocolate/],
+  ["ciocLapte",     "Ciocolată cu lapte",   /^(tableta .*)?ciocolata|milk-chocolate|en:chocolates$/],
   ["crenvursti",    "Crenvurști",           /crenvurst|frankfurter|wiener/],
   ["sunca",         "Șuncă",                /\bsunca\b|\bhams?\b|en:hams/],
-  ["mezeluri",      "Mezeluri",             /\bsalam|kaizer|bacon|\btoba\b|parizer|mezel|salami/],
+  ["mezeluri",      "Mezeluri",             /^(salam|kaiser|kaizer|bacon|toba|parizer|pastrama (?!de (somon|peste|ton))|muschi|cabanos|ghiudem|sujuc|babic)|salami|en:(salamis|bacons|cooked-sausages|dry-sausages)/],
   ["smantanaGatit", "Smântână de gătit",    /smantana (lichida|de gatit)|cooking-cream/],
-  ["smantana",      "Smântână",             /\bsmantana\b|sour-cream/],
-  ["post",          "Produse de post",      /(pate|pasta|crema) vegetal|fainosag|^vegetal\b|plant-based-spread|vegetable-pate/],
+  ["smantana",      "Smântână",             /^smantana\b|sour-cream/],
+  ["zacusca",       "Zacuscă",              /zacusca/],
+  ["hummus",        "Hummus",               /hummus|humus\b/],
+  ["post",          "Pastă vegetală (de post)", /(pate|pasta|crema) (tartinabila )?vegetal|fainosag|^vegetal\b|plant-based-spread|vegetable-pate/],
+  ["paine",         "Pâine",                /^(paine|chifl|bagheta|lipie|toast)|en:(breads|sliced-breads|white-breads|wholemeal-breads)$/],
   ["lapte",         "Lapte",                /^lapte\b(?! praf| condensat)|en:(whole-|semi-skimmed-|skimmed-|uht-)?milks$/]
 ];
 let refData = null;
@@ -2239,8 +2244,8 @@ async function loadRef(){
 }
 function refCatOf(name, cats){
   const nm = norm(name || "");
-  const tags = (cats || []).join(" ");
-  for(const [k, label, re] of REF_CATS){ if(re.test(nm) || re.test(tags)) return {k, label}; }
+  const tags = cats || [];
+  for(const [k, label, re] of REF_CATS){ if(re.test(nm) || tags.some(tg => re.test(tg))) return {k, label}; }
   return null;
 }
 /* produsele din bază, în forma Open Food Facts, ca să le notăm cu aceleași reguli ca produsul scanat */
@@ -2701,7 +2706,7 @@ function closeAiAsk(ok){
 }
 
 /* ---------- statistici anonime: doar numele evenimentului, fără ID, fără date despre produs ---------- */
-const APP_VERSION = "0.14.1";
+const APP_VERSION = "0.15.0";
 function track(ev){
   if(!AI_URL) return;
   try{ fetch(`${AI_URL}/m`, {method:"POST", keepalive:true, headers:{"Content-Type":"text/plain"}, body:ev}).catch(() => {}); }catch(e){}
